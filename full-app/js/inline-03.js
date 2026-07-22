@@ -23,6 +23,7 @@
         document.head.appendChild(style);
         window.addEventListener("error", function (ev) {
           var msg = ev.message || "알 수 없는 오류";
+          if (msg.indexOf("ResizeObserver loop") !== -1) return;
           if (root) {
             root.innerHTML =
               '<div style="max-width:720px;margin:40px auto;padding:20px;border:1px solid #fecaca;background:#fff1f2;border-radius:12px;font-family:monospace;font-size:12px;color:#991b1b">' +
@@ -33,4 +34,3 @@
           }
         });
       })();
-    

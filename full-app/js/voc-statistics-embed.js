@@ -31,7 +31,10 @@
       function handleLoad() {
         var frame = frameRef.current;
         if (!frame) return;
-        function resizeFrame() {
+        var resizeRaf = 0;
+        var lastFrameHeight = "";
+        function applyFrameHeight() {
+          resizeRaf = 0;
           try {
             var doc = frame.contentDocument;
             if (!doc) return;
@@ -45,8 +48,16 @@
               lastBottom + 24,
               5600
             );
-            frame.style.height = Math.ceil(height + 8) + "px";
+            var nextHeight = Math.ceil(height + 8) + "px";
+            if (nextHeight !== lastFrameHeight) {
+              lastFrameHeight = nextHeight;
+              frame.style.height = nextHeight;
+            }
           } catch (_error) {}
+        }
+        function resizeFrame() {
+          if (resizeRaf) return;
+          resizeRaf = global.requestAnimationFrame ? global.requestAnimationFrame(applyFrameHeight) : global.setTimeout(applyFrameHeight, 0);
         }
         resizeFrame();
         if (frame.__vocResizeObserver) frame.__vocResizeObserver.disconnect();

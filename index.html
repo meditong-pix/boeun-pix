@@ -161,7 +161,10 @@
       function handleLoad() {
         var frame = frameRef.current;
         if (!frame) return;
-        function resizeFrame() {
+        var resizeRaf = 0;
+        var lastFrameHeight = "";
+        function applyFrameHeight() {
+          resizeRaf = 0;
           try {
             var doc = frame.contentDocument;
             if (!doc) return;
@@ -175,8 +178,16 @@
               lastBottom + 24,
               5600
             );
-            frame.style.height = Math.ceil(height + 8) + "px";
+            var nextHeight = Math.ceil(height + 8) + "px";
+            if (nextHeight !== lastFrameHeight) {
+              lastFrameHeight = nextHeight;
+              frame.style.height = nextHeight;
+            }
           } catch (_error) {}
+        }
+        function resizeFrame() {
+          if (resizeRaf) return;
+          resizeRaf = global.requestAnimationFrame ? global.requestAnimationFrame(applyFrameHeight) : global.setTimeout(applyFrameHeight, 0);
         }
         resizeFrame();
         if (frame.__vocResizeObserver) frame.__vocResizeObserver.disconnect();
@@ -241,6 +252,7 @@
         document.head.appendChild(style);
         window.addEventListener("error", function (ev) {
           var msg = ev.message || "알 수 없는 오류";
+          if (msg.indexOf("ResizeObserver loop") !== -1) return;
           if (root) {
             root.innerHTML =
               '<div style="max-width:720px;margin:40px auto;padding:20px;border:1px solid #fecaca;background:#fff1f2;border-radius:12px;font-family:monospace;font-size:12px;color:#991b1b">' +
@@ -4326,5 +4338,4 @@ if(String(routePath||"").startsWith("/admin/templates")){return/*#__PURE__*/Reac
 <!-- VOC_MENU_MASTER_SYNC_END -->
   </body>
 </html>
-
 
