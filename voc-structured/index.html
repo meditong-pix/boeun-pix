@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<!--
+  ┌────────────────────────────────────────────────────────────────────┐
+  │ PIX 마스터 · VOC 통계 (프론트 친화 구조화본)                          │
+  │ 목적: 기획변경 4건을 프론트가 쉽게 매핑·적용하도록 구조화한 뷰 초안     │
+  │ 구성: index.html + styles.css + app.js (Chart.js는 CDN, recharts 아님) │
+  │ 변경 4건은 본문에서 [기획변경 ①~④] 주석으로 표시 · 적용가이드.md 참고   │
+  │ pix-front 실제 컴포넌트: src/pages/master/components/voc-stats/        │
+  └────────────────────────────────────────────────────────────────────┘
+-->
+
+<!-- 이 파일 수정 후 sync-voc-statistics.ps1을 실행해 index.html의 file:// 내장본도 갱신합니다. -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOC 통계</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h2 class="sr-only">VOC 통계 페이지 최종본</h2>
+
+  <p class="page-title">VOC 통계</p>
+  <p class="page-subtitle">2026년 6월 기준으로 주요 접수 현황과 흐름을 확인하세요.</p>
+
+  <div class="filter-bar" aria-label="VOC 통계 조회 조건">
+    <div class="filter-group">
+      <label class="filter-label" for="filterYear">연도</label>
+      <select class="filter-select" id="filterYear">
+        <option value="2026">2026년</option>
+        <option value="2025">2025년</option>
+        <option value="2024">2024년</option>
+      </select>
+    </div>
+    <div class="filter-group period">
+      <span class="filter-label">조회 기간</span>
+      <div class="period-tabs" id="periodTabs" role="tablist" aria-label="조회 기간">
+        <button type="button" class="period-tab active" data-period="month" role="tab" aria-selected="true">월별</button>
+        <button type="button" class="period-tab" data-period="quarter" role="tab" aria-selected="false">분기별</button>
+        <button type="button" class="period-tab" data-period="half" role="tab" aria-selected="false">반기별</button>
+        <button type="button" class="period-tab" data-period="year" role="tab" aria-selected="false">연도별</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label" id="filterPeriodLabel" for="filterPeriodValue">월 선택</label>
+      <select class="filter-select" id="filterPeriodValue">
+        <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option>
+        <option value="4">4월</option><option value="5">5월</option><option value="6" selected>6월</option>
+        <option value="7">7월</option><option value="8">8월</option><option value="9">9월</option>
+        <option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+      </select>
+    </div>
+    <div class="filter-ai-action">
+      <button type="button" class="filter-ai-btn" id="vocAiAnalyzeBtn"><span>✦</span>AI 분석하기</button>
+    </div>
+  </div>
+
+  <div class="group-detail-modal" id="vocAiModal" aria-hidden="true">
+    <button type="button" class="group-detail-backdrop" id="vocAiBackdrop" aria-label="AI 분석 닫기"></button>
+    <div class="group-detail-dialog voc-ai-dialog" role="dialog" aria-modal="true" aria-labelledby="vocAiTitle">
+      <div class="group-detail-header">
+        <div>
+          <h3 class="group-detail-title" id="vocAiTitle">PIX AI 상세 분석</h3>
+          <p class="group-detail-sub" id="vocAiPeriodText">2026년 6월 VOC 분석</p>
+        </div>
+        <button type="button" class="group-detail-close" id="vocAiClose" aria-label="닫기">×</button>
+      </div>
+      <div class="voc-ai-grid">
+        <section class="voc-ai-summary">
+          <div class="voc-ai-summary-head">
+            <span class="voc-ai-icon">✦</span>
+            <div>
+              <p class="voc-ai-section-title">AI 요약</p>
+              <p class="voc-ai-section-sub" id="vocAiSummaryPeriod">2026년 6월 VOC 요약</p>
+            </div>
+          </div>
+          <p class="voc-ai-summary-text">
+            선택 기간 동안 전체 VOC는 <b>9,065건</b>이며, 이 중 분석 가능 VOC는 <b>8,939건</b>입니다.
+            유형별로는 좋아요 <b>4,110건(46.0%)</b>, 불편 <b>2,569건(28.7%)</b>,
+            문의 <b>925건(10.3%)</b>, 요청 <b>719건(8.0%)</b>, 복합 <b>616건(6.9%)</b>으로 집계되었습니다.<br><br>
+            전월 대비 좋아요 비중은 <b>1.2% 증가</b>했으며 불편은 <b>0.8% 감소</b>해 전반적인 고객 경험이 개선되었습니다.
+            다만 <b>대기시간</b>과 <b>응대 속도</b> 관련 불편이 주요 이슈로 유지되고 있어 병동·진료과별 집중 관리가 필요합니다.<br><br>
+            유입 채널은 메디통 픽스(앱)가 <b>3,450건(38.1%)</b>으로 가장 높고,
+            고객의견카드 <b>2,166건(23.9%)</b>이 뒤를 이었습니다.
+            직원칭찬 <b>126건</b>은 랭킹 집계에만 사용되며 VOC 유형 분석에서는 제외됩니다.
+          </p>
+          <button type="button" class="voc-ai-copy" id="vocAiCopy">▣ 요약 복사</button>
+        </section>
+        <section class="voc-ai-right">
+          <div>
+            <p class="voc-ai-section-title">AI 인사이트</p>
+            <div class="voc-ai-insights">
+              <div class="voc-ai-insight">
+                <p class="label">주요 신호</p>
+                <p class="value">대기시간 불편 집중</p>
+                <p class="meta">진료/치료 카테고리 우선 개선</p>
+              </div>
+              <div class="voc-ai-insight">
+                <p class="label">강점</p>
+                <p class="value">친절함·간호사 응대 증가</p>
+                <p class="meta">좋아요 유형 전월 대비 +1.2%</p>
+              </div>
+              <div class="voc-ai-insight">
+                <p class="label">모니터링</p>
+                <p class="value">문의·요청 비중 18.3%</p>
+                <p class="meta">검사 안내와 시설 개선 수요 지속</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="voc-ai-section-title">핵심 지표 변화</p>
+            <div class="voc-ai-metrics">
+              <div class="voc-ai-metric"><div class="label">전체 VOC</div><div class="value">9,065건</div><div class="delta ck-change-up">▲ 2.4%</div></div>
+              <div class="voc-ai-metric"><div class="label">좋아요 비중</div><div class="value">46.0%</div><div class="delta ck-change-up">▲ 1.2%</div></div>
+              <div class="voc-ai-metric"><div class="label">불편 비중</div><div class="value">28.7%</div><div class="delta" style="color:#185FA5;">▼ 0.8%</div></div>
+              <div class="voc-ai-metric"><div class="label">직원칭찬</div><div class="value">126건</div><div class="delta ck-change-up">▲ 4.1%</div></div>
+            </div>
+          </div>
+          <div>
+            <p class="voc-ai-section-title">AI 상세 판단</p>
+            <p class="voc-ai-section-sub">주요 이슈와 개선 우선순위를 VOC 변화율과 언급량 기준으로 제안합니다.</p>
+            <div class="voc-ai-issues">
+              <div class="voc-ai-issue">
+                <span class="voc-ai-severity high">우선 개선</span>
+                <div><div class="voc-ai-issue-title">대기시간 불편</div><div class="voc-ai-issue-desc">진료/치료와 병원생활 전반에서 반복 언급되어 안내 강화와 동선 개선이 필요합니다.</div></div>
+                <span class="voc-ai-issue-change" style="color:#B4392B;">▲ 8.4%</span>
+              </div>
+              <div class="voc-ai-issue">
+                <span class="voc-ai-severity watch">모니터링</span>
+                <div><div class="voc-ai-issue-title">검사 안내 문의</div><div class="voc-ai-issue-desc">검사 절차·결과 확인 시점에 대한 문의가 증가해 사전 안내 표준화가 필요합니다.</div></div>
+                <span class="voc-ai-issue-change" style="color:#B4392B;">▲ 4.0%</span>
+              </div>
+              <div class="voc-ai-issue">
+                <span class="voc-ai-severity good">긍정 신호</span>
+                <div><div class="voc-ai-issue-title">친절함·세심함</div><div class="voc-ai-issue-desc">간호사 응대와 설명 만족도가 상승해 우수 사례의 부서 확산을 권장합니다.</div></div>
+                <span class="voc-ai-issue-change" style="color:#15803d;">▲ 5.0%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title">전체 VOC 현황</p>
+    <p class="sec-sub">접수 규모, 칭찬/불편 흐름, 응답자 구성을 한 화면에서 확인합니다.</p>
+
+    <div class="voc-overall-panel">
+      <p class="voc-overall-period">2026-07 기준 전월 대비</p>
+      <div class="voc-overall-headlines">
+        <article class="voc-overall-headline"><p class="label">전체 VOC 건수</p><p class="value">8,323건</p><p class="change">▲ 214건</p></article>
+        <article class="voc-overall-headline"><p class="label">언급된 건수</p><p class="value">9,120건</p><p class="change">▲ 340건</p></article>
+        <article class="voc-overall-headline"><p class="label">부서칭찬 건수</p><p class="value">420건</p><p class="change">▲ 18건</p></article>
+        <article class="voc-overall-headline"><p class="label">직원칭찬 건수</p><p class="value">820건</p><p class="change">▲ 32건</p></article>
+      </div>
+    </div>
+
+    <section class="voc-classify-chart-card voc-type-reception-card" style="margin-top:14px;">
+      <!-- [기획변경 ③] 상단 유형별 접수: 기타문의 우측에 "미분류" 카드 추가 (7 → 8개)
+           · pix-front 대응: MasterVocStatsTopSection.tsx / MasterVocStatsTopParts.tsx -->
+      <p class="ct">8개 유형별 접수</p>
+      <p class="cs">건수 많은 순 · 감정은 긍정/부정으로 구분합니다.</p>
+      <div class="voc-type-score-grid">
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#2a78d6"></i>진료 및 치료·검사관련</p><p class="voc-type-score-stat">2,410건 · 29% · <span style="color:#185fa5">▼ 1.2%p</span></p><div class="voc-type-score-track"><span style="width:100%;background:#2a78d6"></span></div></article>
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#e24b4a"></i>인적응대관련</p><p class="voc-type-score-stat">1,350건 · 16.2% · <span style="color:#185fa5">▼ 0.9%p</span></p><div class="voc-type-score-track"><span style="width:56%;background:#e24b4a"></span></div></article>
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#3aa0a0"></i>서비스제공관련</p><p class="voc-type-score-stat">940건 · 11.3% · <span style="color:#b4392b">▲ 0.4%p</span></p><div class="voc-type-score-track"><span style="width:39%;background:#3aa0a0"></span></div></article>
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#7f77dd"></i>시스템 및 서비스</p><p class="voc-type-score-stat">780건 · 9.4% · <span style="color:#b4392b">▲ 2.1%p</span></p><div class="voc-type-score-track"><span style="width:32%;background:#7f77dd"></span></div></article>
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#8a6d3b"></i>환경관련</p><p class="voc-type-score-stat">705건 · 8.5% · <span style="color:#b4392b">▲ 1.0%p</span></p><div class="voc-type-score-track"><span style="width:29%;background:#8a6d3b"></span></div></article>
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#c98a2c"></i>비용관련</p><p class="voc-type-score-stat">612건 · 7.4% · <span style="color:#b4392b">▲ 0.6%p</span></p><div class="voc-type-score-track"><span style="width:25%;background:#c98a2c"></span></div></article>
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#898781"></i>기타문의</p><p class="voc-type-score-stat">286건 · 3.4% · <span style="color:#185fa5">▼ 0.2%p</span></p><div class="voc-type-score-track"><span style="width:12%;background:#898781"></span></div></article>
+        <article class="voc-type-score-card"><p class="voc-type-score-name"><i style="background:#9ca3af"></i>미분류</p><p class="voc-type-score-stat">42건 · 0.5% · <span style="color:#185fa5">▼ 0.1%p</span></p><div class="voc-type-score-track"><span style="width:3%;background:#9ca3af"></span></div></article>
+      </div>
+    </section>
+
+    <!-- [기획변경 ④] 부서칭찬 현황 · 직원칭찬 현황 (랭킹 리스트 카드, 건수 + 전월대비)
+         · 기존 표+차트 형식 "직원 칭찬 현황" 섹션은 제거하고 이미지 형식으로 대체
+         · pix-front 대응: MasterVocPraiseComplaintSection.tsx -->
+    <section class="sec praise-rank-section" style="margin-top:14px;">
+      <div class="praise-rank-grid">
+        <div class="praise-rank-card">
+          <div class="praise-rank-head">
+            <div>
+              <p class="praise-rank-title">부서칭찬 현황</p>
+              <p class="praise-rank-sub">부서별 칭찬 접수 건수 · 전월 대비</p>
+            </div>
+            <button type="button" class="praise-rank-btn">전월 랭킹 보기</button>
+          </div>
+          <div class="praise-rank-list">
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">1</span>
+              <div><p class="praise-rank-name">간호부</p><p class="praise-rank-desc">5병동·12병동 담당</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">148건</p><p class="praise-rank-delta up">▲ 6.2%</p></div>
+              <div class="praise-rank-bar"><span style="width:100%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">2</span>
+              <div><p class="praise-rank-name">원무팀</p><p class="praise-rank-desc">외래 접수·수납</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">96건</p><p class="praise-rank-delta down">▼ 1.4%</p></div>
+              <div class="praise-rank-bar"><span style="width:65%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">3</span>
+              <div><p class="praise-rank-name">영상의학과</p><p class="praise-rank-desc">검사·촬영</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">74건</p><p class="praise-rank-delta up">▲ 3.0%</p></div>
+              <div class="praise-rank-bar"><span style="width:50%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">4</span>
+              <div><p class="praise-rank-name">물리치료실</p><p class="praise-rank-desc">재활치료</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">61건</p><p class="praise-rank-delta up">▲ 2.1%</p></div>
+              <div class="praise-rank-bar"><span style="width:41%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">5</span>
+              <div><p class="praise-rank-name">원무행정팀</p><p class="praise-rank-desc">입퇴원 행정</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">41건</p><p class="praise-rank-delta down">▼ 0.8%</p></div>
+              <div class="praise-rank-bar"><span style="width:28%"></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="praise-rank-card">
+          <div class="praise-rank-head">
+            <div>
+              <p class="praise-rank-title">직원칭찬 현황</p>
+              <p class="praise-rank-sub">직원별 칭찬 접수 건수 · 전월 대비</p>
+            </div>
+            <button type="button" class="praise-rank-btn">전월 랭킹 보기</button>
+          </div>
+          <div class="praise-rank-list">
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">1</span>
+              <div><p class="praise-rank-name">이OO 간호사</p><p class="praise-rank-desc">3병동</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">32건</p><p class="praise-rank-delta up">▲ 8.4%</p></div>
+              <div class="praise-rank-bar"><span style="width:100%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">2</span>
+              <div><p class="praise-rank-name">박OO 간호사</p><p class="praise-rank-desc">12병동</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">27건</p><p class="praise-rank-delta up">▲ 4.1%</p></div>
+              <div class="praise-rank-bar"><span style="width:84%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">3</span>
+              <div><p class="praise-rank-name">김OO 원무</p><p class="praise-rank-desc">원무팀</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">22건</p><p class="praise-rank-delta down">▼ 2.0%</p></div>
+              <div class="praise-rank-bar"><span style="width:69%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">4</span>
+              <div><p class="praise-rank-name">최OO 물리치료사</p><p class="praise-rank-desc">재활센터</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">19건</p><p class="praise-rank-delta up">▲ 3.5%</p></div>
+              <div class="praise-rank-bar"><span style="width:59%"></span></div>
+            </div>
+            <div class="praise-rank-row">
+              <span class="praise-rank-no">5</span>
+              <div><p class="praise-rank-name">정OO 간호사</p><p class="praise-rank-desc">5병동</p></div>
+              <div class="praise-rank-metric"><p class="praise-rank-count">17건</p><p class="praise-rank-delta up">▲ 1.2%</p></div>
+              <div class="praise-rank-bar"><span style="width:53%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="voc-kpi-board" style="display:none;">
+      <div class="voc-kpi-summary">
+        <div class="voc-kpi-summary-item">
+          <p class="lbl">전체 VOC 건수</p>
+          <p class="val" id="vocKpiTotal">9,065건</p>
+          <p class="voc-kpi-summary-help">모든 유입 채널의 접수 건수 합계</p>
+        </div>
+        <div class="voc-kpi-summary-item analyzable">
+          <p class="lbl">
+            분석 가능 VOC 건수
+            <span class="kpi-tip">
+              <button type="button" class="kpi-tip-btn" aria-describedby="vocKpiAnalyzableTip">?</button>
+              <span class="kpi-tip-pop" id="vocKpiAnalyzableTip" role="tooltip">신뢰할 수 있는 분석 결과를 위해 좋아요, 불편, 문의, 요청, 복합 유형의 VOC만 분석에 포함됩니다. 직원 칭찬과 미분류 VOC는 분석 대상에서 제외됩니다.</span>
+            </span>
+          </p>
+          <p class="val" id="vocKpiAnalyzable">8,939건</p>
+          <p class="voc-kpi-summary-help">좋아요·불편·문의·요청·복합 유형의 합계</p>
+        </div>
+      </div>
+
+      <div class="voc-kpi-target">
+        <p class="voc-kpi-section-lbl">VOC 유형 · 5종</p>
+        <div class="voc-kpi-target-box">
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#2a78d6"></i>좋아요</p>
+            <p class="stat">4,110건<span class="pct">46.0%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#e24b4a"></i>불편</p>
+            <p class="stat">2,569건<span class="pct">28.7%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#7f77dd"></i>문의</p>
+            <p class="stat">925건<span class="pct">10.3%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#1baf7a"></i>요청</p>
+            <p class="stat">719건<span class="pct">8.0%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#eda100"></i>복합</p>
+            <p class="stat">616건<span class="pct">6.9%</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="voc-kpi-excluded">
+        <p class="voc-kpi-section-lbl">별도 현황 · 2종</p>
+        <div class="voc-kpi-excluded-items">
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#9ca3af"></i>미분류</p>
+            <p class="stat">0건<span class="pct">0.0%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name">
+              <i style="background:#d4a017"></i>직원칭찬
+              <span class="kpi-tip">
+                <button type="button" class="kpi-tip-btn" aria-describedby="vocStaffPraiseTip">?</button>
+                <span class="kpi-tip-pop" id="vocStaffPraiseTip" role="tooltip">직원칭찬은 직원 칭찬 현황의 랭킹 집계에만 사용되며 VOC 유형 분석에는 활용되지 않습니다.</span>
+              </span>
+            </p>
+            <p class="stat">126건<span class="pct">1.4%</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="voc-classify-stack">
+      <div class="voc-share-channel-row">
+        <div class="voc-classify-chart-card voc-type-reception-card">
+          <p class="ct">유형별 접수</p>
+          <p class="cs">7개 VOC 유형별 비중과 긍정·부정 비율입니다. 유형을 클릭하면 대표 원문이 표시됩니다.</p>
+          <div class="voc-type-summary-list" id="vocTypeSummaryList"></div>
+          <div class="voc-type-summary-legacy" aria-hidden="true">
+            <canvas id="vocClassifyDonut"></canvas>
+            <span id="vocClassifyDonutTotal"></span>
+            <div id="vocClassifyLegend"></div>
+            <table><tbody id="vocClassifyBody"></tbody><tfoot id="vocClassifyFoot"></tfoot></table>
+          </div>
+        </div>
+
+        <div class="voc-classify-chart-card voc-channel-card">
+          <p class="ct">채널별 접수</p>
+          <p class="cs">유입 채널별 VOC 접수 규모와 비중을 확인합니다.</p>
+          <div class="voc-channel-inner">
+            <div>
+              <p class="cs" style="margin-bottom:8px;">채널별 접수 비중</p>
+              <div class="voc-classify-share voc-channel-share">
+                <div class="voc-classify-donut-wrap">
+                  <canvas id="vocChannelDonut" role="img" aria-label="채널별 VOC 접수 비중"></canvas>
+                  <div class="voc-classify-donut-center">
+                    <p class="total" id="vocChannelDonutTotal"></p>
+                    <p class="lbl">전체 접수</p>
+                  </div>
+                </div>
+                <div class="voc-classify-legend-list" id="vocChannelLegend"></div>
+              </div>
+            </div>
+            <div>
+              <p class="cs" style="margin-bottom:8px;">채널별 접수 건수와 전체 대비 비율</p>
+              <div class="dim-tbl-wrap">
+                <table class="tbl reception-tbl">
+                  <thead>
+                    <tr>
+                      <th style="width:40px;">순위</th>
+                      <th>채널</th>
+                      <th class="num" style="width:68px;">접수 건수</th>
+                      <th class="num" style="width:52px;">비율</th>
+                      <th class="num" style="width:48px;">증감</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vocChannelBody"></tbody>
+                  <tfoot id="vocChannelFoot"></tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="voc-classify-chart-card">
+        <div class="voc-classify-ratio-hdr">
+          <div>
+            <p class="ct">유형별 VOC 월별 추이</p>
+            <p class="cs">긍정·부정 비율(%)과 총 접수 건수(선), 월별 긍정·불편 TOP3 카테고리를 확인합니다.</p>
+          </div>
+          <div class="voc-classify-ratio-legend" aria-hidden="true">
+            <span><i style="background:#1baf7a"></i>긍정</span>
+            <span><i style="background:#e24b4a"></i>부정</span>
+            <span><i class="line-swatch"></i>총 접수 건수</span>
+          </div>
+        </div>
+        <div class="voc-classify-trend-wrap">
+          <canvas id="vocClassifyTrend" role="img" aria-label="유형별 VOC 월별 추이"></canvas>
+        </div>
+
+        <div class="voc-month-top-grid" id="vocMonthTopCards"></div>
+      </div>
+    </div>
+
+    <div class="voc-rag-wrap">
+      <div class="voc-rag-left">
+        <h3 class="voc-rag-title">응답자 성별 및 연령 구성</h3>
+        <p class="voc-rag-sub">성별과 연령을 선택하면 우측 키워드·추이가 갱신됩니다.</p>
+
+        <p class="voc-rag-section-label">성별</p>
+        <div class="voc-rag-gender-bar" aria-hidden="true">
+          <span class="male" style="width:50%"></span>
+          <span class="female" style="width:50%"></span>
+        </div>
+        <div class="voc-rag-gender-pct">
+          <span>남 50%</span><span>여 50%</span>
+        </div>
+        <div class="voc-rag-gender-detail">
+          <span class="male">♂ 남 4,495명 (50%)</span>
+          <span class="female">♀ 여 4,444명 (50%)</span>
+        </div>
+        <div class="voc-rag-gender-tabs" id="genderTabs" role="tablist" aria-label="성별 선택"></div>
+
+        <div class="voc-rag-age-hdr">
+          <p class="voc-rag-section-label" style="margin:0;">연령</p>
+          <div class="voc-rag-age-legend">
+            <span><i class="male"></i>남</span>
+            <span><i class="female"></i>여</span>
+          </div>
+        </div>
+        <div class="voc-rag-age-list" id="ageList"></div>
+      </div>
+
+      <div class="voc-rag-right">
+        <!-- [기획변경 ②] 연령·성별 VOC 키워드: "월별 추이" 차트 제거 (TOP5 키워드만 유지)
+             · pix-front 대응: MasterVocKeywordAnalysisSection.tsx -->
+        <h3 class="voc-rag-title">연령·성별 VOC 키워드</h3>
+        <p class="voc-rag-sub">선택한 연령대·성별에서 자주 언급된 키워드와 최근 추이를 확인합니다.</p>
+
+        <div class="voc-rag-kw-hdr">
+          <span class="voc-rag-kw-hdr-title" id="ageHeader"></span>
+          <span class="voc-rag-kw-hdr-total" id="ageTotal"></span>
+        </div>
+
+        <p class="voc-rag-kw-section-title">응답자 기준 긍정·부정 주요 키워드 TOP5</p>
+        <div class="voc-rag-kw-top5" id="top5Keywords"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="multitag-banner">
+      <span class="mt-icon">ⓘ</span>
+      <div>
+        카테고리·키워드는 VOC 1건에 여러 개가 함께 집계될 수 있어, 아래 합계가 전체 접수 건수와 다를 수 있습니다.
+        하나의 VOC에서 여러 키워드가 언급되면 각각 카운트되기 때문으로, 집계 오류가 아닙니다.
+        표준 키워드와 매칭되지 않은 문구는 미태깅으로 제외되므로, 미태깅 비율을 낮출수록 더 정확한 통계를 확보할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="ck-analysis">
+      <div class="ck-header">
+        <h2 class="ck-title">카테고리 / 키워드 분석</h2>
+        <p class="ck-desc">카테고리를 선택하면 긍정·부정 키워드 TOP5를 확인할 수 있습니다.</p>
+        <div class="ck-chips" id="ckCatChips" role="tablist" aria-label="카테고리 선택"></div>
+      </div>
+
+      <div class="ck-realigned-main">
+        <div class="ck-realigned-panel">
+          <p class="ck-panel-title">카테고리 비중</p>
+          <div class="ck-donut-wrap">
+            <canvas id="ckCatDonut" role="img" aria-label="카테고리별 VOC 비중 도넛 차트"></canvas>
+          </div>
+          <table class="ck-realigned-table">
+            <thead>
+              <tr>
+                <th class="rank">순위</th>
+                <th>카테고리</th>
+                <th class="metric">건수</th>
+                <th class="metric">비중</th>
+              </tr>
+            </thead>
+            <tbody id="ckCatShareBody"></tbody>
+          </table>
+        </div>
+
+        <div class="ck-realigned-panel">
+          <p class="ck-panel-title" id="ckKwPanelTitle"></p>
+          <div class="ck-sentiment-stack" id="ckKwGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec group-score-sec">
+    <div class="group-score-head">
+      <p class="sec-title">그룹별 VOC 현황</p>
+      <span class="dim-split-count">· 총 15개</span>
+      <span class="dim-split-top-badge">Top 5</span>
+    </div>
+    <p class="sec-sub">병동·진료과·담당의사별 접수 건수와 비율, 전월 대비 변화를 그래프 또는 표로 확인하세요.</p>
+    <div class="group-score-grid">
+      <div class="group-score-card ward-score-layout">
+        <div class="ward-score-header">
+          <div class="ward-score-icon"><i class="ti ti-building-hospital" aria-hidden="true"></i></div>
+          <div>
+            <p class="ward-score-title">병동별 VOC 현황 <span class="dim-split-count" id="wardSplitCount">· 총 5개 병동</span></p>
+            <p class="ward-score-sub">병동 단위 긍정 비율 흐름과 부정 응답 집중도를 한 화면에서 비교합니다.</p>
+          </div>
+        </div>
+        <div class="ward-score-content">
+          <div class="ward-score-panel">
+            <div class="ward-score-badges" id="wardSplitLegend"></div>
+            <div class="ward-score-chart">
+              <canvas id="c5" role="img" aria-label="병동별 긍정 비율 막대그래프"></canvas>
+            </div>
+          </div>
+          <div class="ward-score-panel">
+            <p class="group-score-card-title">병동별 VOC 현황</p>
+            <p class="group-score-card-sub">병동별 세부 지표와 부정 건수를 함께 확인합니다.</p>
+            <table class="ward-score-table">
+              <thead>
+                <tr>
+                  <th>병동</th><th>접수건수</th><th>긍정비율</th><th>전월 대비</th><th>부정건수</th>
+                </tr>
+              </thead>
+              <tbody id="wardAnalysisBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <div class="dim-expand-panel" id="wardExpandPanel">
+      <p class="voc-rag-kw-section-title" id="wardExpandKwTitle"></p>
+      <div class="voc-rag-kw-top5" id="wardExpandKwList"></div>
+      <div class="voc-rag-trend-hdr">
+        <p class="voc-rag-kw-section-title" id="wardExpandTrendTitle">직전 6개월 추이</p>
+        <div class="voc-rag-trend-mode-tabs" id="wardTrendModeTabs" role="tablist" aria-label="병동 월별 추이 유형"></div>
+      </div>
+      <div class="voc-rag-trend-legend" id="wardTrendLegend"></div>
+      <div class="voc-rag-trend-wrap">
+        <canvas id="wardTrendChart" role="img" aria-label="병동 VOC 월별 추이"></canvas>
+      </div>
+    </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           [기획변경 ①] 진료과별·의사별 VOC 현황 → 병동별과 "동일 구조"로 통일
+           · 그래프/표 토글 · "자세히 보기" 제거 → 막대그래프(긍정/부정) + 5열 표
+             (라벨 / 접수건수 / 긍정비율 / 전월대비 / 부정건수) 를 나란히 동시 표시
+           · pix-front 대응: MasterVocDepartmentAnalysisSection.tsx
+             (병동=MasterVocWardAnalysisSection.tsx, 셋 다 MasterVocGroupAnalysisPanel 공유)
+           · 참고: pix-front는 이미 셋을 동일 Panel로 통일해 둔 상태(사전 예고용 정합)
+           ═══════════════════════════════════════════════════════════════ -->
+      <div class="group-score-card ward-score-layout">
+        <div class="ward-score-header">
+          <div class="ward-score-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div>
+          <div>
+            <p class="ward-score-title">진료과별 VOC 현황 <span class="dim-split-count" id="deptSplitCount">· 총 5개 진료과</span></p>
+            <p class="ward-score-sub">진료과 단위 긍정 비율 흐름과 부정 응답 집중도를 한 화면에서 비교합니다.</p>
+          </div>
+        </div>
+        <div class="ward-score-content">
+          <div class="ward-score-panel">
+            <div class="ward-score-badges" id="deptSplitLegend"></div>
+            <div class="ward-score-chart">
+              <canvas id="c6" role="img" aria-label="진료과별 긍정 비율 막대그래프"></canvas>
+            </div>
+          </div>
+          <div class="ward-score-panel">
+            <p class="group-score-card-title">진료과별 VOC 현황</p>
+            <p class="group-score-card-sub">진료과별 세부 지표와 부정 건수를 함께 확인합니다.</p>
+            <table class="ward-score-table">
+              <thead>
+                <tr>
+                  <th>진료과</th><th>접수건수</th><th>긍정비율</th><th>전월 대비</th><th>부정건수</th>
+                </tr>
+              </thead>
+              <tbody id="deptAnalysisBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <div class="dim-expand-panel" id="deptExpandPanel">
+      <p class="voc-rag-kw-section-title" id="deptExpandKwTitle"></p>
+      <div class="voc-rag-kw-top5" id="deptExpandKwList"></div>
+      <div class="voc-rag-trend-hdr">
+        <p class="voc-rag-kw-section-title" id="deptExpandTrendTitle">직전 6개월 추이</p>
+        <div class="voc-rag-trend-mode-tabs" id="deptTrendModeTabs" role="tablist" aria-label="진료과 월별 추이 유형"></div>
+      </div>
+      <div class="voc-rag-trend-legend" id="deptTrendLegend"></div>
+      <div class="voc-rag-trend-wrap">
+        <canvas id="deptTrendChart" role="img" aria-label="진료과 VOC 월별 추이"></canvas>
+      </div>
+    </div>
+
+      <div class="group-score-card ward-score-layout">
+        <div class="ward-score-header">
+          <div class="ward-score-icon"><i class="ti ti-user-heart" aria-hidden="true"></i></div>
+          <div>
+            <p class="ward-score-title">의사별 VOC 현황 <span class="dim-split-count" id="doctorSplitCount">· 총 5개</span></p>
+            <p class="ward-score-sub">담당의사 단위 긍정 비율 흐름과 부정 응답 집중도를 한 화면에서 비교합니다.</p>
+          </div>
+        </div>
+        <div class="ward-score-content">
+          <div class="ward-score-panel">
+            <div class="ward-score-badges" id="doctorSplitLegend"></div>
+            <div class="ward-score-chart">
+              <canvas id="c7" role="img" aria-label="의사별 긍정 비율 막대그래프"></canvas>
+            </div>
+          </div>
+          <div class="ward-score-panel">
+            <p class="group-score-card-title">의사별 VOC 현황</p>
+            <p class="group-score-card-sub">담당의사별 세부 지표와 부정 건수를 함께 확인합니다.</p>
+            <table class="ward-score-table">
+              <thead>
+                <tr>
+                  <th>담당의사</th><th>접수건수</th><th>긍정비율</th><th>전월 대비</th><th>부정건수</th>
+                </tr>
+              </thead>
+              <tbody id="doctorAnalysisBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <div class="dim-expand-panel" id="doctorExpandPanel">
+      <p class="voc-rag-kw-section-title" id="doctorExpandKwTitle"></p>
+      <div class="voc-rag-kw-top5" id="doctorExpandKwList"></div>
+      <div class="voc-rag-trend-hdr">
+        <p class="voc-rag-kw-section-title" id="doctorExpandTrendTitle">직전 6개월 추이</p>
+        <div class="voc-rag-trend-mode-tabs" id="doctorTrendModeTabs" role="tablist" aria-label="의사 월별 추이 유형"></div>
+      </div>
+      <div class="voc-rag-trend-legend" id="doctorTrendLegend"></div>
+      <div class="voc-rag-trend-wrap">
+        <canvas id="doctorTrendChart" role="img" aria-label="의사 VOC 월별 추이"></canvas>
+      </div>
+    </div>
+    </div>
+    <p class="note">* 환자의 병동·진료과·담당의사 기준 집계입니다. 직원 개인 칭찬은 상단의 "직원칭찬 현황"에서 확인하세요.</p>
+  </div>
+
+  <div class="group-detail-modal" id="groupDetailModal" aria-hidden="true">
+    <button type="button" class="group-detail-backdrop" id="groupDetailBackdrop" aria-label="상세 닫기"></button>
+    <div class="group-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="groupDetailTitle">
+      <div class="group-detail-header">
+        <div>
+          <h3 class="group-detail-title" id="groupDetailTitle">그룹별 VOC 현황 전체</h3>
+          <p class="group-detail-sub" id="groupDetailSub"></p>
+        </div>
+        <button type="button" class="group-detail-close" id="groupDetailClose" aria-label="닫기">×</button>
+      </div>
+      <div class="group-detail-toolbar">
+        <div class="group-detail-filters" id="groupDetailFilters">
+          <button type="button" class="group-detail-filter active" data-sort="countDesc">건수 높은순</button>
+          <button type="button" class="group-detail-filter" data-sort="countAsc">건수 낮은순</button>
+          <button type="button" class="group-detail-filter" data-sort="changeDesc">상승순</button>
+          <button type="button" class="group-detail-filter" data-sort="changeAsc">하락순</button>
+        </div>
+        <div class="group-detail-view-toggle" role="tablist" aria-label="상세 보기 방식">
+          <button type="button" class="group-detail-view-btn" data-detail-view="chart">그래프</button>
+          <button type="button" class="group-detail-view-btn active" data-detail-view="table">표</button>
+        </div>
+      </div>
+      <div class="group-detail-view" id="groupDetailChartView">
+        <div class="group-detail-chart-wrap"><canvas id="groupDetailChart" role="img" aria-label="그룹별 전체 VOC 접수 건수 그래프"></canvas></div>
+      </div>
+      <div class="group-detail-view active" id="groupDetailTableView">
+        <table class="group-detail-table">
+          <thead>
+            <tr><th>순위</th><th>항목</th><th>건수(비율)</th><th>전월 대비</th><th>대표 키워드</th><th>상세</th></tr>
+          </thead>
+          <tbody id="groupDetailBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="group-detail-modal" id="groupItemModal" aria-hidden="true">
+    <button type="button" class="group-detail-backdrop" id="groupItemBackdrop" aria-label="목록으로 돌아가기"></button>
+    <div class="group-detail-dialog group-item-dialog" role="dialog" aria-modal="true" aria-labelledby="groupItemTitle">
+      <div class="group-detail-header">
+        <div>
+          <h3 class="group-detail-title" id="groupItemTitle">항목 상세 분석</h3>
+          <p class="group-detail-sub" id="groupItemSub">유형별 대표 키워드 TOP5와 최근 6개월 추이</p>
+        </div>
+        <button type="button" class="group-detail-close" id="groupItemClose" aria-label="목록으로 돌아가기">×</button>
+      </div>
+      <div class="group-item-body" id="groupItemBody"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
