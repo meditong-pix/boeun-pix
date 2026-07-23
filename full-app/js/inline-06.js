@@ -409,7 +409,6 @@
         const VocInboxPageV2Restore = ({ showToast }) => {
           const [rows, setRows] = React.useState(() => buildRows());
           const [registerOpen, setRegisterOpen] = React.useState(false);
-          const [activeInboxTab, setActiveInboxTab] = React.useState("list");
           const [nameQuery, setNameQuery] = React.useState("");
           const [typeFilter, setTypeFilter] = React.useState("전체 유형");
           const [wardFilter, setWardFilter] = React.useState("전체 병동");
@@ -421,12 +420,25 @@
           const [datePreset, setDatePreset] = React.useState("전체 기간");
           const [dateFrom, setDateFrom] = React.useState("");
           const [dateTo, setDateTo] = React.useState("");
-          const [manualFilter, setManualFilter] = React.useState("미분류");
           const [expandedRowId, setExpandedRowId] = React.useState(null);
-          const [selectedUnclassifiedId, setSelectedUnclassifiedId] = React.useState(null);
-          const [selectedManualType, setSelectedManualType] = React.useState("");
-          const [staffNameDraft, setStaffNameDraft] = React.useState("");
-          const [staffDeptDraft, setStaffDeptDraft] = React.useState("");
+          const VOC_DISPLAY_TYPES = ["긍정", "부정", "미분류"];
+          const toDisplayType = (t) => ({ 칭찬: "긍정", 불편: "부정", 복합: "부정", 미분류: "미분류" }[t] || "미분류");
+          const fromDisplayType = (t) => ({ 긍정: "칭찬", 부정: "불편", 미분류: "미분류" }[t] || "미분류");
+          const typeSelectClass = (displayType) =>
+            "rounded-full border-none px-2.5 py-0.5 text-[10px] font-black cursor-pointer appearance-none pr-6 " +
+            (displayType === "긍정"
+              ? "bg-emerald-50 text-emerald-700"
+              : displayType === "부정"
+              ? "bg-rose-50 text-rose-700"
+              : "bg-amber-50 text-amber-700");
+          const onChangeRowType = (rowId, displayType) => {
+            const nextType = fromDisplayType(displayType);
+            setRows((prev) =>
+              prev.map((row) =>
+                row.id === rowId ? { ...row, type: nextType, status: nextType === "미분류" ? "미분류" : "접수" } : row
+              )
+            );
+          };
           const channels = React.useMemo(() => ["전체 채널"].concat(getEnabledManualChannels().concat(["메디통 픽스(앱)"])), [rows.length]);
           const typeOptions = React.useMemo(
             () =>
@@ -484,20 +496,6 @@
               ),
             [rows]
           );
-          const unclassifiedRows = React.useMemo(() => {
-            return rows.filter((r) => r.type === "미분류" || r.status === "미분류" || r.status === "검토완료 · 미분류 유지" || r.manualReviewed);
-          }, [rows]);
-          const unclassifiedBadgeCount = React.useMemo(() => {
-            return unclassifiedRows.filter((r) => !r.manualReviewed && (r.status === "미분류" || r.type === "미분류")).length;
-          }, [unclassifiedRows]);
-          const unclassifiedFilteredRows = React.useMemo(() => {
-            if (manualFilter === "전체") return unclassifiedRows;
-            if (manualFilter === "검토완료") return unclassifiedRows.filter((r) => !!r.manualReviewed || r.status === "검토완료 · 미분류 유지");
-            return unclassifiedRows.filter((r) => !r.manualReviewed && (r.status === "미분류" || r.type === "미분류"));
-          }, [unclassifiedRows, manualFilter]);
-          const selectedUnclassifiedRow = React.useMemo(() => {
-            return unclassifiedRows.find((r) => r.id === selectedUnclassifiedId) || null;
-          }, [unclassifiedRows, selectedUnclassifiedId]);
           const formatDateInput = (date) => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -563,12 +561,6 @@
                 return new Date(b.receivedAt || 0).getTime() - new Date(a.receivedAt || 0).getTime();
               });
           }, [rows, typeFilter, wardFilter, channelFilter, deptFilter, doctorFilter, categoryFilter, keywordQuery, nameQuery, dateFrom, dateTo]);
-          const resetManualDetail = () => {
-            setSelectedUnclassifiedId(null);
-            setSelectedManualType("");
-            setStaffNameDraft("");
-            setStaffDeptDraft("");
-          };
           const extractKeywords = (text) => {
             const source = String(text || "")
               .replace(/[.,/#!$%^&*;:{}=\-_`~()?\[\]"'<>|]/g, " ")
@@ -645,62 +637,6 @@
             setRows((prev) => mapped.concat(prev));
             showToast && showToast(`파일 업로드 ${items.length}건이 접수 목록에 반영되었습니다.`);
           };
-          const onSelectUnclassifiedRow = (row) => {
-            setSelectedUnclassifiedId(row.id);
-            setSelectedManualType("");
-            setStaffNameDraft("");
-            setStaffDeptDraft("");
-          };
-          const onConfirmManualClassification = () => {
-            if (!selectedUnclassifiedRow) {
-              showToast && showToast("분류할 항목을 먼저 선택해 주세요.");
-              return;
-            }
-            if (!selectedManualType) {
-              showToast && showToast("유형을 선택해 주세요.");
-              return;
-            }
-            if (selectedManualType === "미분류유지") {
-              setRows((prev) =>
-                prev.map((row) =>
-                  row.id === selectedUnclassifiedRow.id
-                    ? { ...row, manualReviewed: true, manualClassification: "미분류 유지", status: "검토완료 · 미분류 유지" }
-                    : row
-                )
-              );
-              showToast && showToast("미분류 상태로 유지되었습니다.");
-              resetManualDetail();
-              return;
-            }
-            const nextType =
-              selectedManualType === "직원칭찬" || selectedManualType === "좋아요"
-                ? "칭찬"
-                : selectedManualType === "복합"
-                ? "복합"
-                : "불편";
-            const statusText = selectedManualType === "직원칭찬" ? "직원칭찬 확정" : "접수";
-            setRows((prev) =>
-              prev.map((row) => {
-                if (row.id !== selectedUnclassifiedRow.id) return row;
-                const staffText =
-                  selectedManualType === "직원칭찬" && String(staffNameDraft || "").trim()
-                    ? ` / 직원:${String(staffNameDraft).trim()}${String(staffDeptDraft || "").trim() ? `(${String(staffDeptDraft).trim()})` : ""}`
-                    : "";
-                return {
-                  ...row,
-                  type: nextType,
-                  status: statusText,
-                  summary: String(row.summary || "-") + ` [수동분류:${selectedManualType}]` + staffText,
-                  manualReviewed: true,
-                  manualClassification: selectedManualType,
-                  unclassifiedReason: "",
-                  unclassifiedAction: "",
-                };
-              })
-            );
-            showToast && showToast(`${selectedManualType}(으)로 분류가 확정되었습니다.`);
-            resetManualDetail();
-          };
 
           return React.createElement(
             "div",
@@ -715,52 +651,17 @@
                 React.createElement(
                   "div",
                   { className: "flex flex-wrap items-center gap-2" },
-                  activeInboxTab === "list"
-                    ? React.createElement("button", { type: "button", onClick: () => setRegisterOpen(true), className: "px-3 py-2 rounded-lg bg-blue-600 text-white text-[12px] font-black hover:bg-blue-700" }, "+ VOC 등록")
-                    : null
+                  React.createElement("button", { type: "button", onClick: () => setRegisterOpen(true), className: "px-3 py-2 rounded-lg bg-blue-600 text-white text-[12px] font-black hover:bg-blue-700" }, "+ VOC 등록")
                 )
               ),
               React.createElement(
-                "div",
-                { className: "mt-3 flex gap-1 border-b border-gray-200", role: "tablist", "aria-label": "VOC 접수 목록 보기" },
-                React.createElement(
-                  "button",
-                  {
-                    type: "button",
-                    role: "tab",
-                    "aria-selected": activeInboxTab === "list",
-                    onClick: () => setActiveInboxTab("list"),
-                    className:
-                      "px-4 py-2 text-[13px] transition border-b-2 -mb-px " +
-                      (activeInboxTab === "list" ? "border-gray-800 font-black text-gray-900" : "border-transparent font-bold text-gray-500 hover:text-gray-700"),
-                  },
-                  "VOC 접수 목록"
-                ),
-                React.createElement(
-                  "button",
-                  {
-                    type: "button",
-                    role: "tab",
-                    "aria-selected": activeInboxTab === "review",
-                    onClick: () => {
-                      setActiveInboxTab("review");
-                      setExpandedRowId(null);
-                    },
-                    className:
-                      "px-4 py-2 text-[13px] transition border-b-2 -mb-px " +
-                      (activeInboxTab === "review" ? "border-gray-800 font-black text-gray-900" : "border-transparent font-bold text-gray-500 hover:text-gray-700"),
-                  },
-                  "미분류 검토",
-                  React.createElement(
-                    "span",
-                    { className: "ml-1.5 inline-flex min-w-[20px] justify-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-black text-amber-700" },
-                    unclassifiedBadgeCount
-                  )
-                )
+                "p",
+                { className: "mt-3 text-[12px] font-bold leading-relaxed text-gray-500" },
+                "VOC 유형 드롭다운에서 선택하면 AI가 분류한 긍정/부정/미분류를 바로 수정할 수 있습니다."
               ),
               React.createElement(
                 "div",
-                { className: "mt-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-8 gap-2 " + (activeInboxTab === "list" ? "" : "hidden") },
+                { className: "mt-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-8 gap-2" },
                 React.createElement("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-black text-gray-700 bg-white", "aria-label": "VOC 유형" }, typeOptions.map((t) => React.createElement("option", { key: t, value: t }, t))),
                 React.createElement("select", { value: channelFilter, onChange: (e) => setChannelFilter(e.target.value), className: "border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-black text-gray-700 bg-white" }, channels.map((c) => React.createElement("option", { key: c, value: c }, c))),
                 React.createElement("select", { value: wardFilter, onChange: (e) => setWardFilter(e.target.value), className: "border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-black text-gray-700 bg-white" }, wards.map((w) => React.createElement("option", { key: w, value: w }, w))),
@@ -772,7 +673,7 @@
               ),
               React.createElement(
                 "div",
-                { className: "mt-2 flex flex-wrap items-center gap-2 " + (activeInboxTab === "list" ? "" : "hidden") },
+                { className: "mt-2 flex flex-wrap items-center gap-2" },
                 React.createElement("span", { className: "text-[12px] font-black text-gray-600" }, "접수 기간"),
                 React.createElement(
                   "select",
@@ -808,8 +709,7 @@
                 React.createElement("span", { className: "ml-auto text-[11px] font-bold text-gray-400" }, `조회 ${filtered.length.toLocaleString()}건`)
               )
             ),
-            activeInboxTab === "list"
-              ? React.createElement(
+            React.createElement(
               "div",
               { className: "rounded-xl border border-gray-200 bg-white overflow-auto" },
               React.createElement(
@@ -818,7 +718,7 @@
                 React.createElement(
                   "thead",
                   null,
-                  React.createElement("tr", { className: "bg-gray-50 text-gray-600" }, ["번호", "환자", "병동", "진료과/담당의사", "유입채널", "VOC 유형", "카테고리/키워드", "접수 내용", "첨부", "접수일시", "등록일시"].map((h) => React.createElement("th", { key: h, className: "px-3 py-2 text-left font-black whitespace-nowrap" }, h)))
+                  React.createElement("tr", { className: "bg-gray-50 text-gray-600" }, ["번호", "환자", "병동", "진료과/담당의사", "유입채널", "VOC 유형(AI 분석)", "카테고리/키워드(AI 분석)", "접수 내용", "첨부", "접수일시", "등록일시"].map((h) => React.createElement("th", { key: h, className: "px-3 py-2 text-left font-black whitespace-nowrap" }, h)))
                 ),
                 React.createElement(
                   "tbody",
@@ -845,31 +745,23 @@
                             "td",
                             { className: "px-3 py-2 whitespace-nowrap" },
                             React.createElement(
-                              "span",
+                              "select",
                               {
-                                className:
-                                  "inline-flex px-2 py-0.5 rounded-full border text-[10px] font-black " +
-                                  (r.type === "칭찬"
-                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                    : r.type === "불편"
-                                    ? "bg-rose-50 text-rose-700 border-rose-200"
-                                    : r.type === "복합"
-                                    ? "bg-violet-50 text-violet-700 border-violet-200"
-                                    : "bg-amber-50 text-amber-700 border-amber-200"),
+                                value: toDisplayType(r.type),
+                                onClick: (e) => e.stopPropagation(),
+                                onChange: (e) => onChangeRowType(r.id, e.target.value),
+                                className: typeSelectClass(toDisplayType(r.type)),
+                                "aria-label": "VOC 유형 수동 분류",
                               },
-                              r.type || "미분류"
+                              VOC_DISPLAY_TYPES.map((t) => React.createElement("option", { key: r.id + "-type-" + t, value: t }, t))
                             )
                           ),
                           React.createElement(
                             "td",
                             { className: "px-3 py-2 min-w-[190px]" },
                             React.createElement("p", { className: "text-[11px] font-black text-gray-700" }, r.category || "기타"),
-                            React.createElement(
-                              "div",
-                              { className: "mt-1 flex max-w-[220px] flex-wrap gap-1" },
-                              (Array.isArray(r.keywords) && r.keywords.length ? r.keywords.slice(0, 3) : ["키워드 없음"]).map((keyword) =>
-                                React.createElement("span", { key: r.id + "-" + keyword, className: "rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-black text-blue-700" }, keyword)
-                              )
+                            (Array.isArray(r.keywords) && r.keywords.length ? r.keywords.slice(0, 3) : ["키워드 없음"]).map((keyword) =>
+                              React.createElement("p", { key: r.id + "-" + keyword, className: "text-[11px] font-bold text-gray-500 leading-snug" }, keyword)
                             )
                           ),
                           React.createElement(
@@ -986,175 +878,7 @@
                     : React.createElement("tr", null, React.createElement("td", { colSpan: 11, className: "px-3 py-10 text-center text-gray-400 font-bold" }, "조건에 맞는 VOC가 없습니다."))
                 )
               )
-            )
-              : null,
-            activeInboxTab === "review"
-              ? React.createElement(
-              "div",
-              { className: "rounded-xl border border-gray-200 bg-white p-4 space-y-3" },
-              React.createElement(
-                "div",
-                { className: "flex flex-wrap items-center justify-between gap-2" },
-                React.createElement("p", { className: "text-[14px] font-black text-gray-800" }, "미분류 VOC 수동 분류"),
-                React.createElement(
-                  "div",
-                  { className: "inline-flex rounded-lg border border-gray-200 overflow-hidden" },
-                  ["전체", "미분류", "검토완료"].map((tab) =>
-                    React.createElement(
-                      "button",
-                      {
-                        key: "manual-tab-" + tab,
-                        type: "button",
-                        onClick: () => setManualFilter(tab),
-                        className:
-                          "px-3 py-1.5 text-[12px] font-black border-r border-gray-200 last:border-r-0 " +
-                          (manualFilter === tab ? "bg-blue-600 text-white" : "bg-white text-gray-500 hover:bg-gray-50"),
-                      },
-                      tab,
-                      tab === "미분류"
-                        ? React.createElement(
-                            "span",
-                            { className: "ml-1 inline-flex min-w-[18px] justify-center rounded-full bg-amber-100 px-1.5 text-[10px] font-black text-amber-700" },
-                            unclassifiedBadgeCount
-                          )
-                        : null
-                    )
-                  )
-                )
-              ),
-              React.createElement(
-                "div",
-                { className: "overflow-auto border border-gray-100 rounded-lg" },
-                React.createElement(
-                  "table",
-                  { className: "w-full text-[12px] min-w-[1080px]" },
-                  React.createElement(
-                    "thead",
-                    null,
-                    React.createElement(
-                      "tr",
-                      { className: "bg-gray-50 text-gray-600" },
-                      ["접수일시", "채널", "사유/상태", "카테고리/키워드", "내용", "유형 직접 선택"].map((h) =>
-                        React.createElement("th", { key: "manual-th-" + h, className: "px-3 py-2 text-left font-black whitespace-nowrap" }, h)
-                      )
-                    )
-                  ),
-                  React.createElement(
-                    "tbody",
-                    null,
-                    unclassifiedFilteredRows.length
-                      ? unclassifiedFilteredRows.map((row) =>
-                          React.createElement(
-                            "tr",
-                            {
-                              key: "manual-row-" + row.id,
-                              className:
-                                "border-t border-gray-100 " +
-                                (selectedUnclassifiedId === row.id ? "bg-blue-50" : "hover:bg-gray-50") +
-                                (row.manualReviewed ? " opacity-60" : ""),
-                            },
-                            React.createElement("td", { className: "px-3 py-2 font-bold text-gray-700 whitespace-nowrap" }, row.receivedAt),
-                            React.createElement("td", { className: "px-3 py-2 font-bold text-gray-700 whitespace-nowrap" }, row.channel || "-"),
-                            React.createElement(
-                              "td",
-                              { className: "px-3 py-2 whitespace-nowrap" },
-                              row.manualReviewed || row.status === "검토완료 · 미분류 유지"
-                                ? React.createElement(
-                                    "span",
-                                    { className: "inline-flex rounded-full border border-gray-300 border-dashed bg-gray-50 px-2 py-0.5 text-[10px] font-black text-gray-500" },
-                                    "검토완료 · " + (row.manualClassification || (row.status === "검토완료 · 미분류 유지" ? "미분류 유지" : row.type))
-                                  )
-                                : React.createElement(
-                                    "span",
-                                    { className: "inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black text-amber-700" },
-                                    row.unclassifiedReason || "유형매핑실패"
-                                  )
-                            ),
-                            React.createElement(
-                              "td",
-                              { className: "px-3 py-2 min-w-[180px]" },
-                              React.createElement("p", { className: "text-[11px] font-black text-gray-700" }, row.category || "기타"),
-                              React.createElement(
-                                "p",
-                                { className: "mt-0.5 max-w-[210px] truncate text-[10px] font-bold text-blue-600" },
-                                Array.isArray(row.keywords) && row.keywords.length ? row.keywords.join(" · ") : "키워드 없음"
-                              )
-                            ),
-                            React.createElement("td", { className: "px-3 py-2 font-bold text-gray-700 truncate max-w-[280px]", title: row.summary }, row.summary || "-"),
-                            React.createElement(
-                              "td",
-                              { className: "px-3 py-2 whitespace-nowrap" },
-                              React.createElement(
-                                "div",
-                                { className: "flex flex-nowrap items-center gap-1.5" },
-                                ["좋아요", "불편", "복합", "직원칭찬", "미분류유지"].map((tp) => {
-                                  const isSelected = selectedUnclassifiedId === row.id && selectedManualType === tp;
-                                  const isReviewed = row.manualReviewed || row.status === "검토완료 · 미분류 유지";
-                                  const tone =
-                                    tp === "좋아요"
-                                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                      : tp === "불편"
-                                      ? "border-rose-200 bg-rose-50 text-rose-700"
-                                      : tp === "복합"
-                                      ? "border-violet-200 bg-violet-50 text-violet-700"
-                                      : tp === "직원칭찬"
-                                      ? "border-amber-200 bg-amber-50 text-amber-700"
-                                      : "border-dashed border-gray-300 bg-white text-gray-500";
-                                  return React.createElement(
-                                    "button",
-                                    {
-                                      key: "inline-manual-" + row.id + "-" + tp,
-                                      type: "button",
-                                      disabled: isReviewed,
-                                      onClick: (e) => {
-                                        e.stopPropagation();
-                                        onSelectUnclassifiedRow(row);
-                                        setSelectedManualType(tp);
-                                      },
-                                      className:
-                                        "rounded-full border px-2.5 py-1 text-[11px] font-black transition " +
-                                        tone +
-                                        (isSelected ? " ring-2 ring-blue-500 ring-offset-1" : " hover:brightness-95") +
-                                        (isReviewed ? " cursor-not-allowed opacity-40" : ""),
-                                    },
-                                    tp === "직원칭찬" ? "직원 칭찬" : tp === "미분류유지" ? "미분류 유지" : tp
-                                  );
-                                }),
-                                React.createElement(
-                                  "button",
-                                  {
-                                    type: "button",
-                                    disabled:
-                                      row.manualReviewed ||
-                                      row.status === "검토완료 · 미분류 유지" ||
-                                      selectedUnclassifiedId !== row.id ||
-                                      !selectedManualType,
-                                    onClick: (e) => {
-                                      e.stopPropagation();
-                                      onConfirmManualClassification();
-                                    },
-                                    className:
-                                      "ml-auto rounded-lg px-3 py-1 text-[11px] font-black text-white transition " +
-                                      (selectedUnclassifiedId === row.id && selectedManualType && !row.manualReviewed
-                                        ? "bg-blue-600 hover:bg-blue-700"
-                                        : "cursor-not-allowed bg-gray-300"),
-                                  },
-                                  "저장"
-                                )
-                              )
-                            )
-                          )
-                        )
-                      : React.createElement(
-                          "tr",
-                          null,
-                          React.createElement("td", { colSpan: 6, className: "px-3 py-8 text-center text-gray-400 font-bold" }, "미분류 수동 분류 대상이 없습니다.")
-                        )
-                  )
-                )
-              )
-            )
-              : null,
+            ),
             React.createElement(VocRegisterModalV2, { open: registerOpen, onClose: () => setRegisterOpen(false), onSubmit: onDirectSubmit, onBulkSubmit: onBulkSubmit, showToast: showToast })
           );
         };

@@ -42,7 +42,8 @@
   .tab { padding: 8px 2px 10px; font-size: 14px; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; }
   .tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
   .tab-badge { background: var(--bg-warning); color: var(--text-warning); border-radius: 999px; padding: 1px 7px; font-size: 11px; margin-left: 5px; }
-  .flag-toggle-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .flag-toggle-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .inbox-hint { font-size: 12px; color: var(--text-muted); margin: 0 0 14px; line-height: 1.5; }
   .flag-toggle {
     display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
     padding: 6px 14px; border-radius: 999px; border: 0.5px solid var(--border-strong);
@@ -79,6 +80,22 @@
     background: var(--surface-1); color: var(--text-accent); margin: 2px 3px 0 0;
   }
   .cat-label { font-size: 11px; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 2px; }
+  .kw-sub { display: block; font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+
+  .type-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .type-select {
+    appearance: none; -webkit-appearance: none;
+    font-size: 11px; font-weight: 600; padding: 3px 24px 3px 9px; border-radius: 999px; border: none;
+    cursor: pointer; line-height: 1.4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23633806' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 7px center;
+  }
+  .type-select.type-success { background-color: var(--bg-success); color: var(--text-success); }
+  .type-select.type-danger { background-color: var(--bg-danger); color: var(--text-danger); }
+  .type-select.type-warning { background-color: var(--bg-warning); color: var(--text-warning); }
+  .type-select.type-success { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2327500A' d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); }
+  .type-select.type-danger { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23791F1F' d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); }
+  .flag-sub .chip { margin-left: 0; }
 
   /* Modal */
   .modal-overlay {
@@ -126,15 +143,11 @@
       <button class="btn-primary" onclick="openRegisterModal()">+ VOC 등록</button>
     </div>
 
-    <div class="tab-row">
-      <div class="tab active" data-tab="list" onclick="setMainTab('list')">VOC 접수 목록</div>
-      <div class="tab" data-tab="review" onclick="setMainTab('review')">미분류 검토<span class="tab-badge" id="reviewBadge">2</span></div>
-    </div>
-
     <div class="flag-toggle-row">
       <span class="flag-toggle" id="toggleSafety" onclick="toggleFlagFilter('환자안전')"><span class="dot"></span>환자안전 유형 모아보기</span>
       <span class="flag-toggle" id="toggleInfection" onclick="toggleFlagFilter('감염관리')"><span class="dot"></span>감염관리 유형 모아보기</span>
     </div>
+    <p class="inbox-hint">VOC 유형 드롭다운에서 선택하면 AI가 분류한 긍정/부정/미분류를 바로 수정할 수 있습니다.</p>
 
     <div id="pane-list">
       <div class="filter-row">
@@ -160,16 +173,12 @@
         <thead>
           <tr>
             <td>번호</td><td>환자</td><td>병동</td><td>진료과/담당의사</td><td>유입채널</td>
-            <td>VOC 유형</td><td>카테고리/키워드</td><td>접수 내용</td><td>첨부</td>
+            <td>VOC 유형(AI 분석)</td><td>카테고리/키워드(AI 분석)</td><td>접수 내용</td><td>첨부</td>
             <td>접수일시</td><td>등록일시</td>
           </tr>
         </thead>
         <tbody id="vocRows"></tbody>
       </table>
-    </div>
-
-    <div id="pane-review" style="display:none">
-      <p style="font-size:13px;color:var(--text-muted);padding:20px 0">미분류 검토 목록입니다. (별도 화면 — 이전 목업 참고)</p>
     </div>
 
   </div>
@@ -292,6 +301,24 @@ function typeBadge(t) {
   var role = TYPE_ROLE[t] || "accent";
   return '<span class="chip" style="background:var(--bg-' + role + ');color:var(--text-' + role + ')">' + t + '</span>';
 }
+function typeSelectHtml(r) {
+  var role = TYPE_ROLE[r.type] || "warning";
+  var opts = ["긍정", "부정", "미분류"].map(function (t) {
+    return '<option value="' + t + '"' + (r.type === t ? " selected" : "") + ">" + t + "</option>";
+  }).join("");
+  return '<select class="type-select type-' + role + '" data-no="' + r.no + '" onchange="changeVocType(this)" onclick="event.stopPropagation()">' + opts + "</select>";
+}
+function changeVocType(el) {
+  var no = parseInt(el.getAttribute("data-no"), 10);
+  var row = vocData.find(function (r) { return r.no === no; });
+  if (!row) return;
+  row.type = el.value;
+  renderRows();
+}
+function kwHtml(r) {
+  if (!r.kws.length) return '<span class="kw-sub">키워드 없음</span>';
+  return r.kws.map(function (k) { return '<span class="kw-sub">' + k + "</span>"; }).join("");
+}
 function channelBadge(c) {
   return '<span class="chip" style="background:var(--bg-accent);color:var(--text-accent)">' + c + '</span>';
 }
@@ -303,7 +330,7 @@ var vocData = [
   { no: 265004, patient: "이OO", ward: "52병동", deptDoc: "외과/이의사", channel: "고객의견카드", type: "부정", cat: "행정/절차", kws: ["안내"], content: "대기 안내가 부족했습니다.", date: "2026-07-01 10:01", flag: null },
   { no: 265003, patient: "최OO", ward: "5C병동", deptDoc: "내과/최의사", channel: "홈페이지", type: "부정", cat: "행정/절차", kws: ["수납", "안내"], content: "앱 안내는 좋았지만 수납 대기가 길었습니다.", date: "2026-07-01 12:20", flag: null },
   { no: 265002, patient: "익명", ward: "5병동", deptDoc: "내과/김의사", channel: "고객의견카드", type: "미분류", cat: "간호/처치", kws: ["간호사 응대", "응답 속도"], content: "간호사 응대도 친절하고 병실 환경도 쾌적한데 응답 속도가 너무 느려요", date: "2026-07-01 14:25", flag: null },
-  { no: 265001, patient: "익명", ward: "51병동", deptDoc: "내과/김의사", channel: "전화", type: "미분류", cat: "기타", kws: [], content: "그냥 그랬어요", date: "2026-07-01 13:08", flag: null },
+  { no: 265001, patient: "익명", ward: "51병동", deptDoc: "내과/김의사", channel: "직접 전화", type: "미분류", cat: "기타", kws: [], content: "그냥 그랬어요", date: "2026-07-01 13:08", flag: null },
   { no: 265000, patient: "윤OO", ward: "3병동", deptDoc: "정형외과/박의사", channel: "직접 전화", type: "부정", cat: "간호/처치", kws: ["낙상 위험"], content: "환자가 침대에서 낙상할 뻔했습니다. 안전바가 없었어요.", date: "2026-06-30 16:20", flag: "환자안전" },
   { no: 264999, patient: "장OO", ward: "7병동", deptDoc: "내과/최의사", channel: "고객의견카드", type: "부정", cat: "시설/환경", kws: ["손 소독"], content: "손 소독제가 비치되어 있지 않았습니다.", date: "2026-06-30 15:02", flag: "감염관리" }
 ];
@@ -333,29 +360,22 @@ function renderRows() {
     : vocData;
   var sorted = filtered.slice().sort(function (a, b) { return b.no - a.no; });
   document.getElementById("vocRows").innerHTML = sorted.map(function (r) {
-    var kwHtml = r.kws.length
-      ? r.kws.map(function (k) { return '<span class="kw-chip">' + k + '</span>'; }).join("")
-      : '<span class="kw-chip" style="color:var(--text-muted)">키워드 없음</span>';
+    var flagHtml = r.flag ? '<div class="flag-sub">' + flagBadgeHtml(r.flag) + "</div>" : "";
     return "<tr>" +
       "<td>" + r.no + "</td>" +
       "<td>" + r.patient + "</td>" +
       "<td>" + r.ward + "</td>" +
       "<td>" + r.deptDoc + "</td>" +
       "<td>" + channelBadge(r.channel) + "</td>" +
-      "<td>" + typeBadge(r.type) + flagBadgeHtml(r.flag) + "</td>" +
-      "<td><span class=\"cat-label\">" + r.cat + "</span>" + kwHtml + "</td>" +
+      "<td><div class=\"type-cell\">" + typeSelectHtml(r) + flagHtml + "</div></td>" +
+      "<td><span class=\"cat-label\">" + r.cat + "</span>" + kwHtml(r) + "</td>" +
       "<td class=\"col-content\">" + r.content + "</td>" +
       "<td class=\"col-date\">없음</td>" +
       "<td class=\"col-date\">" + formatDate(r.date) + "</td>" +
       "<td class=\"col-date\">" + formatDate(r.date) + "</td>" +
       "</tr>";
   }).join("");
-    document.getElementById("resultCount").textContent = "조회 " + sorted.length + "건";
-  var reviewBadge = document.getElementById("reviewBadge");
-  if (reviewBadge) {
-    var unclassified = vocData.filter(function (r) { return r.type === "\uBBF8\uBD84\uB958"; }).length;
-    reviewBadge.textContent = String(unclassified);
-  }
+  document.getElementById("resultCount").textContent = "조회 " + sorted.length + "건";
 }
 
 function toggleFlagFilter(flag) {
@@ -364,12 +384,6 @@ function toggleFlagFilter(flag) {
   var cls = flag === "환자안전" ? "on-safety" : "on-infection";
   document.getElementById(elId).classList.toggle(cls, activeFlagFilters[flag]);
   renderRows();
-}
-
-function setMainTab(t) {
-  document.querySelectorAll(".tab").forEach(function (el) { el.classList.toggle("active", el.dataset.tab === t); });
-  document.getElementById("pane-list").style.display = t === "list" ? "block" : "none";
-  document.getElementById("pane-review").style.display = t === "review" ? "block" : "none";
 }
 
 function openRegisterModal() {

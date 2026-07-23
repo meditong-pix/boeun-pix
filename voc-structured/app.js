@@ -193,7 +193,6 @@
       var maxTotal = Math.max.apply(null, ages.map(function (a) { return a.total; }));
 
       var ageListEl = document.getElementById("ageList");
-      var genderTabsEl = document.getElementById("genderTabs");
       var ageHeaderEl = document.getElementById("ageHeader");
       var ageTotalEl = document.getElementById("ageTotal");
       var top5KeywordsEl = document.getElementById("top5Keywords");
@@ -204,21 +203,6 @@
       var selectedGender = "전체";
 
       function fmt(n) { return Math.round(n).toLocaleString(); }
-
-      function buildGenderTabs() {
-        genderTabsEl.innerHTML = ["전체", "남", "여"].map(function (g) {
-          var isSel = g === selectedGender;
-          return (
-            '<button type="button" class="voc-rag-gender-tab' + (isSel ? " active" : "") + '" data-gender="' + g + '" role="tab" aria-selected="' + isSel + '">' + g + "</button>"
-          );
-        }).join("");
-        genderTabsEl.querySelectorAll(".voc-rag-gender-tab").forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            selectedGender = btn.getAttribute("data-gender");
-            render();
-          });
-        });
-      }
 
       function buildAgeList() {
         ageListEl.innerHTML = ages.map(function (a) {
@@ -273,7 +257,6 @@
       }
 
       function render() {
-        buildGenderTabs();
         buildAgeList();
         var age = ages.filter(function (a) { return a.label === selectedAge; })[0];
         if (!age) return;

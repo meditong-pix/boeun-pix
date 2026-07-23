@@ -59,12 +59,6 @@
   .channel-footer { font-size: 12px; color: var(--text-muted); margin-top: 10px; padding: 0 6px; }
 
   /* 키워드 설정 */
-  .kw-banner {
-    background: var(--bg-accent); border-radius: 10px; padding: 12px 16px; margin-bottom: 18px;
-  }
-  .kw-banner-title { font-size: 13px; font-weight: 700; color: var(--text-accent); margin: 0 0 3px; }
-  .kw-banner-desc { font-size: 12px; color: var(--text-accent); margin: 0; line-height: 1.5; }
-
   .cat-tab-row { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid var(--border-strong); flex-wrap: wrap; }
   .cat-tab {
     font-size: 13px; padding: 9px 14px; color: var(--text-secondary); border-bottom: 2px solid transparent;
@@ -146,11 +140,6 @@
 
   <!-- 키워드 설정 -->
   <div id="pane-keyword" style="display:none">
-    <div class="kw-banner">
-      <p class="kw-banner-title">메디통 VOC 표준 분류 · 2026.07.23 (7유형 개편)</p>
-      <p class="kw-banner-desc">기본 카테고리 7개와 키워드 362개가 제공됩니다. 기본 키워드는 클릭으로 선택/비선택할 수 있고, 병원은 기존 카테고리에 키워드만 추가할 수 있습니다.</p>
-    </div>
-
     <div class="cat-tab-row" id="catTabRow"></div>
 
     <div class="kw-head-row">
@@ -177,6 +166,21 @@
     <div class="kw-grid" id="kwGrid"></div>
   </div>
 
+</div>
+
+<!-- 비슷한 표준 키워드 확인 -->
+<div class="modal-overlay" id="similarKwOverlay">
+  <div class="modal-card" style="max-width:420px">
+    <div class="modal-head">
+      <span class="modal-title">비슷한 표준 키워드</span>
+      <button class="modal-close" type="button" onclick="closeSimilarKwModal()">닫기</button>
+    </div>
+    <p id="similarKwMessage" style="font-size:13px;line-height:1.65;color:var(--text-secondary);margin:0 0 18px"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      <button type="button" class="upload-btn" onclick="useExistingStandardKeyword()">기존 키워드 사용</button>
+      <button type="button" class="btn-primary" onclick="confirmAddDespiteSimilar()">그대로 추가</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -724,11 +728,110 @@ function toggleAddForm() {
   document.getElementById("addKwForm").classList.toggle("open");
 }
 
-function addHospitalKeyword() {
+function normalizeKeywordText(value) {
+  return String(value || "").replace(/\s+/g, "").toLowerCase();
+}
+
+function levenshteinDistance(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  var row = [];
+  for (var i = 0; i <= b.length; i++) row[i] = i;
+  for (var i = 1; i <= a.length; i++) {
+    var prev = i;
+    for (var j = 1; j <= b.length; j++) {
+      var val = row[j];
+      row[j] = a[i - 1] === b[j - 1] ? prev : Math.min(prev + 1, row[j] + 1, row[j - 1] + 1);
+      prev = val;
+    }
+  }
+  return row[b.length];
+}
+
+function keywordSimilarity(a, b) {
+  var na = normalizeKeywordText(a);
+  var nb = normalizeKeywordText(b);
+  if (!na || !nb) return 0;
+  if (na === nb) return 1;
+  if (na.includes(nb) || nb.includes(na)) {
+    var shorter = Math.min(na.length, nb.length);
+    var longer = Math.max(na.length, nb.length);
+    if (shorter >= 2) return shorter / longer;
+  }
+  var dist = levenshteinDistance(na, nb);
+  var maxLen = Math.max(na.length, nb.length);
+  return maxLen ? 1 - dist / maxLen : 0;
+}
+
+function findSimilarStandardKeyword(input, standardNames) {
+  if (!input || !standardNames || !standardNames.length) return null;
+  var normInput = normalizeKeywordText(input);
+  var best = null;
+  var bestScore = 0;
+  standardNames.forEach(function (name) {
+    if (normalizeKeywordText(name) === normInput) return;
+    var score = keywordSimilarity(input, name);
+    if (score > bestScore) {
+      bestScore = score;
+      best = name;
+    }
+  });
+  return bestScore >= 0.55 ? best : null;
+}
+
+var pendingSimilarMatch = null;
+
+function closeSimilarKwModal() {
+  pendingSimilarMatch = null;
+  document.getElementById("similarKwOverlay").style.display = "none";
+}
+
+function openSimilarKwModal(matchName) {
+  pendingSimilarMatch = matchName;
+  document.getElementById("similarKwMessage").textContent =
+    "표준 키워드 중 '" + matchName + "'과(와) 비슷해 보입니다. 기존 키워드를 사용하시겠어요, 아니면 새 키워드로 그대로 추가하시겠어요?";
+  document.getElementById("similarKwOverlay").style.display = "flex";
+}
+
+function useExistingStandardKeyword() {
+  if (pendingSimilarMatch) {
+    selectedKw[currentCat + "||" + pendingSimilarMatch] = true;
+    persistKeywordState();
+    renderKeywordGrid();
+  }
+  document.getElementById("newKwName").value = "";
+  document.getElementById("newKwPos").value = "";
+  document.getElementById("newKwNeg").value = "";
+  document.getElementById("addKwForm").classList.remove("open");
+  closeSimilarKwModal();
+}
+
+function confirmAddDespiteSimilar() {
+  closeSimilarKwModal();
+  addHospitalKeyword(true);
+}
+
+function addHospitalKeyword(skipSimilarCheck) {
   var name = document.getElementById("newKwName").value.trim();
   var pos = document.getElementById("newKwPos").value.trim();
   var neg = document.getElementById("newKwNeg").value.trim();
   if (!name || !pos || !neg) { alert("키워드명, 좋아요 문구, 불편 문구를 모두 입력해 주세요."); return; }
+  var baseNames = (VOC_KEYWORD_DATA[currentCat] || []).map(function (k) { return k[0]; });
+  var exactMatch = baseNames.find(function (item) { return normalizeKeywordText(item) === normalizeKeywordText(name); });
+  if (exactMatch) {
+    openSimilarKwModal(exactMatch);
+    return;
+  }
+  var dupHospital = hospitalKw[currentCat].some(function (k) { return normalizeKeywordText(k[0]) === normalizeKeywordText(name); });
+  if (dupHospital) { alert("이미 추가한 병원 키워드입니다."); return; }
+  if (!skipSimilarCheck) {
+    var similar = findSimilarStandardKeyword(name, baseNames);
+    if (similar) {
+      openSimilarKwModal(similar);
+      return;
+    }
+  }
   hospitalKw[currentCat].push([name, pos, neg]);
   selectedKw[currentCat + "||" + name] = true;
   document.getElementById("newKwName").value = "";

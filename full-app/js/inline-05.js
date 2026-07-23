@@ -56,6 +56,54 @@
         function getBaseVocMobilePhrases(category, keyword) {
           return VOC_BASE_MOBILE_PHRASE_OVERRIDES[`${category}::${keyword}`] || getDefaultVocMobilePhrases(keyword);
         }
+        function normalizeKeywordText(value) {
+          return String(value || "").replace(/\s+/g, "").toLowerCase();
+        }
+        function levenshteinDistance(a, b) {
+          if (a === b) return 0;
+          if (!a.length) return b.length;
+          if (!b.length) return a.length;
+          const row = [];
+          for (let i = 0; i <= b.length; i++) row[i] = i;
+          for (let i = 1; i <= a.length; i++) {
+            let prev = i;
+            for (let j = 1; j <= b.length; j++) {
+              const val = row[j];
+              row[j] = a[i - 1] === b[j - 1] ? prev : Math.min(prev + 1, row[j] + 1, row[j - 1] + 1);
+              prev = val;
+            }
+          }
+          return row[b.length];
+        }
+        function keywordSimilarity(a, b) {
+          const na = normalizeKeywordText(a);
+          const nb = normalizeKeywordText(b);
+          if (!na || !nb) return 0;
+          if (na === nb) return 1;
+          if (na.includes(nb) || nb.includes(na)) {
+            const shorter = Math.min(na.length, nb.length);
+            const longer = Math.max(na.length, nb.length);
+            if (shorter >= 2) return shorter / longer;
+          }
+          const dist = levenshteinDistance(na, nb);
+          const maxLen = Math.max(na.length, nb.length);
+          return maxLen ? 1 - dist / maxLen : 0;
+        }
+        function findSimilarStandardKeyword(input, standardNames) {
+          if (!input || !Array.isArray(standardNames) || !standardNames.length) return null;
+          const normInput = normalizeKeywordText(input);
+          let best = null;
+          let bestScore = 0;
+          standardNames.forEach((name) => {
+            if (normalizeKeywordText(name) === normInput) return;
+            const score = keywordSimilarity(input, name);
+            if (score > bestScore) {
+              bestScore = score;
+              best = name;
+            }
+          });
+          return bestScore >= 0.55 ? best : null;
+        }
         function classifyVocTextByTaxonomy(text) {
           const source = String(text || "").replace(/\s+/g, " ").toLowerCase();
           const matches = [];
@@ -251,6 +299,7 @@
           const [negativeDraft, setNegativeDraft] = React.useState("");
           const [selectedBaseKeywords, setSelectedBaseKeywords] = React.useState({});
           const [addModalOpen, setAddModalOpen] = React.useState(false);
+          const [similarMatch, setSimilarMatch] = React.useState(null);
           const [search, setSearch] = React.useState("");
           React.useEffect(() => {
             const refresh = () => setCustomKeywords(readCustomVocKeywords());
@@ -285,6 +334,7 @@
           };
           const closeAddModal = () => {
             setAddModalOpen(false);
+            setSimilarMatch(null);
             resetAddDraft();
           };
           const onChangeKeywordDraft = (value) => {
@@ -303,18 +353,28 @@
               return { ...prev, [selectedCategory]: nextList };
             });
           };
-          const onAddKeyword = () => {
+          const commitAddKeyword = (skipSimilarCheck) => {
             const keyword = String(keywordDraft || "").trim();
             if (!keyword) {
               showToast && showToast("추가할 키워드를 입력해 주세요.");
               return;
             }
-            const duplicate = getAllVocTaxonomy()
-              .find((group) => group.category === selectedCategory)
-              ?.keywords.some((item) => item.toLowerCase() === keyword.toLowerCase());
-            if (duplicate) {
-              showToast && showToast("선택한 카테고리에 이미 등록된 키워드입니다.");
+            const exactMatch = selectedBase.keywords.find((item) => normalizeKeywordText(item) === normalizeKeywordText(keyword));
+            if (exactMatch) {
+              setSimilarMatch(exactMatch);
               return;
+            }
+            const duplicateCustom = selectedCustom.some((item) => normalizeKeywordText(item.keyword) === normalizeKeywordText(keyword));
+            if (duplicateCustom) {
+              showToast && showToast("이미 추가한 병원 키워드입니다.");
+              return;
+            }
+            if (!skipSimilarCheck) {
+              const similar = findSimilarStandardKeyword(keyword, selectedBase.keywords);
+              if (similar) {
+                setSimilarMatch(similar);
+                return;
+              }
             }
             const positiveText = String(positiveDraft || "").trim();
             const negativeText = String(negativeDraft || "").trim();
@@ -335,6 +395,21 @@
             closeAddModal();
             showToast && showToast(`${selectedCategory}에 "${keyword}" 키워드가 추가되었습니다.`);
           };
+          const onAddKeyword = () => commitAddKeyword(false);
+          const onUseExistingStandardKeyword = () => {
+            if (!similarMatch) return;
+            setSelectedBaseKeywords((prev) => {
+              const current = prev[selectedCategory] || [];
+              if (current.includes(similarMatch)) return prev;
+              return { ...prev, [selectedCategory]: current.concat(similarMatch) };
+            });
+            closeAddModal();
+            showToast && showToast(`표준 키워드 "${similarMatch}"을(를) 선택했습니다.`);
+          };
+          const onConfirmAddDespiteSimilar = () => {
+            setSimilarMatch(null);
+            commitAddKeyword(true);
+          };
           const onDeleteCustomKeyword = (id) => {
             const next = customKeywords.filter((item) => item.id !== id);
             writeCustomVocKeywords(next);
@@ -345,16 +420,6 @@
           return React.createElement(
             "div",
             { className: "space-y-3" },
-            React.createElement(
-              "div",
-              { className: "rounded-xl border border-blue-100 bg-blue-50 px-4 py-3" },
-              React.createElement("p", { className: "text-[12px] font-black text-blue-800" }, "메디통 VOC 표준 분류 · 2026.07.19"),
-              React.createElement(
-                "p",
-                { className: "mt-1 text-[11px] font-bold leading-relaxed text-blue-700" },
-                `기본 카테고리 ${VOC_RECLASSIFIED_TAXONOMY.length}개와 키워드 ${totalBase}개가 제공됩니다. 기본 키워드는 클릭으로 선택/비선택할 수 있고, 병원은 기존 카테고리에 키워드만 추가할 수 있습니다.`
-              )
-            ),
             React.createElement(
               "div",
               { className: "rounded-xl border border-gray-200 bg-white p-4" },
@@ -633,6 +698,42 @@
                               : null
                           )
                         )
+                      )
+                    )
+                  )
+                )
+              : null,
+            similarMatch
+              ? React.createElement(
+                  "div",
+                  { className: "fixed inset-0 z-[190] flex items-center justify-center p-4" },
+                  React.createElement("div", { className: "fixed inset-0 bg-black/40 backdrop-blur-sm", onClick: () => setSimilarMatch(null) }),
+                  React.createElement(
+                    "div",
+                    {
+                      className: "relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl",
+                      role: "dialog",
+                      "aria-modal": "true",
+                      "aria-labelledby": "vocSimilarKeywordModalTitle",
+                    },
+                    React.createElement("p", { id: "vocSimilarKeywordModalTitle", className: "text-[15px] font-black text-gray-800" }, "비슷한 표준 키워드"),
+                    React.createElement(
+                      "p",
+                      { className: "mt-3 text-[13px] font-bold leading-relaxed text-gray-600" },
+                      `표준 키워드 중 '${similarMatch}'과(와) 비슷해 보입니다. 기존 키워드를 사용하시겠어요, 아니면 새 키워드로 그대로 추가하시겠어요?`
+                    ),
+                    React.createElement(
+                      "div",
+                      { className: "mt-5 flex flex-wrap justify-end gap-2" },
+                      React.createElement(
+                        "button",
+                        { type: "button", onClick: onUseExistingStandardKeyword, className: "rounded-lg border border-gray-200 bg-white px-4 py-2 text-[12px] font-black text-gray-700 hover:bg-gray-50" },
+                        "기존 키워드 사용"
+                      ),
+                      React.createElement(
+                        "button",
+                        { type: "button", onClick: onConfirmAddDespiteSimilar, className: "rounded-lg bg-blue-600 px-4 py-2 text-[12px] font-black text-white hover:bg-blue-700" },
+                        "그대로 추가"
                       )
                     )
                   )

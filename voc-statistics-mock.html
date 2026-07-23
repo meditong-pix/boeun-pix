@@ -206,12 +206,6 @@
         <span style="color:#378ADD">♂ 남 4,495명 (50%)</span><span style="color:#e0559a">우 여 4,444명 (50%)</span>
       </div>
 
-      <div style="display:flex;gap:6px;margin-bottom:16px">
-        <span id="genderAllBtn" onclick="setGender('전체')" style="font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;background:var(--fill-accent);color:var(--on-accent);cursor:pointer">전체</span>
-        <span onclick="setGender('남')" style="font-size:12px;padding:6px 14px;border-radius:8px;border:0.5px solid var(--border-strong);cursor:pointer">남</span>
-        <span onclick="setGender('여')" style="font-size:12px;padding:6px 14px;border-radius:8px;border:0.5px solid var(--border-strong);cursor:pointer">여</span>
-      </div>
-
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <p style="font-size:12px;font-weight:600;margin:0">연령</p>
         <div style="display:flex;gap:8px;font-size:10px;color:var(--text-secondary)">
@@ -723,13 +717,7 @@ var ageKwData = {
   }
 };
 
-var currentGender = "전체";
 var currentAge = "20대 미만";
-
-function setGender(g) {
-  currentGender = g;
-  renderPage();
-}
 
 function setAge(a) {
   currentAge = a;
@@ -783,8 +771,6 @@ function renderKwPanel() {
 }
 
 function renderPage() {
-  document.getElementById("genderAllBtn").style.background = currentGender === "전체" ? "var(--fill-accent)" : "";
-  document.getElementById("genderAllBtn").style.color = currentGender === "전체" ? "var(--on-accent)" : "";
   renderAgeList();
   renderKwPanel();
 }
