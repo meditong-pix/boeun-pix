@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>VOC 접수 목록</title>
+<style>
+  :root {
+    --surface-2: #ffffff;
+    --surface-1: #f6f5f2;
+    --surface-0: #efeee8;
+    --text-primary: #1f1e1c;
+    --text-secondary: #5f5e5a;
+    --text-muted: #898781;
+    --border: #e1e0d9;
+    --border-strong: #cfcdc5;
+    --bg-success: #EAF3DE; --text-success: #27500A;
+    --bg-danger: #FCEBEB; --text-danger: #791F1F;
+    --bg-warning: #FAEEDA; --text-warning: #633806;
+    --bg-accent: #E6F1FB; --text-accent: #0C447C;
+    --bg-pro: #EEEDFE; --text-pro: #3C3489;
+    --fill-accent: #2f6fb3; --on-accent: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 8px 4px 40px; background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    color: var(--text-primary);
+  }
+  .page { max-width: 1400px; margin: 0 auto; }
+  .panel {
+    background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+  }
+  .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .title { font-size: 20px; font-weight: 700; margin: 0; }
+  button { font-family: inherit; cursor: pointer; }
+  .btn-primary {
+    background: var(--fill-accent); color: var(--on-accent); border: none;
+    border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600;
+  }
+  .tab-row { display: flex; gap: 20px; margin: 14px 0 16px; border-bottom: 1px solid var(--border-strong); }
+  .tab { padding: 8px 2px 10px; font-size: 14px; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; }
+  .tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
+  .tab-badge { background: var(--bg-warning); color: var(--text-warning); border-radius: 999px; padding: 1px 7px; font-size: 11px; margin-left: 5px; }
+  .flag-toggle-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .flag-toggle {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+    padding: 6px 14px; border-radius: 999px; border: 0.5px solid var(--border-strong);
+    background: var(--surface-2); color: var(--text-secondary); cursor: pointer; user-select: none;
+  }
+  .flag-toggle .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--border-strong); }
+  .flag-toggle.on-safety { background: #FCEBEB; border-color: #F2B8B5; color: #B4392B; }
+  .flag-toggle.on-safety .dot { background: #B4392B; }
+  .flag-toggle.on-infection { background: #EEEDFE; border-color: #C9C4F5; color: #4A3F9E; }
+  .flag-toggle.on-infection .dot { background: #4A3F9E; }
+
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .filter-row select, .filter-row input[type=text] {
+    font-size: 12px; padding: 7px 10px; border-radius: 8px; border: 0.5px solid var(--border-strong);
+    background: var(--surface-2); color: var(--text-primary); min-width: 110px;
+  }
+  .filter-row input[type=text] { min-width: 140px; }
+  .date-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: 12px; color: var(--text-secondary); }
+  .date-row input[type=date] { font-size: 12px; padding: 6px 8px; border-radius: 8px; border: 0.5px solid var(--border-strong); }
+  .result-count { margin-left: auto; font-size: 12px; color: var(--text-muted); align-self: center; }
+
+  table { width: 100%; font-size: 12px; border-collapse: collapse; }
+  thead td { color: var(--text-secondary); padding: 8px 6px; white-space: nowrap; }
+  tbody tr { border-top: 0.5px solid var(--border); }
+  tbody tr:hover { background: var(--surface-1); }
+  tbody td { padding: 9px 6px; vertical-align: top; }
+  .col-content { color: var(--text-secondary); max-width: 260px; }
+  .col-date { color: var(--text-muted); white-space: nowrap; }
+  .chip {
+    display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .kw-chip {
+    display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 999px;
+    background: var(--surface-1); color: var(--text-accent); margin: 2px 3px 0 0;
+  }
+  .cat-label { font-size: 11px; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 2px; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    align-items: flex-start; justify-content: center; padding: 5vh 16px; overflow-y: auto; z-index: 20;
+  }
+  .modal-card {
+    background: var(--surface-2); border-radius: 14px; padding: 1.5rem 1.75rem;
+    max-width: 460px; width: 100%; max-height: 88vh; overflow-y: auto;
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-close { font-size: 13px; color: var(--text-muted); background: none; border: none; }
+  .modal-tab-row { display: flex; gap: 20px; margin-bottom: 18px; border-bottom: 1px solid var(--border-strong); }
+  .modal-tab { padding: 6px 2px 9px; font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; }
+  .modal-tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
+  .field-label { font-size: 12px; font-weight: 600; margin: 14px 0 6px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .modal-card select, .modal-card input[type=text], .modal-card input[type=datetime-local], .modal-card textarea {
+    width: 100%; font-size: 12px; padding: 8px 10px; border-radius: 8px; border: 0.5px solid var(--border-strong);
+    background: var(--surface-2); color: var(--text-primary);
+  }
+  .patient-box { border: 0.5px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-top: 6px; }
+  .patient-box-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .anon-check { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+  textarea { resize: vertical; min-height: 70px; }
+  .register-row { display: flex; justify-content: flex-end; margin-top: 18px; }
+
+  .upload-box {
+    border: 1px dashed var(--border-strong); border-radius: 10px; padding: 18px 16px;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: var(--surface-1);
+  }
+  .upload-btn { background: var(--surface-2); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 7px 12px; font-size: 12px; }
+  .upload-hint { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin: 0 0 14px; }
+  .excel-btn { background: var(--surface-2); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px 12px; font-size: 11px; float: right; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+
+    <div class="top-row">
+      <p class="title">VOC 접수 목록</p>
+      <button class="btn-primary" onclick="openRegisterModal()">+ VOC 등록</button>
+    </div>
+
+    <div class="tab-row">
+      <div class="tab active" data-tab="list" onclick="setMainTab('list')">VOC 접수 목록</div>
+      <div class="tab" data-tab="review" onclick="setMainTab('review')">미분류 검토<span class="tab-badge" id="reviewBadge">2</span></div>
+    </div>
+
+    <div class="flag-toggle-row">
+      <span class="flag-toggle" id="toggleSafety" onclick="toggleFlagFilter('환자안전')"><span class="dot"></span>환자안전 유형 모아보기</span>
+      <span class="flag-toggle" id="toggleInfection" onclick="toggleFlagFilter('감염관리')"><span class="dot"></span>감염관리 유형 모아보기</span>
+    </div>
+
+    <div id="pane-list">
+      <div class="filter-row">
+        <select><option>전체 유형</option><option>긍정</option><option>부정</option><option>미분류</option></select>
+        <select id="filterChannel"><option>전체 채널</option><option>메디통 픽스(앱)</option><option>고객의견카드</option><option>직접 전화</option><option>카카오톡·채널톡</option><option>홈페이지</option><option>현장 상담</option></select>
+        <select><option>전체 병동</option><option>51병동</option><option>52병동</option><option>6A병동</option><option>7A병동</option><option>5C병동</option><option>5병동</option></select>
+        <select><option>전체 진료과</option><option>내과</option><option>외과</option><option>정형외과</option><option>신경과</option></select>
+        <select><option>전체 담당의사</option><option>김의사</option><option>이의사</option><option>박의사</option><option>최의사</option><option>정의사</option></select>
+        <select><option>전체 카테고리</option><option>진료/치료</option><option>간호/처치</option><option>시설/환경</option><option>행정/절차</option><option>직원응대</option><option>기타</option></select>
+        <input type="text" placeholder="카테고리·키워드 검색">
+        <input type="text" placeholder="이름 검색">
+      </div>
+      <div class="date-row">
+        <span>접수 기간</span>
+        <select style="font-size:12px;padding:6px 10px;border-radius:8px;border:0.5px solid var(--border-strong)"><option>전체 기간</option><option>오늘</option><option>최근 7일</option><option>최근 30일</option><option>직접 선택</option></select>
+        <input type="date">
+        <span>~</span>
+        <input type="date">
+        <span class="result-count" id="resultCount">조회 7건</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <td>번호</td><td>환자</td><td>병동</td><td>진료과/담당의사</td><td>유입채널</td>
+            <td>VOC 유형</td><td>카테고리/키워드</td><td>접수 내용</td><td>첨부</td>
+            <td>접수일시</td><td>등록일시</td>
+          </tr>
+        </thead>
+        <tbody id="vocRows"></tbody>
+      </table>
+    </div>
+
+    <div id="pane-review" style="display:none">
+      <p style="font-size:13px;color:var(--text-muted);padding:20px 0">미분류 검토 목록입니다. (별도 화면 — 이전 목업 참고)</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- VOC 등록 모달 -->
+<div class="modal-overlay" id="registerOverlay">
+  <div class="modal-card">
+    <div class="modal-head">
+      <span class="modal-title">VOC 등록</span>
+      <button class="modal-close" onclick="closeRegisterModal()">닫기</button>
+    </div>
+
+    <div class="modal-tab-row">
+      <div class="modal-tab active" data-mtab="manual" onclick="setModalTab('manual')">직접 입력</div>
+      <div class="modal-tab" data-mtab="upload" onclick="setModalTab('upload')">파일 업로드</div>
+    </div>
+
+    <!-- 직접 입력 -->
+    <div id="modal-pane-manual">
+      <div class="field-label">채널 <span style="color:#B4392B">*</span></div>
+      <select id="fChannel">
+        <option>고객의견카드</option><option>메디통 픽스(앱)</option><option>직접 전화</option>
+        <option>카카오톡·채널톡</option><option>홈페이지</option><option>현장 상담</option>
+      </select>
+
+      <div class="field-label">직원 정보</div>
+      <div class="field-row">
+        <select id="fDept"><option>내과</option><option>외과</option><option>정형외과</option><option>신경과</option></select>
+        <input type="text" id="fStaffName" placeholder="직원명 (선택 입력)">
+      </div>
+
+      <div class="patient-box">
+        <div class="patient-box-head">
+          <span style="font-size:12px;font-weight:600">환자 정보</span>
+          <label class="anon-check"><input type="checkbox" id="fAnon" onchange="toggleAnon()"> 익명</label>
+        </div>
+        <div class="field-row3" style="margin-bottom:10px">
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">이름</div>
+            <input type="text" id="fName" value="홍길동">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">등록번호</div>
+            <input type="text" id="fRegNo" value="20261234">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">환자와의 관계</div>
+            <select id="fRelation"><option>본인</option><option>보호자</option></select>
+          </div>
+        </div>
+        <div class="field-row3">
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">성별</div>
+            <select id="fGender"><option>남</option><option>여</option></select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">생년월일</div>
+            <input type="text" id="fBirth" value="1990-01-01">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">휴대폰 번호</div>
+            <input type="text" id="fPhone" value="010-1234-5678">
+          </div>
+        </div>
+      </div>
+
+      <div class="field-row3" style="margin-top:14px">
+        <div>
+          <div class="field-label" style="margin-top:0">병동</div>
+          <select id="fWard"><option>5병동</option><option>51병동</option><option>52병동</option><option>6A병동</option><option>7A병동</option></select>
+        </div>
+        <div>
+          <div class="field-label" style="margin-top:0">진료과</div>
+          <select id="fDept2"><option>내과</option><option>외과</option><option>정형외과</option><option>신경과</option></select>
+        </div>
+        <div>
+          <div class="field-label" style="margin-top:0">담당의사</div>
+          <select id="fDoctor"><option>김의사</option><option>이의사</option><option>박의사</option><option>최의사</option></select>
+        </div>
+      </div>
+
+      <div class="field-label">접수일시 <span style="color:#B4392B">*</span></div>
+      <input type="date" id="fDatetime" value="2026-07-23" onchange="updateDatetimeDisplay()">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px" id="fDatetimeDisplay">선택된 접수일시: 26-07-23</div>
+
+      <div class="field-label">원문 내용 <span style="color:#B4392B">*</span></div>
+      <textarea id="fContent" placeholder="파일 첨부 없이 직접 입력도 가능합니다."></textarea>
+
+      <div class="register-row">
+        <button class="btn-primary" onclick="submitManual()">등록</button>
+      </div>
+    </div>
+
+    <!-- 파일 업로드 -->
+    <div id="modal-pane-upload" style="display:none">
+      <button class="excel-btn" onclick="alert('엑셀 양식 파일이 다운로드됩니다. (목업 동작)')">엑셀 양식 다운로드</button>
+      <div style="clear:both"></div>
+      <div class="upload-box">
+        <button class="upload-btn" onclick="simulateUpload()">파일 선택</button>
+        <span style="font-size:12px;color:var(--text-muted)" id="uploadFileName">선택된 파일 없음</span>
+      </div>
+      <p class="upload-hint">카카오톡, 전화, 현장접수 등 여러 채널이 섞인 파일도 한 번에 업로드할 수 있습니다. 채널은 엑셀의 channel 컬럼에서 행 단위로 읽어 AI가 자동 분류합니다.</p>
+      <div class="field-label" style="margin-top:0">업로드 내역</div>
+      <table>
+        <thead><tr><td>파일명</td><td>업로드 일시</td><td>건수(전체/병원생활/직원칭찬/미분류)</td><td>상태</td></tr></thead>
+        <tbody id="uploadHistoryRows">
+          <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px 0">업로드 내역이 없습니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var TYPE_ROLE = { "긍정": "success", "부정": "danger", "미분류": "warning" };
+
+function typeBadge(t) {
+  var role = TYPE_ROLE[t] || "accent";
+  return '<span class="chip" style="background:var(--bg-' + role + ');color:var(--text-' + role + ')">' + t + '</span>';
+}
+function channelBadge(c) {
+  return '<span class="chip" style="background:var(--bg-accent);color:var(--text-accent)">' + c + '</span>';
+}
+
+var vocData = [
+  { no: 265007, patient: "박OO", ward: "6A병동", deptDoc: "정형외과/박의사", channel: "직접 전화", type: "긍정", cat: "기타", kws: [], content: "간호 응대가 세심했습니다.", date: "2026-07-01 10:25", flag: null },
+  { no: 265006, patient: "김OO", ward: "51병동", deptDoc: "내과/김의사", channel: "메디통 픽스(앱)", type: "긍정", cat: "진료/치료", kws: ["회진", "설명"], content: "회진 설명이 친절했습니다.", date: "2026-07-01 09:12", flag: null },
+  { no: 265005, patient: "정OO", ward: "7A병동", deptDoc: "신경과/정의사", channel: "카카오톡·채널톡", type: "부정", cat: "시설/환경", kws: ["소음"], content: "병실 소음이 큽니다.", date: "2026-07-01 11:44", flag: null },
+  { no: 265004, patient: "이OO", ward: "52병동", deptDoc: "외과/이의사", channel: "고객의견카드", type: "부정", cat: "행정/절차", kws: ["안내"], content: "대기 안내가 부족했습니다.", date: "2026-07-01 10:01", flag: null },
+  { no: 265003, patient: "최OO", ward: "5C병동", deptDoc: "내과/최의사", channel: "홈페이지", type: "부정", cat: "행정/절차", kws: ["수납", "안내"], content: "앱 안내는 좋았지만 수납 대기가 길었습니다.", date: "2026-07-01 12:20", flag: null },
+  { no: 265002, patient: "익명", ward: "5병동", deptDoc: "내과/김의사", channel: "고객의견카드", type: "미분류", cat: "간호/처치", kws: ["간호사 응대", "응답 속도"], content: "간호사 응대도 친절하고 병실 환경도 쾌적한데 응답 속도가 너무 느려요", date: "2026-07-01 14:25", flag: null },
+  { no: 265001, patient: "익명", ward: "51병동", deptDoc: "내과/김의사", channel: "전화", type: "미분류", cat: "기타", kws: [], content: "그냥 그랬어요", date: "2026-07-01 13:08", flag: null },
+  { no: 265000, patient: "윤OO", ward: "3병동", deptDoc: "정형외과/박의사", channel: "직접 전화", type: "부정", cat: "간호/처치", kws: ["낙상 위험"], content: "환자가 침대에서 낙상할 뻔했습니다. 안전바가 없었어요.", date: "2026-06-30 16:20", flag: "환자안전" },
+  { no: 264999, patient: "장OO", ward: "7병동", deptDoc: "내과/최의사", channel: "고객의견카드", type: "부정", cat: "시설/환경", kws: ["손 소독"], content: "손 소독제가 비치되어 있지 않았습니다.", date: "2026-06-30 15:02", flag: "감염관리" }
+];
+
+var activeFlagFilters = { "환자안전": false, "감염관리": false };
+var FLAG_STYLE = { "환자안전": { bg: "#FCEBEB", text: "#B4392B" }, "감염관리": { bg: "#EEEDFE", text: "#4A3F9E" } };
+
+function flagBadgeHtml(flag) {
+  if (!flag) return "";
+  var s = FLAG_STYLE[flag];
+  return ' <span class="chip" style="background:' + s.bg + ';color:' + s.text + ';margin-left:3px">' + flag + '</span>';
+}
+
+/* 공통 정책: 일시 표시는 YY-MM-DD 형식으로 통일 */
+function formatDate(str) {
+  if (!str || str === "-") return str;
+  var datePart = str.split(" ")[0];
+  var parts = datePart.split("-");
+  if (parts.length !== 3) return str;
+  return parts[0].slice(2) + "-" + parts[1] + "-" + parts[2];
+}
+
+function renderRows() {
+  var anyOn = activeFlagFilters["환자안전"] || activeFlagFilters["감염관리"];
+  var filtered = anyOn
+    ? vocData.filter(function (r) { return r.flag && activeFlagFilters[r.flag]; })
+    : vocData;
+  var sorted = filtered.slice().sort(function (a, b) { return b.no - a.no; });
+  document.getElementById("vocRows").innerHTML = sorted.map(function (r) {
+    var kwHtml = r.kws.length
+      ? r.kws.map(function (k) { return '<span class="kw-chip">' + k + '</span>'; }).join("")
+      : '<span class="kw-chip" style="color:var(--text-muted)">키워드 없음</span>';
+    return "<tr>" +
+      "<td>" + r.no + "</td>" +
+      "<td>" + r.patient + "</td>" +
+      "<td>" + r.ward + "</td>" +
+      "<td>" + r.deptDoc + "</td>" +
+      "<td>" + channelBadge(r.channel) + "</td>" +
+      "<td>" + typeBadge(r.type) + flagBadgeHtml(r.flag) + "</td>" +
+      "<td><span class=\"cat-label\">" + r.cat + "</span>" + kwHtml + "</td>" +
+      "<td class=\"col-content\">" + r.content + "</td>" +
+      "<td class=\"col-date\">없음</td>" +
+      "<td class=\"col-date\">" + formatDate(r.date) + "</td>" +
+      "<td class=\"col-date\">" + formatDate(r.date) + "</td>" +
+      "</tr>";
+  }).join("");
+    document.getElementById("resultCount").textContent = "조회 " + sorted.length + "건";
+  var reviewBadge = document.getElementById("reviewBadge");
+  if (reviewBadge) {
+    var unclassified = vocData.filter(function (r) { return r.type === "\uBBF8\uBD84\uB958"; }).length;
+    reviewBadge.textContent = String(unclassified);
+  }
+}
+
+function toggleFlagFilter(flag) {
+  activeFlagFilters[flag] = !activeFlagFilters[flag];
+  var elId = flag === "환자안전" ? "toggleSafety" : "toggleInfection";
+  var cls = flag === "환자안전" ? "on-safety" : "on-infection";
+  document.getElementById(elId).classList.toggle(cls, activeFlagFilters[flag]);
+  renderRows();
+}
+
+function setMainTab(t) {
+  document.querySelectorAll(".tab").forEach(function (el) { el.classList.toggle("active", el.dataset.tab === t); });
+  document.getElementById("pane-list").style.display = t === "list" ? "block" : "none";
+  document.getElementById("pane-review").style.display = t === "review" ? "block" : "none";
+}
+
+function openRegisterModal() {
+  document.getElementById("registerOverlay").style.display = "flex";
+}
+function closeRegisterModal() {
+  document.getElementById("registerOverlay").style.display = "none";
+}
+
+function setModalTab(t) {
+  document.querySelectorAll(".modal-tab").forEach(function (el) { el.classList.toggle("active", el.dataset.mtab === t); });
+  document.getElementById("modal-pane-manual").style.display = t === "manual" ? "block" : "none";
+  document.getElementById("modal-pane-upload").style.display = t === "upload" ? "block" : "none";
+}
+
+function toggleAnon() {
+  var anon = document.getElementById("fAnon").checked;
+  ["fName", "fRegNo", "fBirth", "fPhone"].forEach(function (id) {
+    document.getElementById(id).disabled = anon;
+    document.getElementById(id).style.opacity = anon ? 0.4 : 1;
+  });
+  document.getElementById("fRelation").disabled = anon;
+}
+
+function updateDatetimeDisplay() {
+  var v = document.getElementById("fDatetime").value;
+  document.getElementById("fDatetimeDisplay").textContent = "선택된 접수일시: " + (v ? formatDate(v) : "-");
+}
+
+function submitManual() {
+  var channel = document.getElementById("fChannel").value;
+  var dateStr = document.getElementById("fDatetime").value;
+  var content = document.getElementById("fContent").value.trim();
+
+  if (!channel) { alert("채널을 선택해 주세요."); return; }
+  if (!dateStr) { alert("접수일시를 선택해 주세요."); return; }
+  if (!content) { alert("원문 내용을 입력해 주세요."); return; }
+
+  var anon = document.getElementById("fAnon").checked;
+  var name = anon ? "익명" : (document.getElementById("fName").value || "익명");
+  var ward = document.getElementById("fWard").value;
+  var dept = document.getElementById("fDept2").value;
+  var doctor = document.getElementById("fDoctor").value;
+
+  var nextNo = Math.max.apply(null, vocData.map(function (r) { return r.no; })) + 1;
+
+  vocData.push({
+    no: nextNo, patient: name, ward: ward, deptDoc: dept + "/" + doctor, channel: channel,
+    type: "미분류", cat: "AI 분류 대기", kws: [], content: content, date: dateStr, flag: null
+  });
+
+  renderRows();
+  closeRegisterModal();
+  document.getElementById("fContent").value = "";
+  alert("VOC가 등록되었습니다. AI가 유형·카테고리·키워드를 분류하는 동안 임시로 \"미분류\"로 표시됩니다. (목업 동작)");
+}
+
+function simulateUpload() {
+  document.getElementById("uploadFileName").textContent = "voc_upload_0723.xlsx";
+  document.getElementById("uploadHistoryRows").innerHTML =
+    "<tr><td>voc_upload_0723.xlsx</td><td>" + formatDate("2026-07-23 11:32") + "</td><td>18건 (12/4/2)</td><td><span class=\"chip\" style=\"background:var(--bg-success);color:var(--text-success)\">완료</span></td></tr>";
+}
+
+/* ---------- 채널 설정 (pix_voc_channels_v1) ---------- */
+var CHANNEL_STORAGE_KEY = "pix_voc_channels_v1";
+var CHANNELS_EVENT = "pix:voc-channels-updated";
+var DEFAULT_CHANNELS = [
+  { id: "app", name: "메디통 픽스(앱)", desc: "앱 내 VOC는 자동 등록·자동 분석되어 통계에 반영됩니다.", icon: "Smartphone", on: true, locked: true, custom: false },
+  { id: "card", name: "고객의견카드", desc: "종이로 접수된 의견을 담당자가 직접 입력합니다.", icon: "NotebookText", on: true, locked: false, custom: false },
+  { id: "phone", name: "직접 전화", desc: "전화로 접수된 내용을 담당자가 직접 입력합니다.", icon: "Phone", on: true, locked: false, custom: false },
+  { id: "kakao", name: "카카오톡·채널톡", desc: "메신저 상담 내용을 담당자가 직접 입력합니다.", icon: "MessageCircle", on: false, locked: false, custom: false },
+  { id: "web", name: "홈페이지", desc: "홈페이지 게시판 접수 내용을 담당자가 직접 입력합니다.", icon: "Globe", on: false, locked: false, custom: false },
+  { id: "visit", name: "현장 상담", desc: "대면 상담 내용을 담당자가 직접 입력합니다.", icon: "Users", on: true, locked: false, custom: false },
+  { id: "survey", name: "기타 만족도 조사", desc: "별도 만족도 조사 결과를 담당자가 직접 입력합니다.", icon: "ClipboardList", on: false, locked: false, custom: false },
+  { id: "etc", name: "기타", desc: "위 채널에 해당하지 않는 접수 내용을 직접 입력합니다.", icon: "MoreHorizontal", on: false, locked: false, custom: false }
+];
+
+function loadChannels() {
+  try {
+    var raw = localStorage.getItem(CHANNEL_STORAGE_KEY);
+    if (!raw) return DEFAULT_CHANNELS.slice();
+    var parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_CHANNELS.slice();
+  } catch (e) {
+    return DEFAULT_CHANNELS.slice();
+  }
+}
+
+function getEnabledChannels() {
+  return loadChannels().filter(function (c) { return c.on; });
+}
+
+function populateChannelSelects() {
+  var enabled = getEnabledChannels();
+  var filterEl = document.getElementById("filterChannel");
+  var regEl = document.getElementById("fChannel");
+  if (filterEl) {
+    filterEl.innerHTML = '<option value="">\uC804\uCCB4 \uCC44\uB110</option>' + enabled.map(function (c) {
+      return '<option value="' + c.name.replace(/"/g, "&quot;") + '">' + c.name + '</option>';
+    }).join("");
+  }
+  if (regEl) {
+    regEl.innerHTML = enabled.map(function (c) {
+      return '<option value="' + c.name.replace(/"/g, "&quot;") + '">' + c.name + '</option>';
+    }).join("");
+  }
+}
+
+window.addEventListener(CHANNELS_EVENT, function () { populateChannelSelects(); });
+window.addEventListener("storage", function (e) {
+  if (e.key === CHANNEL_STORAGE_KEY) populateChannelSelects();
+});
+populateChannelSelects();
+
+renderRows();
+</script>
+</body>
+</html>

@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<!-- 이 파일 수정 후 sync-voc-statistics.ps1을 실행해 index.html의 file:// 내장본도 갱신합니다. -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>VOC 통계 페이지</title>
+<style>
+  :root {
+    --surface-2: #ffffff;
+    --surface-1: #f6f5f2;
+    --surface-0: #efeee8;
+    --text-primary: #1f1e1c;
+    --text-secondary: #5f5e5a;
+    --text-muted: #898781;
+    --border: #e1e0d9;
+    --border-strong: #cfcdc5;
+    --bg-success: #EAF3DE; --text-success: #27500A;
+    --bg-danger: #FCEBEB; --text-danger: #791F1F;
+    --bg-warning: #FAEEDA; --text-warning: #633806;
+    --bg-accent: #E6F1FB; --text-accent: #0C447C;
+    --fill-accent: #2f6fb3; --on-accent: #ffffff;
+  }
+  body {
+    margin: 0; padding: 8px 4px 40px; background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    color: var(--text-primary);
+  }
+  .page { max-width: 100%; margin: 0 auto; }
+  .voc-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.45);
+    overflow: auto;
+  }
+  .voc-modal-card {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: min(100%, 760px);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+  }
+  #prevRankModalCard { width: min(100%, 520px); }
+  .panel {
+    background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px;
+    padding: 1.25rem 1.5rem; margin-bottom: 16px;
+  }
+  .panel-title { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+  .panel-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 4px; }
+  .panel-sub2 { font-size: 11px; color: var(--text-muted); margin: 0 0 12px; }
+  .kpi5-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .kpi-card { background: var(--surface-1); border-radius: 10px; padding: 10px 14px; }
+  .kpi-label { font-size: 11px; color: var(--text-muted); margin: 0 0 4px; }
+  .info-tip {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 13px; height: 13px; border-radius: 999px; background: var(--border-strong);
+    color: var(--surface-2); font-size: 9px; font-weight: 700; margin-left: 4px; cursor: default;
+    vertical-align: middle;
+  }
+  .info-tip::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 140%; left: 50%; transform: translateX(-50%);
+    width: 240px; background: var(--text-primary); color: var(--surface-2);
+    font-size: 11px; font-weight: 400; line-height: 1.6; padding: 8px 10px; border-radius: 8px;
+    opacity: 0; visibility: hidden; transition: opacity 0.15s ease; z-index: 5; pointer-events: none;
+    white-space: pre-line; text-align: left;
+  }
+  .info-tip:hover::after { opacity: 1; visibility: visible; }
+  .kpi-value { font-size: 15px; font-weight: 600; margin: 0; }
+  .up { color: #B4392B; }
+  .down { color: #185FA5; }
+  .good { color: #185FA5; } /* 긍정적 신호 증가 등 - 파랑 */
+  .bad { color: #B4392B; } /* 부정적 신호 증가 등 - 빨강 */
+  .neutral { color: var(--text-secondary); }
+  .type-card-head { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .type-dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+  .type-name { font-size: 12px; color: var(--text-secondary); }
+  .type-line { font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+  .type-bar-track { height: 8px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+  .type-bar-fill { height: 100%; }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+<div class="page" id="page">
+
+  <div class="panel">
+    <p class="panel-title">전체 VOC 현황</p>
+    <p class="panel-sub">접수 규모, 칭찬/불편 흐름, 응답자 구성을 한 화면에서 확인합니다.</p>
+    <p class="panel-sub2" style="text-align:right">2026-07 기준 전월 대비</p>
+    <div class="kpi5-grid">
+      <div class="kpi-card"><p class="kpi-label">접수된 VOC 건수<span class="info-tip" data-tip="해당 기간 동안 실제 접수된 VOC 원문 건수입니다. VOC 1건은 1건으로 집계됩니다.">i</span></p><p class="kpi-value">8,323건 <span class="neutral" style="font-size:11px;font-weight:500">▲214건</span></p></div>
+      <div class="kpi-card"><p class="kpi-label">언급된 VOC 건수<span class="info-tip" data-tip="VOC 내용에서 분리된 문장이 유형(카테고리)에 태깅된 총 횟수입니다. 하나의 VOC가 여러 유형에 해당하는 경우 각각 집계되므로, 접수된 VOC 건수보다 많을 수 있습니다.">i</span></p><p class="kpi-value">9,120건 <span class="neutral" style="font-size:11px;font-weight:500">▲340건</span></p></div>
+      <div class="kpi-card"><p class="kpi-label">평균 태그 수<span class="info-tip" data-tip="VOC 1건당 평균적으로 몇 개의 유형이 태깅되었는지를 나타냅니다.
+(언급된 VOC 건수 ÷ 접수된 VOC 건수)
+수치가 높을수록 하나의 VOC에 여러 주제가 함께 포함된 복합 의견의 비중이 높다는 의미입니다.">i</span></p><p class="kpi-value">1.10개 <span class="neutral" style="font-size:11px;font-weight:500">▲0.02개</span></p></div>
+      <div class="kpi-card"><p class="kpi-label">부서칭찬 건수</p><p class="kpi-value">420건 <span class="good" style="font-size:11px;font-weight:500">▲18건</span></p></div>
+      <div class="kpi-card"><p class="kpi-label">직원칭찬 건수</p><p class="kpi-value">820건 <span class="good" style="font-size:11px;font-weight:500">▲32건</span></p></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-title" style="font-size:14px">유형별 접수 현황</p>
+    <p class="panel-sub2">하나의 VOC에 여러 유형이 함께 태깅될 수 있어, 아래 합계는 접수된 VOC 건수보다 많을 수 있습니다.</p>
+    <div class="type-grid" id="typeGrid"></div>
+
+    <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border)">
+      <table style="width:100%;font-size:12px;border-collapse:collapse;table-layout:fixed">
+        <thead><tr style="color:var(--text-secondary)">
+          <td style="width:6%;padding:6px 4px">순위</td>
+          <td style="width:18%;padding:6px 4px">유형</td>
+          <td style="padding:6px 4px">긍·부정 건수</td>
+          <td style="width:16%;padding:6px 4px;text-align:right">전월대비 부정률</td>
+        </tr></thead>
+        <tbody id="typeTableRows"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border)">
+      <p style="font-size:11px;color:var(--text-muted);margin:0 0 8px">환자안전 · 감염관리 태깅은 접수된 VOC에서 AI가 감지하여 따로 체크합니다.</p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap" id="flagRow2"></div>
+      <div id="flagListPanel2" style="margin-top:12px"></div>
+    </div>
+
+    <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border)">
+      <p style="font-size:13px;font-weight:600;margin:0 0 4px">VOC 월별 추이</p>
+      <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px">월별 긍정·부정 TOP3 카테고리를 확인합니다.</p>
+
+      <div style="display:flex;gap:16px;margin-bottom:10px;font-size:11px;color:var(--text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#1baf7a"></span>긍정</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#e24b4a"></span>부정</span>
+      </div>
+      <div style="position:relative;height:220px;margin-bottom:16px">
+        <canvas id="monthlyTrendChart" role="img" aria-label="월별 긍정 부정 건수 추이">1월 긍정 7,549건·부정 6,969건, 2월 긍정 11,520건·부정 2,880건, 3월 긍정 7,799건·부정 6,915건, 4월 긍정 7,389건·부정 7,388건, 5월 긍정 7,950건·부정 6,504건, 6월 긍정 7,645건·부정 7,056건</canvas>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(6, 1fr);gap:10px" id="monthCardGrid"></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <div class="panel" style="margin-bottom:0">
+      <p class="panel-title" style="font-size:14px">채널별 접수</p>
+      <p class="panel-sub">유입 채널별 VOC 접수 규모와 비중을 확인합니다.</p>
+      <p style="font-size:11px;font-weight:600;margin:0 0 8px">채널별 접수 비중</p>
+      <div style="position:relative;height:140px;margin-bottom:12px">
+        <canvas id="channelDonut" role="img" aria-label="채널별 접수 비중 도넛 차트">전체 9,065건 중 메디통 픽스(앱) 38.1%, 고객의견카드 23.9%, 직접 전화 14.2%</canvas>
+      </div>
+      <table style="width:100%;font-size:11px;border-collapse:collapse">
+        <thead><tr style="color:var(--text-secondary)">
+          <td style="padding:5px 3px">채널</td>
+          <td style="padding:5px 3px;text-align:right">건수</td>
+          <td style="padding:5px 3px;text-align:right">비율</td>
+          <td style="padding:5px 3px;text-align:right">증감</td>
+        </tr></thead>
+        <tbody id="channelRows"></tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-bottom:0">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+        <p class="panel-title" style="font-size:14px">부서칭찬 현황</p>
+        <button onclick="openPrevRankModal('dept')" style="font-size:11px;padding:5px 10px;border-radius:8px;border:0.5px solid var(--border-strong);background:var(--surface-2);color:var(--text-secondary);cursor:pointer">전월 랭킹 보기</button>
+      </div>
+      <p class="panel-sub">부서별 칭찬 접수 건수</p>
+      <div id="deptList"></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:0">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+        <p class="panel-title" style="font-size:14px">직원칭찬 현황</p>
+        <button onclick="openPrevRankModal('staff')" style="font-size:11px;padding:5px 10px;border-radius:8px;border:0.5px solid var(--border-strong);background:var(--surface-2);color:var(--text-secondary);cursor:pointer">전월 랭킹 보기</button>
+      </div>
+      <p class="panel-sub">직원별 칭찬 접수 건수</p>
+      <div id="staffList"></div>
+    </div>
+
+  </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:16px;margin-bottom:16px">
+
+    <div class="panel" style="margin-bottom:0">
+      <p class="panel-title" style="font-size:14px">응답자 성별 및 연령 구성</p>
+      <p class="panel-sub" style="margin-bottom:14px">성별과 연령을 선택하면 우측 키워드·추이가 갱신됩니다.</p>
+
+      <p style="font-size:12px;font-weight:600;margin:0 0 6px">성별</p>
+      <div style="display:flex;height:14px;border-radius:3px;overflow:hidden;margin-bottom:4px">
+        <div style="width:50%;background:#378ADD"></div>
+        <div style="width:50%;background:#e0559a"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:6px">
+        <span>남 50%</span><span>여 50%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:14px">
+        <span style="color:#378ADD">♂ 남 4,495명 (50%)</span><span style="color:#e0559a">우 여 4,444명 (50%)</span>
+      </div>
+
+      <div style="display:flex;gap:6px;margin-bottom:16px">
+        <span id="genderAllBtn" onclick="setGender('전체')" style="font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;background:var(--fill-accent);color:var(--on-accent);cursor:pointer">전체</span>
+        <span onclick="setGender('남')" style="font-size:12px;padding:6px 14px;border-radius:8px;border:0.5px solid var(--border-strong);cursor:pointer">남</span>
+        <span onclick="setGender('여')" style="font-size:12px;padding:6px 14px;border-radius:8px;border:0.5px solid var(--border-strong);cursor:pointer">여</span>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <p style="font-size:12px;font-weight:600;margin:0">연령</p>
+        <div style="display:flex;gap:8px;font-size:10px;color:var(--text-secondary)">
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#378ADD;border-radius:2px"></span>남</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#e0559a;border-radius:2px"></span>여</span>
+        </div>
+      </div>
+      <div id="ageList"></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:0">
+      <p class="panel-title" style="font-size:14px">연령·성별 VOC 키워드</p>
+      <p class="panel-sub" style="margin-bottom:14px">선택한 연령대·성별에서 자주 언급된 키워드와 최근 추이를 확인합니다.</p>
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+        <p style="font-size:13px;font-weight:600;margin:0" id="ageKwTitle">20대 미만 응답자 기준</p>
+        <span style="font-size:12px;color:var(--text-muted)" id="ageKwCount">75명</span>
+      </div>
+      <p class="panel-sub" style="margin-bottom:10px">응답자 기준 긍정·부정 주요 키워드 TOP5</p>
+
+      <p style="font-size:12px;font-weight:600;color:#1baf7a;margin:0 0 6px">긍정 TOP5</p>
+      <table style="width:100%;font-size:11.5px;border-collapse:collapse;margin-bottom:16px">
+        <thead><tr style="color:var(--text-secondary)">
+          <td style="width:6%;padding:5px 3px">순위</td>
+          <td style="width:9%;padding:5px 3px"></td>
+          <td style="padding:5px 3px">카테고리</td>
+          <td style="padding:5px 3px">주요 키워드</td>
+          <td style="width:14%;padding:5px 3px;text-align:right">건수(비율)</td>
+          <td style="width:10%;padding:5px 3px;text-align:right">증감</td>
+        </tr></thead>
+        <tbody id="posKwRows"></tbody>
+      </table>
+
+      <p style="font-size:12px;font-weight:600;color:#e24b4a;margin:0 0 6px">부정 TOP5</p>
+      <table style="width:100%;font-size:11.5px;border-collapse:collapse">
+        <thead><tr style="color:var(--text-secondary)">
+          <td style="width:6%;padding:5px 3px">순위</td>
+          <td style="width:9%;padding:5px 3px"></td>
+          <td style="padding:5px 3px">카테고리</td>
+          <td style="padding:5px 3px">주요 키워드</td>
+          <td style="width:14%;padding:5px 3px;text-align:right">건수(비율)</td>
+          <td style="width:10%;padding:5px 3px;text-align:right">증감</td>
+        </tr></thead>
+        <tbody id="negKwRows"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="panel">
+    <div style="background:var(--bg-warning);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:var(--text-warning);line-height:1.6">
+      ⓘ 카테고리·키워드는 VOC 1건에 여러 개가 함께 집계될 수 있어, 아래 합계가 전체 접수 건수와 다를 수 있습니다. 하나의 VOC에서 여러 키워드가 언급되면 각각 카운트되기 때문으로, 집계 오류가 아닙니다. 표준 키워드와 매칭되지 않은 문구는 미태깅으로 제외되므로, 미태깅 비율을 낮출수록 더 정확한 통계를 확보할 수 있습니다.
+    </div>
+
+    <p class="panel-title" style="font-size:14px">카테고리 / 키워드 분석</p>
+    <p class="panel-sub" style="margin-bottom:12px">카테고리를 선택하면 긍정·부정 키워드 TOP5를 확인할 수 있습니다.</p>
+
+    <div id="catChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px">
+
+      <div>
+        <p style="font-size:12px;font-weight:600;margin:0 0 10px">카테고리 비중</p>
+        <div style="position:relative;height:170px;margin-bottom:14px">
+          <canvas id="catDonut" role="img" aria-label="카테고리 비중 도넛 차트">진료 및 치료·검사관련 29.0%, 인적응대관련 16.2%, 서비스제공관련 11.3%</canvas>
+        </div>
+        <table style="width:100%;font-size:11.5px;border-collapse:collapse">
+          <thead><tr style="color:var(--text-secondary)">
+            <td style="width:6%;padding:5px 3px">순위</td>
+            <td style="padding:5px 3px">카테고리</td>
+            <td style="width:16%;padding:5px 3px;text-align:right">건수(비율)</td>
+            <td style="width:10%;padding:5px 3px;text-align:right">증감</td>
+            <td style="width:18%;padding:5px 3px;text-align:right">직전 3개월 추이</td>
+          </tr></thead>
+          <tbody id="catTableRows"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <p style="font-size:13px;font-weight:600;margin:0 0 12px" id="catKwTitle">진료 및 치료·검사관련 긍부정 키워드 TOP5</p>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:600;color:#1baf7a">● 긍정 TOP5</span>
+          <span style="font-size:11px;color:var(--text-muted)" id="catPosTotal">1,200건</span>
+        </div>
+        <div id="catPosList" style="margin-bottom:16px"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:600;color:#e24b4a">● 부정 TOP5</span>
+          <span style="font-size:11px;color:var(--text-muted)" id="catNegTotal">1,210건</span>
+        </div>
+        <div id="catNegList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <p class="panel-title" style="margin:0">그룹별 VOC 현황 <span style="font-size:12px;font-weight:400;color:var(--text-muted)">· 총 15개</span></p>
+      <span style="font-size:11px;padding:2px 9px;border-radius:999px;border:0.5px solid var(--border-strong);color:var(--text-secondary)">Top 5</span>
+    </div>
+    <p class="panel-sub" style="margin-bottom:16px">병동·진료과·담당의사별 접수 건수와 비율, 전월 대비 변화를 그래프 또는 표로 확인하세요.</p>
+
+    <div style="background:var(--surface-1);border-radius:10px;padding:16px 18px">
+      <p style="font-size:13px;font-weight:600;margin:0 0 4px">병동별 VOC 현황 <span style="font-size:11px;font-weight:400;color:var(--text-muted)">· 총 5개 병동</span></p>
+      <p style="font-size:11px;color:var(--text-muted);margin:0 0 14px">병동 단위 긍정 비율 흐름과 부정 응답 집중도를 한 화면에서 비교합니다.</p>
+
+      <div style="display:grid;grid-template-columns:0.9fr 1.4fr;gap:16px">
+
+        <div style="background:var(--surface-2);border-radius:10px;padding:14px 16px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+            <span style="font-size:11px;color:var(--text-muted)">- - - 평균 <b style="color:var(--text-primary)">62.4%</b></span>
+            <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:var(--bg-success);color:var(--text-success)">최고 <b>12병동 65.2%</b></span>
+            <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger)">최저 <b>7병동 59.9%</b></span>
+          </div>
+          <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--text-secondary)">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#1baf7a"></span>긍정</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#e24b4a"></span>부정</span>
+          </div>
+          <div id="wardCountBars"></div>
+        </div>
+
+        <div style="background:var(--surface-2);border-radius:10px;padding:14px 16px">
+          <p style="font-size:12px;font-weight:600;margin:0 0 4px">병동별 VOC 현황</p>
+          <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px">병동별 세부 지표와 부정 건수를 함께 확인합니다.</p>
+          <div style="display:flex;gap:6px;margin-bottom:10px" id="wardSortToggle"></div>
+          <table style="width:100%;font-size:11px;border-collapse:collapse;table-layout:fixed">
+            <thead><tr style="color:var(--text-secondary)">
+              <td style="width:13%;padding:5px 3px">병동</td>
+              <td style="width:15%;padding:5px 3px;text-align:right">언급 건수</td>
+              <td style="width:18%;padding:5px 3px;text-align:right">긍정건수(비율)</td>
+              <td style="width:18%;padding:5px 3px;text-align:right">부정건수(비율)</td>
+              <td style="width:15%;padding:5px 3px;text-align:right">전월대비 부정률</td>
+              <td style="width:22%;padding:5px 3px;text-align:right">직전 3개월 부정률 추이</td>
+            </tr></thead>
+            <tbody id="wardTableRows"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="background:var(--surface-1);border-radius:10px;padding:16px 18px;margin-top:16px">
+      <p style="font-size:13px;font-weight:600;margin:0 0 4px">진료과별 VOC 현황 <span style="font-size:11px;font-weight:400;color:var(--text-muted)">· 총 5개 진료과</span></p>
+      <p style="font-size:11px;color:var(--text-muted);margin:0 0 14px">진료과 단위 긍정 비율 흐름과 부정 응답 집중도를 한 화면에서 비교합니다.</p>
+
+      <div style="display:grid;grid-template-columns:0.9fr 1.4fr;gap:16px">
+        <div style="background:var(--surface-2);border-radius:10px;padding:14px 16px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+            <span style="font-size:11px;color:var(--text-muted)">- - - 평균 <b style="color:var(--text-primary)">68.6%</b></span>
+            <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:var(--bg-success);color:var(--text-success)">최고 <b>정형외과 92.4%</b></span>
+            <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger)">최저 <b>외과 62.6%</b></span>
+          </div>
+          <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--text-secondary)">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#1baf7a"></span>긍정</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#e24b4a"></span>부정</span>
+          </div>
+          <div id="deptCountBars"></div>
+        </div>
+
+        <div style="background:var(--surface-2);border-radius:10px;padding:14px 16px">
+          <p style="font-size:12px;font-weight:600;margin:0 0 4px">진료과별 VOC 현황</p>
+          <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px">진료과별 세부 지표와 부정 건수를 함께 확인합니다.</p>
+          <div style="display:flex;gap:6px;margin-bottom:10px" id="deptSortToggle"></div>
+          <table style="width:100%;font-size:11px;border-collapse:collapse;table-layout:fixed">
+            <thead><tr style="color:var(--text-secondary)">
+              <td style="padding:5px 3px">진료과</td>
+              <td style="width:15%;padding:5px 3px;text-align:right">언급 건수</td>
+              <td style="width:18%;padding:5px 3px;text-align:right">긍정건수(비율)</td>
+              <td style="width:18%;padding:5px 3px;text-align:right">부정건수(비율)</td>
+              <td style="width:15%;padding:5px 3px;text-align:right">전월대비 부정률</td>
+              <td style="width:22%;padding:5px 3px;text-align:right">직전 3개월 부정률 추이</td>
+            </tr></thead>
+            <tbody id="deptTableRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface-1);border-radius:10px;padding:16px 18px;margin-top:16px">
+      <p style="font-size:13px;font-weight:600;margin:0 0 4px">의사별 VOC 현황 <span style="font-size:11px;font-weight:400;color:var(--text-muted)">· 총 5개</span></p>
+      <p style="font-size:11px;color:var(--text-muted);margin:0 0 14px">담당의사 단위 긍정 비율 흐름과 부정 응답 집중도를 한 화면에서 비교합니다.</p>
+
+      <div style="display:grid;grid-template-columns:0.9fr 1.4fr;gap:16px">
+        <div style="background:var(--surface-2);border-radius:10px;padding:14px 16px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+            <span style="font-size:11px;color:var(--text-muted)">- - - 평균 <b style="color:var(--text-primary)">61.4%</b></span>
+            <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:var(--bg-success);color:var(--text-success)">최고 <b>정형외과 원장 61.6%</b></span>
+            <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger)">최저 <b>신경외과 이의사 61.3%</b></span>
+          </div>
+          <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--text-secondary)">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#1baf7a"></span>긍정</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#e24b4a"></span>부정</span>
+          </div>
+          <div id="doctorCountBars"></div>
+        </div>
+
+        <div style="background:var(--surface-2);border-radius:10px;padding:14px 16px">
+          <p style="font-size:12px;font-weight:600;margin:0 0 4px">의사별 VOC 현황</p>
+          <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px">담당의사별 세부 지표와 부정 건수를 함께 확인합니다.</p>
+          <div style="display:flex;gap:6px;margin-bottom:10px" id="doctorSortToggle"></div>
+          <table style="width:100%;font-size:11px;border-collapse:collapse;table-layout:fixed">
+            <thead><tr style="color:var(--text-secondary)">
+              <td style="padding:5px 3px">담당의사</td>
+              <td style="width:12%;padding:5px 3px">소속</td>
+<td style="width:13%;padding:5px 3px;text-align:right">언급 건수</td>
+              <td style="width:16%;padding:5px 3px;text-align:right">긍정건수(비율)</td>
+              <td style="width:16%;padding:5px 3px;text-align:right">부정건수(비율)</td>
+              <td style="width:13%;padding:5px 3px;text-align:right">전월대비 부정률</td>
+              <td style="width:20%;padding:5px 3px;text-align:right">직전 3개월 부정률 추이</td>
+            </tr></thead>
+            <tbody id="doctorTableRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:11px;color:var(--text-muted);margin:14px 0 0">* 환자의 병동·진료과·담당의사 기준 집계입니다. 직원 개인 칭찬은 상단의 "직원칭찬 현황"에서 확인하세요.</p>
+  </div>
+
+  <!-- NEXT-SECTION-ANCHOR -->
+</div>
+<div id="wardModalOverlay" class="voc-modal-overlay" aria-hidden="true" onclick="if(event.target===this)closeWardModal()">
+  <div id="wardModalCard" class="voc-modal-card" role="dialog" aria-modal="true"></div>
+</div>
+<div id="prevRankModalOverlay" class="voc-modal-overlay" aria-hidden="true" onclick="if(event.target===this)closePrevRankModal()">
+  <div id="prevRankModalCard" class="voc-modal-card" role="dialog" aria-modal="true"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var typeSentiment = [
+  { type: "진료 및 치료·검사관련", cnt: 2410, change: -1.2, pos: 50, neg: 50 },
+  { type: "인적응대관련", cnt: 1350, change: -0.9, pos: 67, neg: 33 },
+  { type: "서비스제공관련", cnt: 940, change: 0.4, pos: 66, neg: 34 },
+  { type: "시스템 및 서비스", cnt: 780, change: 2.1, pos: 38, neg: 62 },
+  { type: "환경관련", cnt: 705, change: 1.0, pos: 57, neg: 43 },
+  { type: "비용관련", cnt: 612, change: 0.6, pos: 25, neg: 75 },
+  { type: "기타문의", cnt: 286, change: -0.2, pos: 35, neg: 65 },
+  { type: "미분류", cnt: 180, change: -5, pos: null, neg: null }
+];
+
+var maxTypeCnt = Math.max.apply(null, typeSentiment.filter(function (t) { return t.pos !== null; }).map(function (t) {
+  return Math.max(Math.round(t.cnt * t.pos / 100), Math.round(t.cnt * t.neg / 100));
+}));
+
+document.getElementById("typeTableRows").innerHTML = typeSentiment.map(function (t, i) {
+  var negChange = t.pos === null ? null : -t.change; // 부정률 전월대비(%p) = 긍정 비율 변화의 반대
+  var changeText;
+  if (t.pos === null) {
+    var isUp0 = t.change > 0, isFlat0 = t.change === 0;
+    var sign0 = isFlat0 ? "－" : (isUp0 ? "▲" : "▼");
+    changeText = '<span class="neutral">' + sign0 + Math.abs(t.change) + '건</span>';
+  } else {
+    var negUp = negChange > 0, negFlat = negChange === 0;
+    var negColorCls = negFlat ? "neutral" : (negUp ? "bad" : "good");
+    var negSign = negFlat ? "－" : (negUp ? "▲" : "▼");
+    changeText = '<span class="' + negColorCls + '">' + negSign + Math.abs(negChange).toFixed(1) + '%p</span>';
+  }
+
+  var ratioCell;
+  if (t.pos === null) {
+    ratioCell = '<div style="display:flex;align-items:center;gap:6px">' +
+      '<div style="flex:1;height:8px;border-radius:2px;background:#c9c4a0;width:60%"></div>' +
+      '<span style="font-size:10px;color:var(--text-muted)">감정 미확인</span>' +
+      '</div>';
+  } else {
+    var posCnt = Math.round(t.cnt * t.pos / 100);
+    var negCnt = t.cnt - posCnt;
+    var posBarPct = Math.round((posCnt / maxTypeCnt) * 100);
+    var negBarPct = Math.round((negCnt / maxTypeCnt) * 100);
+    ratioCell =
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">' +
+      '<div style="flex:1;height:8px;border-radius:2px;background:var(--surface-1);overflow:hidden"><div style="height:100%;width:' + posBarPct + '%;background:#1baf7a"></div></div>' +
+      '<span style="width:44px;text-align:right;font-size:11px;color:#1baf7a;font-weight:500">' + posCnt.toLocaleString() + '건</span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:6px">' +
+      '<div style="flex:1;height:8px;border-radius:2px;background:var(--surface-1);overflow:hidden"><div style="height:100%;width:' + negBarPct + '%;background:#e24b4a"></div></div>' +
+      '<span style="width:44px;text-align:right;font-size:11px;color:#e24b4a;font-weight:500">' + negCnt.toLocaleString() + '건</span>' +
+      '</div>';
+  }
+
+  return "<tr style=\"border-top:0.5px solid var(--border)\">" +
+    "<td style=\"padding:8px 4px;color:var(--text-muted);vertical-align:top\">" + (i + 1) + "</td>" +
+    "<td style=\"padding:8px 4px;font-weight:500;vertical-align:top\">" + t.type + "</td>" +
+    "<td style=\"padding:8px 4px;vertical-align:top\">" + ratioCell + "</td>" +
+    "<td style=\"padding:8px 4px;text-align:right;vertical-align:top\">" + changeText + "</td>" +
+    "</tr>";
+}).join("");
+
+var channels = [
+  { name: "메디통 픽스(앱)", cnt: 3450, pct: 38.1, change: 2.4, color: "#378ADD" },
+  { name: "고객의견카드", cnt: 2166, pct: 23.9, change: -0.6, color: "#1baf7a" },
+  { name: "직접 전화", cnt: 1289, pct: 14.2, change: 1.1, color: "#e8a33d" },
+  { name: "카카오톡·채널톡", cnt: 988, pct: 10.9, change: 0.8, color: "#e0559a" },
+  { name: "홈페이지", cnt: 626, pct: 6.9, change: -0.3, color: "#8f7fe0" },
+  { name: "현장 상담", cnt: 380, pct: 4.2, change: -1.2, color: "#3aa0a0" },
+  { name: "기타", cnt: 166, pct: 1.8, change: null, color: "#b7b3a8" }
+];
+
+new Chart(document.getElementById("channelDonut"), {
+  type: "doughnut",
+  data: {
+    labels: channels.map(function (c) { return c.name; }),
+    datasets: [{ data: channels.map(function (c) { return c.cnt; }), backgroundColor: channels.map(function (c) { return c.color; }), borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: "68%",
+    plugins: { legend: { display: false } }
+  }
+});
+
+var chTotal = channels.reduce(function (s, c) { return s + c.cnt; }, 0);
+document.getElementById("channelRows").innerHTML = channels.map(function (c, i) {
+  var changeText;
+  if (c.change === null) {
+    changeText = "－";
+  } else {
+    var isUp = c.change > 0;
+    var colorClass = "neutral";
+    var sign = isUp ? "▲" : "▼";
+    changeText = '<span class="' + colorClass + '">' + sign + Math.abs(c.change).toFixed(1) + "%</span>";
+  }
+  return "<tr style=\"border-top:0.5px solid var(--border)\">" +
+    "<td style=\"padding:5px 3px\"><span style=\"font-size:10px;padding:2px 7px;border-radius:999px;background:" + c.color + "22;color:" + c.color + "\">" + c.name + "</span></td>" +
+    "<td style=\"padding:5px 3px;text-align:right;font-weight:500\">" + c.cnt.toLocaleString() + "</td>" +
+    "<td style=\"padding:5px 3px;text-align:right\">" + c.pct + "%</td>" +
+    "<td style=\"padding:5px 3px;text-align:right\">" + changeText + "</td>" +
+    "</tr>";
+}).join("") +
+"<tr style=\"border-top:1px solid var(--border-strong);font-weight:600\">" +
+"<td style=\"padding:6px 3px\">합계</td>" +
+"<td style=\"padding:6px 3px;text-align:right\">" + chTotal.toLocaleString() + "</td>" +
+"<td style=\"padding:6px 3px;text-align:right\">100.0%</td>" +
+"<td style=\"padding:6px 3px\"></td>" +
+"</tr>";
+</script>
+
+<script>
+/* total(접수 건수)과 posCnt+negCnt(감정 언급 건수 합)는 서로 다른 값입니다.
+   감정이 명확하지 않은 절(단순 문의 등)은 긍/부정 어디에도 집계되지 않아
+   언급 건수 합이 접수 건수보다 작을 수 있습니다. */
+var monthlyTrend = [
+  { m: "1월", total: 14967, posCnt: 7549, negCnt: 6969,
+    posTop3: [["진료 및 치료·검사관련", 2200], ["인적응대관련", 1500], ["서비스제공관련", 690]],
+    negTop3: [["진료 및 치료·검사관련", 2010], ["인적응대관련", 880], ["환경관련", 610]] },
+  { m: "2월", total: 14845, posCnt: 11520, negCnt: 2880,
+    posTop3: [["진료 및 치료·검사관련", 2180], ["인적응대관련", 1460], ["서비스제공관련", 670]],
+    negTop3: [["진료 및 치료·검사관련", 2000], ["인적응대관련", 830], ["시스템 및 서비스", 590]] },
+  { m: "3월", total: 15169, posCnt: 7799, negCnt: 6915,
+    posTop3: [["진료 및 치료·검사관련", 2290], ["인적응대관련", 1580], ["서비스제공관련", 740]],
+    negTop3: [["진료 및 치료·검사관련", 2050], ["인적응대관련", 830], ["환경관련", 620]] },
+  { m: "4월", total: 15234, posCnt: 7389, negCnt: 7388,
+    posTop3: [["진료 및 치료·검사관련", 2310], ["인적응대관련", 1600], ["서비스제공관련", 760]],
+    negTop3: [["진료 및 치료·검사관련", 2080], ["인적응대관련", 870], ["환경관련", 640]] },
+  { m: "5월", total: 14901, posCnt: 7950, negCnt: 6504,
+    posTop3: [["진료 및 치료·검사관련", 2240], ["인적응대관련", 1540], ["서비스제공관련", 710]],
+    negTop3: [["진료 및 치료·검사관련", 2020], ["인적응대관련", 840], ["비용관련", 580]] },
+  { m: "6월", total: 15156, posCnt: 7645, negCnt: 7056,
+    posTop3: [["진료 및 치료·검사관련", 2360], ["인적응대관련", 1610], ["서비스제공관련", 780]],
+    negTop3: [["진료 및 치료·검사관련", 2040], ["인적응대관련", 840], ["환경관련", 650]] }
+];
+
+var maxMonthlyTotal = Math.max.apply(null, monthlyTrend.map(function (r) { return r.total; }));
+
+new Chart(document.getElementById("monthlyTrendChart"), {
+  type: "line",
+  data: {
+    labels: monthlyTrend.map(function (r) { return r.m; }),
+    datasets: [
+      { label: "긍정", data: monthlyTrend.map(function (r) { return r.posCnt; }), borderColor: "#1baf7a", backgroundColor: "rgba(27,175,122,0.12)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 },
+      { label: "부정", data: monthlyTrend.map(function (r) { return r.negCnt; }), borderColor: "#e24b4a", backgroundColor: "rgba(226,75,74,0.12)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: function (item) { return item.dataset.label + ": " + item.raw.toLocaleString() + "건"; } } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: "#898781" } },
+      y: { ticks: { color: "#898781", callback: function (v) { return v.toLocaleString(); } }, grid: { color: "#e1e0d9" } }
+    }
+  }
+});
+
+document.getElementById("monthCardGrid").innerHTML = monthlyTrend.map(function (r) {
+  var posRows = r.posTop3.map(function (c) {
+    return '<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0"><span style="color:var(--text-secondary)">' + c[0] + '</span><span style="font-weight:500">' + c[1].toLocaleString() + '</span></div>';
+  }).join("");
+  var negRows = r.negTop3.map(function (c) {
+    return '<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0"><span style="color:var(--text-secondary)">' + c[0] + '</span><span style="font-weight:500">' + c[1].toLocaleString() + '</span></div>';
+  }).join("");
+  return '<div style="background:var(--surface-1);border-radius:10px;padding:10px 11px">' +
+    '<p style="font-size:12px;font-weight:600;margin:0 0 6px">' + r.m + '</p>' +
+    '<p style="font-size:10.5px;font-weight:600;color:#1baf7a;margin:0 0 2px">긍정 TOP3</p>' + posRows +
+    '<p style="font-size:10.5px;font-weight:600;color:#e24b4a;margin:6px 0 2px">부정 TOP3</p>' + negRows +
+    '</div>';
+}).join("");
+</script>
+
+<script>
+var ages = [
+  { label: "20대 미만", male: 38, female: 37, total: 75, pct: 1 },
+  { label: "20대", male: 590, female: 591, total: 1181, pct: 13 },
+  { label: "30대", male: 605, female: 602, total: 1207, pct: 14 },
+  { label: "40대", male: 690, female: 661, total: 1351, pct: 15 },
+  { label: "50대", male: 660, female: 628, total: 1288, pct: 14 },
+  { label: "60대 이상", male: 1912, female: 1925, total: 3837, pct: 43 }
+];
+
+var ageKwData = {
+  "20대 미만": {
+    pos: [
+      ["인적응대관련", "친절함", 7, 9.3, 4.2],
+      ["환경관련", "정갈함", 6, 8.0, 2.8],
+      ["진료 및 치료·검사관련", "세심함", 5, 6.7, 1.6],
+      ["진료 및 치료·검사관련", "의사 설명", 5, 6.7, 3.4],
+      ["서비스제공관련", "시설 만족", 4, 5.3, -0.5]
+    ],
+    neg: [
+      ["진료 및 치료·검사관련", "대기시간", 6, 8.0, 7.8],
+      ["환경관련", "소음", 5, 6.7, 4.6],
+      ["인적응대관련", "응대 불친절", 4, 5.3, 2.3],
+      ["진료 및 치료·검사관련", "검사 결과", 3, 4.0, 1.9],
+      ["서비스제공관련", "퇴원 일정", 2, 2.7, -1.2]
+    ]
+  },
+  "20대": {
+    pos: [
+      ["인적응대관련", "친절함", 98, 8.3, 3.1],
+      ["진료 및 치료·검사관련", "의사 설명", 84, 7.1, 2.0],
+      ["환경관련", "청결", 71, 6.0, 1.4],
+      ["서비스제공관련", "시설 만족", 58, 4.9, 0.6],
+      ["진료 및 치료·검사관련", "치료 결과", 52, 4.4, 0.9]
+    ],
+    neg: [
+      ["진료 및 치료·검사관련", "대기시간", 89, 7.5, 3.8],
+      ["인적응대관련", "응대 지연", 66, 5.6, 2.1],
+      ["시스템 및 서비스", "예약 절차", 47, 4.0, 1.0],
+      ["환경관련", "소음", 40, 3.4, -0.4],
+      ["비용관련", "수납 대기", 33, 2.8, 0.7]
+    ]
+  },
+  "30대": {
+    pos: [
+      ["인적응대관련", "친절함", 110, 9.1, 3.3],
+      ["진료 및 치료·검사관련", "의사 설명", 95, 7.9, 2.9],
+      ["인적응대관련", "세심함", 84, 7.0, 1.8],
+      ["환경관련", "청결", 71, 5.9, 0.9],
+      ["서비스제공관련", "친절 응대", 60, 5.0, 0.4]
+    ],
+    neg: [
+      ["진료 및 치료·검사관련", "대기시간", 90, 7.5, -2.8],
+      ["환경관련", "소음", 85, 7.0, 1.1],
+      ["시스템 및 서비스", "예약 시스템", 58, 4.8, 0.5],
+      ["인적응대관련", "응대 지연", 44, 3.6, -0.6],
+      ["비용관련", "수납 절차", 31, 2.6, 0.3]
+    ]
+  },
+  "40대": {
+    pos: [
+      ["진료 및 치료·검사관련", "의사 설명", 120, 8.9, 2.4],
+      ["인적응대관련", "친절함", 103, 7.6, 1.9],
+      ["환경관련", "청결", 88, 6.5, 0.7],
+      ["서비스제공관련", "시설 만족", 66, 4.9, -0.3],
+      ["진료 및 치료·검사관련", "치료 결과", 60, 4.4, 1.1]
+    ],
+    neg: [
+      ["진료 및 치료·검사관련", "대기시간", 98, 7.3, 1.5],
+      ["인적응대관련", "응대 불친절", 70, 5.2, 0.8],
+      ["환경관련", "소음", 55, 4.1, -1.0],
+      ["비용관련", "비용 부담", 42, 3.1, 0.6],
+      ["시스템 및 서비스", "절차 복잡", 30, 2.2, -0.2]
+    ]
+  },
+  "50대": {
+    pos: [
+      ["인적응대관련", "친절함", 115, 8.9, 1.6],
+      ["진료 및 치료·검사관련", "의사 설명", 92, 7.1, 2.0],
+      ["환경관련", "정갈함", 74, 5.7, 0.5],
+      ["서비스제공관련", "시설 만족", 58, 4.5, -0.4],
+      ["진료 및 치료·검사관련", "치료 태도", 49, 3.8, 0.9]
+    ],
+    neg: [
+      ["진료 및 치료·검사관련", "대기시간", 88, 6.8, -0.6],
+      ["환경관련", "소음", 60, 4.7, 0.4],
+      ["비용관련", "비용 부담", 52, 4.0, 1.2],
+      ["인적응대관련", "응대 지연", 41, 3.2, -0.3],
+      ["시스템 및 서비스", "예약 절차", 28, 2.2, 0.1]
+    ]
+  },
+  "60대 이상": {
+    pos: [
+      ["인적응대관련", "친절함", 320, 8.3, 2.0],
+      ["진료 및 치료·검사관련", "의사 설명", 268, 7.0, 1.5],
+      ["환경관련", "정갈함", 210, 5.5, 0.6],
+      ["서비스제공관련", "시설 만족", 165, 4.3, -0.2],
+      ["진료 및 치료·검사관련", "친절 안내", 140, 3.6, 0.8]
+    ],
+    neg: [
+      ["진료 및 치료·검사관련", "대기시간", 250, 6.5, 1.0],
+      ["환경관련", "소음", 172, 4.5, 0.3],
+      ["인적응대관련", "응대 지연", 133, 3.5, -0.5],
+      ["비용관련", "비용 부담", 98, 2.6, 0.9],
+      ["시스템 및 서비스", "절차 복잡", 71, 1.9, -0.1]
+    ]
+  }
+};
+
+var currentGender = "전체";
+var currentAge = "20대 미만";
+
+function setGender(g) {
+  currentGender = g;
+  renderPage();
+}
+
+function setAge(a) {
+  currentAge = a;
+  renderPage();
+}
+
+function kwTableRows(list) {
+  return list.map(function (row, i) {
+    var isPos = row.__pos;
+    var badgeBg = isPos ? "var(--bg-success)" : "var(--bg-danger)";
+    var badgeText = isPos ? "var(--text-success)" : "var(--text-danger)";
+    var isUp = row[4] > 0, isFlat = row[4] === 0;
+    var color = isFlat ? "var(--text-muted)" : (isUp ? "#B4392B" : "#185FA5");
+    var sign = isFlat ? "－" : (isUp ? "▲" : "▼");
+    return "<tr style=\"border-top:0.5px solid var(--border)\">" +
+      "<td style=\"padding:6px 3px;color:var(--text-muted)\">" + (i + 1) + "</td>" +
+      "<td style=\"padding:6px 3px\"><span style=\"font-size:9px;font-weight:600;padding:1px 6px;border-radius:999px;background:" + badgeBg + ";color:" + badgeText + "\">" + (isPos ? "긍정" : "부정") + "</span></td>" +
+      "<td style=\"padding:6px 3px;color:var(--text-secondary)\">" + row[0] + "</td>" +
+      "<td style=\"padding:6px 3px;font-weight:600\">" + row[1] + "</td>" +
+      "<td style=\"padding:6px 3px;text-align:right\">" + row[2] + "건(" + row[3] + "%)</td>" +
+      "<td style=\"padding:6px 3px;text-align:right;color:" + color + "\">" + sign + Math.abs(row[4]).toFixed(1) + "%</td>" +
+      "</tr>";
+  }).join("");
+}
+
+function renderAgeList() {
+  document.getElementById("ageList").innerHTML = ages.map(function (a) {
+    var isSel = a.label === currentAge;
+    return "<div onclick=\"setAge('" + a.label + "')\" style=\"cursor:pointer;padding:6px 8px;border-radius:8px;margin-bottom:4px;" + (isSel ? "background:var(--bg-accent)" : "") + "\">" +
+      "<div style=\"display:flex;align-items:center;gap:8px\">" +
+      "<span style=\"width:64px;flex-shrink:0;font-size:12px;" + (isSel ? "font-weight:600;color:var(--text-accent)" : "") + "\">" + a.label + "</span>" +
+      "<div style=\"flex:1;height:12px;border-radius:3px;overflow:hidden;display:flex\">" +
+      "<div style=\"width:" + (a.male / a.total * 100) + "%;background:#378ADD\"></div>" +
+      "<div style=\"width:" + (a.female / a.total * 100) + "%;background:#e0559a\"></div>" +
+      "</div>" +
+      "<span style=\"width:78px;flex-shrink:0;text-align:right;font-size:12px;color:var(--text-secondary)\">" + a.total.toLocaleString() + "명 (" + a.pct + "%)</span>" +
+      "</div></div>";
+  }).join("");
+}
+
+function renderKwPanel() {
+  var d = ageKwData[currentAge];
+  document.getElementById("ageKwTitle").textContent = currentAge + " 응답자 기준";
+  var ageObj = ages.filter(function (a) { return a.label === currentAge; })[0];
+  document.getElementById("ageKwCount").textContent = ageObj.total.toLocaleString() + "명";
+
+  var posRows = d.pos.map(function (r) { r.__pos = true; return r; });
+  var negRows = d.neg.map(function (r) { r.__pos = false; return r; });
+  document.getElementById("posKwRows").innerHTML = kwTableRows(posRows);
+  document.getElementById("negKwRows").innerHTML = kwTableRows(negRows);
+}
+
+function renderPage() {
+  document.getElementById("genderAllBtn").style.background = currentGender === "전체" ? "var(--fill-accent)" : "";
+  document.getElementById("genderAllBtn").style.color = currentGender === "전체" ? "var(--on-accent)" : "";
+  renderAgeList();
+  renderKwPanel();
+}
+
+renderPage();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var catColor = {
+  "진료 및 치료·검사관련": "#2a78d6",
+  "인적응대관련": "#e24b4a",
+  "서비스제공관련": "#3aa0a0",
+  "시스템 및 서비스": "#7f77dd",
+  "환경관련": "#8a6d3b",
+  "비용관련": "#c98a2c",
+  "기타문의": "#898781"
+};
+
+var catData = {
+  "진료 및 치료·검사관련": {
+    cnt: 2410, pct: 29.0, change: -1.2, trend: [2460, 2430, 2410],
+    posTotal: 1200, negTotal: 1210,
+    pos: [["의사 설명", 164], ["치료 결과", 144], ["진료 태도", 124], ["검사 안내", 105], ["진료 과정 설명", 85]],
+    neg: [["치료 속도", 129], ["전문성", 113], ["상담 시간", 98], ["수술 설명", 82], ["검사 결과 설명", 67]]
+  },
+  "인적응대관련": {
+    cnt: 1350, pct: 16.2, change: -0.9, trend: [1310, 1330, 1350],
+    posTotal: 900, negTotal: 450,
+    pos: [["친절함", 320], ["세심함", 210], ["신속 응대", 165], ["배려", 120], ["매너", 85]],
+    neg: [["응대 지연", 140], ["불친절", 110], ["소통 부족", 90], ["신뢰성 부족", 65], ["수치심 유발", 45]]
+  },
+  "서비스제공관련": {
+    cnt: 940, pct: 11.3, change: 0.4, trend: [905, 920, 940],
+    posTotal: 620, negTotal: 320,
+    pos: [["시설 만족", 210], ["식사 만족", 150], ["편의시설", 120], ["안내 친절", 90], ["청결 서비스", 50]],
+    neg: [["식단 아쉬움", 95], ["편의시설 부족", 80], ["대기 공간 부족", 70], ["안내 미흡", 45], ["서비스 지연", 30]]
+  },
+  "시스템 및 서비스": {
+    cnt: 780, pct: 9.4, change: 2.1, trend: [720, 745, 780],
+    posTotal: 300, negTotal: 480,
+    pos: [["예약 편리", 110], ["앱 편의성", 90], ["안내 시스템", 60], ["온라인 접수", 25], ["알림 서비스", 15]],
+    neg: [["예약 절차 복잡", 180], ["앱 오류", 130], ["접수 지연", 90], ["안내 부족", 50], ["시스템 오류", 30]]
+  },
+  "환경관련": {
+    cnt: 705, pct: 8.5, change: 1.0, trend: [680, 690, 705],
+    posTotal: 400, negTotal: 305,
+    pos: [["병실 청결", 150], ["채광·환기", 90], ["휴게공간", 80], ["소음 관리", 50], ["온도 쾌적", 30]],
+    neg: [["소음", 120], ["청소 시간", 80], ["주차 불편", 60], ["온도 불편", 25], ["시설 노후", 20]]
+  },
+  "비용관련": {
+    cnt: 612, pct: 7.4, change: 0.6, trend: [590, 600, 612],
+    posTotal: 150, negTotal: 462,
+    pos: [["수납 절차 명확", 60], ["비용 안내 친절", 45], ["보험 처리 원활", 25], ["할인 혜택", 12], ["결제 편리", 8]],
+    neg: [["비용 부담", 210], ["수납 대기", 120], ["보험 처리 지연", 70], ["설명 부족", 40], ["추가 비용 안내 미흡", 22]]
+  },
+  "기타문의": {
+    cnt: 286, pct: 3.4, change: -0.2, trend: [300, 292, 286],
+    posTotal: 100, negTotal: 186,
+    pos: [["전반적 만족", 45], ["재방문 의사", 30], ["병원 추천", 15], ["브랜드 신뢰", 6], ["기타 만족", 4]],
+    neg: [["절차 복잡", 80], ["안내 미흡", 55], ["기타 불만", 30], ["소통 채널 부족", 15], ["기타 문의 지연", 6]]
+  }
+};
+
+var catOrder = Object.keys(catData);
+var currentCat = catOrder[0];
+var catDonutChart = null;
+
+function sparkSvg(trend, isUp) {
+  var w = 60, h = 22;
+  var min = Math.min.apply(null, trend), max = Math.max.apply(null, trend);
+  var range = max - min || 1;
+  var pts = trend.map(function (v, i) {
+    var x = (i / (trend.length - 1)) * (w - 4) + 2;
+    var y = h - 2 - ((v - min) / range) * (h - 4);
+    return x + "," + y;
+  }).join(" ");
+  var color = isUp ? "#B4392B" : "#185FA5";
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '"><polyline points="' + pts + '" fill="none" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+function setCat(cat) {
+  currentCat = cat;
+  renderCatSection();
+}
+
+function catKwListHtml(list, color) {
+  var max = Math.max.apply(null, list.map(function (r) { return r[1]; }));
+  return list.map(function (r, i) {
+    var pct = Math.round((r[1] / max) * 100);
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;padding:4px 0">' +
+      '<span style="width:14px;color:var(--text-muted)">' + (i + 1) + '</span>' +
+      '<span style="width:80px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + r[0] + '</span>' +
+      '<span style="flex:1;height:12px;background:var(--surface-1);border-radius:3px;overflow:hidden"><span style="display:block;height:100%;width:' + pct + '%;background:' + color + '"></span></span>' +
+      '<span style="width:38px;text-align:right;color:var(--text-secondary)">' + r[1] + '건</span>' +
+      '</div>';
+  }).join("");
+}
+
+function renderCatChips() {
+  var sorted = catOrder.slice().sort(function (a, b) { return catData[b].cnt - catData[a].cnt; });
+  var chips = ['<span onclick="setCat(\'__all__\')" style="font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;' +
+    (currentCat === "__all__" ? "background:var(--fill-accent);color:var(--on-accent);font-weight:600" : "border:0.5px solid var(--border-strong)") + '">전체</span>'];
+  sorted.forEach(function (c, i) {
+    var isSel = c === currentCat;
+    chips.push('<span onclick="setCat(\'' + c + '\')" style="font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;' +
+      (isSel ? "background:var(--fill-accent);color:var(--on-accent);font-weight:600" : "border:0.5px solid var(--border-strong)") + '">' + (i + 1) + '위 ' + c + '</span>');
+  });
+  document.getElementById("catChips").innerHTML = chips.join("");
+}
+
+function renderCatDonut() {
+  var sorted = catOrder.slice().sort(function (a, b) { return catData[b].cnt - catData[a].cnt; });
+  if (catDonutChart) catDonutChart.destroy();
+  catDonutChart = new Chart(document.getElementById("catDonut"), {
+    type: "doughnut",
+    data: {
+      labels: sorted,
+      datasets: [{
+        data: sorted.map(function (c) { return catData[c].cnt; }),
+        backgroundColor: sorted.map(function (c) { return catColor[c]; }),
+        borderWidth: 0
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, cutout: "62%", plugins: { legend: { display: false } } }
+  });
+}
+
+function renderCatTable() {
+  var sorted = catOrder.slice().sort(function (a, b) { return catData[b].cnt - catData[a].cnt; });
+  document.getElementById("catTableRows").innerHTML = sorted.map(function (c, i) {
+    var d = catData[c];
+    var isUp = d.change > 0, isFlat = d.change === 0;
+    var colorClass = isFlat ? "neutral" : "neutral";
+    var sign = isFlat ? "－" : (isUp ? "▲" : "▼");
+    return "<tr style=\"border-top:0.5px solid var(--border);" + (c === currentCat ? "background:var(--bg-accent)" : "") + "\">" +
+      "<td style=\"padding:6px 3px\">" + (i + 1) + "</td>" +
+      "<td style=\"padding:6px 3px;font-weight:500\">" + c + "</td>" +
+      "<td style=\"padding:6px 3px;text-align:right\">" + d.cnt.toLocaleString() + "건(" + d.pct + "%)</td>" +
+      "<td style=\"padding:6px 3px;text-align:right\" class=\"" + colorClass + "\">" + sign + Math.abs(d.change).toFixed(1) + "%p</td>" +
+      "<td style=\"padding:6px 3px;text-align:right\">" + sparkSvg(d.trend, isUp) + "</td>" +
+      "</tr>";
+  }).join("");
+}
+
+function renderCatKwPanel() {
+  var c = currentCat === "__all__" ? catOrder[0] : currentCat;
+  var d = catData[c];
+  document.getElementById("catKwTitle").textContent = c + " 긍부정 키워드 TOP5";
+  document.getElementById("catPosTotal").textContent = d.posTotal.toLocaleString() + "건";
+  document.getElementById("catNegTotal").textContent = d.negTotal.toLocaleString() + "건";
+  document.getElementById("catPosList").innerHTML = catKwListHtml(d.pos, "#1baf7a");
+  document.getElementById("catNegList").innerHTML = catKwListHtml(d.neg, "#e24b4a");
+}
+
+function renderCatSection() {
+  renderCatChips();
+  renderCatDonut();
+  renderCatTable();
+  renderCatKwPanel();
+}
+
+renderCatSection();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var wards2 = [
+  { name: "12병동", total: 14946, pos: 65.2, neg: 34.8, posCnt: 9750, negCnt: 5196, change: 3.1, trend: [14520, 14710, 14946] },
+  { name: "3병동", total: 14126, pos: 64.0, neg: 36.0, posCnt: 9040, negCnt: 5086, change: 2.0, trend: [13850, 13990, 14126] },
+  { name: "내과 중환자실", total: 13479, pos: 61.9, neg: 38.1, posCnt: 8346, negCnt: 5133, change: -0.5, trend: [13560, 13510, 13479] },
+  { name: "5병동", total: 13117, pos: 60.9, neg: 39.1, posCnt: 7989, negCnt: 5128, change: 1.1, trend: [12980, 13040, 13117] },
+  { name: "7병동", total: 12613, pos: 59.9, neg: 40.1, posCnt: 7559, negCnt: 5054, change: -1.2, trend: [12780, 12690, 12613] }
+];
+
+function renderCountBars(containerId, rows) {
+  var maxCnt = Math.max.apply(null, rows.map(function (r) { return Math.max(r.posCnt, r.negCnt); }));
+  document.getElementById(containerId).innerHTML = rows.map(function (r) {
+    var total = r.posCnt + r.negCnt;
+    var barPosPct = Math.round((r.posCnt / maxCnt) * 100);
+    var barNegPct = Math.round((r.negCnt / maxCnt) * 100);
+    var sharePos = total ? Math.round((r.posCnt / total) * 1000) / 10 : 0;
+    var shareNeg = total ? Math.round((r.negCnt / total) * 1000) / 10 : 0;
+    return '<div style="margin-bottom:12px">' +
+      '<p style="font-size:12px;font-weight:500;margin:0 0 4px">' + r.name + '</p>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
+      '<span style="flex:1;height:12px;background:var(--surface-1);border-radius:3px;overflow:hidden"><span style="display:block;height:100%;width:' + barPosPct + '%;background:#1baf7a"></span></span>' +
+      '<span style="width:96px;text-align:right;font-size:11px;color:#1baf7a;font-weight:500">' + r.posCnt.toLocaleString() + '건 (' + sharePos.toFixed(1) + '%)</span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+      '<span style="flex:1;height:12px;background:var(--surface-1);border-radius:3px;overflow:hidden"><span style="display:block;height:100%;width:' + barNegPct + '%;background:#e24b4a"></span></span>' +
+      '<span style="width:96px;text-align:right;font-size:11px;color:#e24b4a;font-weight:500">' + r.negCnt.toLocaleString() + '건 (' + shareNeg.toFixed(1) + '%)</span>' +
+      '</div>' +
+      '</div>';
+  }).join("");
+}
+
+function renderSortToggle(containerId, mode, selectFnName) {
+  var opts = [["none", "기본순"], ["pos", "긍정 많은 순"], ["neg", "부정 많은 순"]];
+  document.getElementById(containerId).innerHTML = opts.map(function (o) {
+    var active = mode === o[0];
+    var style = active
+      ? "background:var(--fill-accent);color:var(--on-accent);font-weight:600"
+      : "border:0.5px solid var(--border-strong);color:var(--text-secondary)";
+    return '<span onclick="' + selectFnName + '(\'' + o[0] + '\')" style="cursor:pointer;font-size:11px;padding:4px 10px;border-radius:999px;' + style + '">' + o[1] + '</span>';
+  }).join("");
+}
+
+function sortByMode(rows, mode, posKey, negKey) {
+  var copy = rows.slice();
+  if (mode === "pos") copy.sort(function (a, b) { return b[posKey] - a[posKey]; });
+  if (mode === "neg") copy.sort(function (a, b) { return b[negKey] - a[negKey]; });
+  return copy;
+}
+
+var wardSortMode = "none";
+
+function setWardSort(mode) {
+  wardSortMode = mode;
+  renderWardSection();
+}
+
+function renderWardSection() {
+  renderSortToggle("wardSortToggle", wardSortMode, "setWardSort");
+  var sortedWards = sortByMode(wards2, wardSortMode, "posCnt", "negCnt");
+
+  renderCountBars("wardCountBars", sortedWards);
+
+  document.getElementById("wardTableRows").innerHTML = sortedWards.map(function (w) {
+    var totalChange = w.trend[2] - w.trend[1];
+    var totalUp = totalChange > 0, totalFlat = totalChange === 0;
+    var totalSign = totalFlat ? "－" : (totalUp ? "▲" : "▼");
+
+    var posChange = w.change; // 긍정 비율 전월 대비(%p)
+    var negChange = -posChange; // 부정 비율은 긍정과 반대 방향
+    var negUp = negChange > 0, negFlat = negChange === 0;
+    var negColor = negFlat ? "neutral" : (negUp ? "bad" : "good"); // 부정 증가=나쁨(빨강), 감소=좋음(파랑)
+    var negSign = negFlat ? "－" : (negUp ? "▲" : "▼");
+
+    // 부정률 3개월 추이: 현재 부정 비율에서 역산 (긍정 비율 추이의 반대)
+    var negTrend = [w.neg - negChange, w.neg - negChange * 0.5, w.neg];
+
+    return "<tr style=\"border-top:0.5px solid var(--border)\">" +
+      "<td style=\"padding:7px 3px;font-weight:500;cursor:pointer;color:var(--text-accent);text-decoration:underline;text-decoration-color:var(--border-strong)\" onclick=\"openWardModal('" + w.name + "')\">" + w.name + "</td>" +
+      "<td style=\"padding:7px 3px;text-align:right\">" + w.total.toLocaleString() + "건 <span class=\"neutral\">" + totalSign + Math.abs(totalChange) + "건</span></td>" +
+      "<td style=\"padding:7px 3px;text-align:right;color:#1baf7a\">" + w.posCnt.toLocaleString() + "(" + w.pos.toFixed(1) + "%)</td>" +
+      "<td style=\"padding:7px 3px;text-align:right;color:#e24b4a\">" + w.negCnt.toLocaleString() + "(" + w.neg.toFixed(1) + "%)</td>" +
+      "<td style=\"padding:7px 3px;text-align:right\" class=\"" + negColor + "\">" + negSign + Math.abs(negChange).toFixed(1) + "%p</td>" +
+      "<td style=\"padding:7px 3px;text-align:right\">" + sparkSvg(negTrend, negUp) + "</td>" +
+      "</tr>";
+  }).join("");
+}
+
+renderWardSection();
+</script>
+
+
+<script>
+var wardModalData = {
+  "12병동": {
+    posTotal: 720, negTotal: 396,
+    pos: [["친절함", 210], ["의사 설명", 175], ["병실 청결", 148], ["세심함", 112], ["간호사 응대", 75]],
+    neg: [["대기시간", 128], ["회진 시간", 96], ["소음", 74], ["응대 지연", 58], ["시설 요청", 40]],
+    trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+    trendPos: [9200, 9350, 9420, 9500, 9620, 9750],
+    trendNeg: [4800, 4850, 4900, 4980, 5080, 5196]
+  },
+  "3병동": {
+    posTotal: 640, negTotal: 372,
+    pos: [["의사 설명", 190], ["친절함", 160], ["병실 청결", 130], ["치료 결과", 100], ["세심함", 60]],
+    neg: [["회진 시간", 120], ["대기시간", 90], ["소음", 70], ["응대 지연", 52], ["시설 요청", 40]],
+    trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+    trendPos: [8600, 8700, 8800, 8880, 8960, 9040],
+    trendNeg: [4700, 4750, 4820, 4900, 4990, 5086]
+  },
+  "내과 중환자실": {
+    posTotal: 590, negTotal: 400,
+    pos: [["환자 확인", 180], ["친절함", 150], ["세심함", 110], ["의사 설명", 90], ["신속 대응", 60]],
+    neg: [["면회 제한", 130], ["대기시간", 95], ["소음", 70], ["응대 지연", 62], ["시설 요청", 43]],
+    trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+    trendPos: [8500, 8450, 8420, 8390, 8360, 8346],
+    trendNeg: [4900, 4950, 5000, 5060, 5100, 5133]
+  },
+  "5병동": {
+    posTotal: 560, negTotal: 388,
+    pos: [["병실 청결", 170], ["친절함", 145], ["의사 설명", 110], ["세심함", 85], ["간호사 응대", 50]],
+    neg: [["청소 시간", 120], ["대기시간", 92], ["소음", 70], ["응대 지연", 60], ["시설 요청", 46]],
+    trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+    trendPos: [7700, 7780, 7830, 7880, 7940, 7989],
+    trendNeg: [4900, 4950, 5000, 5040, 5090, 5128]
+  },
+  "7병동": {
+    posTotal: 417, negTotal: 339,
+    pos: [["병실 청결", 124], ["간호사 응대", 99], ["친절함", 81], ["의사 설명", 63], ["세심함", 50]],
+    neg: [["소음", 97], ["대기시간", 83], ["식사 안내", 68], ["응대 지연", 52], ["시설 요청", 39]],
+    trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+    trendPos: [5650, 5800, 5780, 5800, 5950, 6300],
+    trendNeg: [6250, 6220, 6250, 6480, 7000, 7180]
+  }
+};
+
+var wardModalChart = null;
+
+function wardKwListHtml(list, color) {
+  var max = Math.max.apply(null, list.map(function (r) { return r[1]; }));
+  return list.map(function (r, i) {
+    var pct = Math.round((r[1] / max) * 100);
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0">' +
+      '<span style="width:14px;color:var(--text-muted)">' + (i + 1) + '</span>' +
+      '<span style="width:80px;flex-shrink:0">' + r[0] + '</span>' +
+      '<span style="flex:1;height:13px;background:var(--surface-1);border-radius:3px;overflow:hidden"><span style="display:block;height:100%;width:' + pct + '%;background:' + color + '"></span></span>' +
+      '<span style="width:38px;text-align:right;color:var(--text-secondary)">' + r[1] + '건</span>' +
+      '</div>';
+  }).join("");
+}
+
+function openWardModal(wardName) {
+  var d = wardModalData[wardName];
+  if (!d) return;
+  var overlay = document.getElementById("wardModalOverlay");
+  var card = document.getElementById("wardModalCard");
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  card.innerHTML =
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px">' +
+    '<p style="font-size:16px;font-weight:600;margin:0">' + wardName + ' VOC 월별 추이</p>' +
+    '<i class="ti ti-x" style="font-size:18px;color:var(--text-muted);cursor:pointer" aria-hidden="true" onclick="closeWardModal()"></i>' +
+    '</div>' +
+    '<p style="font-size:12px;color:var(--text-muted);margin:0 0 16px">병동 기준 최근 6개월 긍정/부정 흐름입니다.</p>' +
+
+    '<div style="background:var(--surface-1);border-radius:10px;padding:12px 14px;margin-bottom:12px">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+    '<span style="font-size:12px;font-weight:600;color:#1baf7a">● 긍정 TOP5</span>' +
+    '<span style="font-size:11px;color:var(--text-muted)">' + d.posTotal.toLocaleString() + '건</span>' +
+    '</div>' + wardKwListHtml(d.pos, "#1baf7a") + '</div>' +
+
+    '<div style="background:var(--surface-1);border-radius:10px;padding:12px 14px;margin-bottom:16px">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+    '<span style="font-size:12px;font-weight:600;color:#e24b4a">● 부정 TOP5</span>' +
+    '<span style="font-size:11px;color:var(--text-muted)">' + d.negTotal.toLocaleString() + '건</span>' +
+    '</div>' + wardKwListHtml(d.neg, "#e24b4a") + '</div>' +
+
+    '<p style="font-size:13px;font-weight:600;margin:0 0 8px">월별 추이 <span style="font-weight:400;color:var(--text-muted);font-size:11px">(긍정·부정)</span></p>' +
+    '<div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--text-secondary)">' +
+    '<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#1baf7a"></span>긍정</span>' +
+    '<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#e24b4a"></span>부정</span>' +
+    '</div>' +
+    '<div style="position:relative;height:220px"><canvas id="wardModalTrendChart"></canvas></div>';
+
+  if (wardModalChart) wardModalChart.destroy();
+  setTimeout(function () {
+    wardModalChart = new Chart(document.getElementById("wardModalTrendChart"), {
+      type: "line",
+      data: {
+        labels: d.trendMonths,
+        datasets: [
+          { label: "긍정", data: d.trendPos, borderColor: "#1baf7a", backgroundColor: "rgba(27,175,122,0.12)", fill: true, tension: 0.35, pointRadius: 4, borderWidth: 2 },
+          { label: "부정", data: d.trendNeg, borderColor: "#e24b4a", backgroundColor: "rgba(226,75,74,0.12)", fill: true, tension: 0.35, pointRadius: 4, borderWidth: 2 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: "#898781" }, grid: { display: false } },
+          y: { ticks: { color: "#898781" }, grid: { color: "#e1e0d9" } }
+        }
+      }
+    });
+  }, 0);
+}
+
+function closeWardModal() {
+  var overlay = document.getElementById("wardModalOverlay");
+  overlay.style.display = "none";
+  overlay.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+// 진료과·의사 클릭 모달용 데이터 확장
+wardModalData["외과"] = {
+  posTotal: 610, negTotal: 386,
+  pos: [["수술 결과 만족", 180], ["친절함", 150], ["회복 속도", 110], ["의사 설명", 100], ["세심함", 70]],
+  neg: [["수술 대기", 130], ["통증 관리", 95], ["회진 시간", 78], ["응대 지연", 50], ["시설 요청", 33]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [9200, 9350, 9480, 9600, 9750, 9877],
+  trendNeg: [3600, 3650, 3700, 3760, 3820, 3864]
+};
+wardModalData["정형외과"] = {
+  posTotal: 1050, negTotal: 88,
+  pos: [["재활 지도 만족", 320], ["통증 완화", 260], ["친절함", 220], ["의사 설명", 160], ["회복 속도", 90]],
+  neg: [["대기시간", 30], ["재활 일정", 22], ["회진 시간", 18], ["응대 지연", 10], ["시설 요청", 8]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [11800, 11950, 12100, 12250, 12180, 12180],
+  trendNeg: [900, 880, 860, 840, 820, 810]
+};
+wardModalData["내과"] = {
+  posTotal: 560, negTotal: 356,
+  pos: [["친절함", 170], ["진단 신뢰", 140], ["의사 설명", 120], ["세심함", 80], ["치료 결과", 50]],
+  neg: [["대기시간", 120], ["검사 결과 설명", 90], ["약물 안내", 70], ["응대 지연", 48], ["시설 요청", 28]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [7700, 7750, 7800, 7830, 7900, 7910],
+  trendNeg: [3400, 3420, 3460, 3500, 3530, 3550]
+};
+wardModalData["신경외과"] = {
+  posTotal: 500, negTotal: 330,
+  pos: [["검사 안내", 150], ["친절함", 120], ["의사 설명", 110], ["세심함", 70], ["치료 결과", 50]],
+  neg: [["대기시간", 110], ["통증 관리", 85], ["회진 시간", 65], ["응대 지연", 45], ["시설 요청", 25]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [7100, 7150, 7200, 7250, 7280, 7300],
+  trendNeg: [3200, 3230, 3260, 3290, 3310, 3330]
+};
+wardModalData["재활의학과"] = {
+  posTotal: 480, negTotal: 300,
+  pos: [["재활 지도 만족", 150], ["친절함", 120], ["운동 지도", 100], ["세심함", 70], ["회복 속도", 40]],
+  neg: [["대기시간", 100], ["재활 일정 지연", 80], ["회진 시간", 60], ["응대 지연", 38], ["시설 요청", 22]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [6600, 6650, 6700, 6720, 6750, 6760],
+  trendNeg: [3000, 3030, 3060, 3080, 3100, 3125]
+};
+wardModalData["정형외과 원장"] = {
+  posTotal: 189, negTotal: 88,
+  pos: [["재활 지도 만족", 60], ["친절함", 50], ["통증 완화", 40], ["의사 설명", 25], ["세심함", 14]],
+  neg: [["대기시간", 30], ["재활 일정", 22], ["회진 시간", 18], ["응대 지연", 10], ["시설 요청", 8]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [170, 175, 180, 185, 187, 189],
+  trendNeg: [100, 96, 94, 92, 90, 88]
+};
+wardModalData["내과 김의사"] = {
+  posTotal: 145, negTotal: 67,
+  pos: [["친절함", 55], ["진단 신뢰", 40], ["의사 설명", 30], ["세심함", 14], ["치료 결과", 6]],
+  neg: [["대기시간", 25], ["검사 결과 설명", 18], ["약물 안내", 14], ["응대 지연", 6], ["시설 요청", 4]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [130, 135, 138, 140, 143, 145],
+  trendNeg: [78, 75, 72, 70, 68, 67]
+};
+wardModalData["외과 박의사"] = {
+  posTotal: 130, negTotal: 61,
+  pos: [["수술 결과 만족", 50], ["친절함", 38], ["회복 속도", 26], ["의사 설명", 12], ["세심함", 4]],
+  neg: [["수술 대기", 24], ["통증 관리", 18], ["회진 시간", 12], ["응대 지연", 5], ["시설 요청", 2]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [116, 120, 123, 126, 128, 130],
+  trendNeg: [72, 70, 68, 65, 63, 61]
+};
+wardModalData["신경외과 이의사"] = {
+  posTotal: 117, negTotal: 55,
+  pos: [["검사 안내", 45], ["친절함", 34], ["의사 설명", 24], ["세심함", 10], ["치료 결과", 4]],
+  neg: [["대기시간", 22], ["통증 관리", 16], ["회진 시간", 10], ["응대 지연", 5], ["시설 요청", 2]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [104, 108, 111, 113, 115, 117],
+  trendNeg: [65, 62, 60, 58, 56, 55]
+};
+wardModalData["재활의학과 최의사"] = {
+  posTotal: 104, negTotal: 49,
+  pos: [["재활 지도 만족", 38], ["친절함", 30], ["운동 지도", 22], ["세심함", 10], ["회복 속도", 4]],
+  neg: [["대기시간", 18], ["재활 일정 지연", 14], ["회진 시간", 10], ["응대 지연", 5], ["시설 요청", 2]],
+  trendMonths: ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"],
+  trendPos: [92, 95, 98, 100, 102, 104],
+  trendNeg: [58, 56, 54, 52, 50, 49]
+};
+
+var groupTables = {
+  dept: {
+    stackId: "deptStackChart", barsId: "deptCountBars", tableId: "deptTableRows",
+    rows: [
+      { name: "외과", cnt: 13741, change: 2.1, negCnt: 3864, trend: [13320, 13520, 13741] },
+      { name: "정형외과", cnt: 13183, change: 3.8, negCnt: 810, trend: [12680, 12930, 13183] },
+      { name: "내과", cnt: 12630, change: -0.6, negCnt: 3550, trend: [12700, 12660, 12630] },
+      { name: "신경외과", cnt: 11848, change: 1.5, negCnt: 3330, trend: [11600, 11720, 11848] },
+      { name: "재활의학과", cnt: 11117, change: -1.1, negCnt: 3125, trend: [11250, 11180, 11117] }
+    ]
+  },
+  doctor: {
+    stackId: "doctorStackChart", barsId: "doctorCountBars", tableId: "doctorTableRows",
+    showDept: true,
+    rows: [
+      { name: "정형외과 원장", dept: "정형외과", cnt: 307, change: 4.2, negCnt: 88, trend: [285, 296, 307] },
+      { name: "내과 김의사", dept: "내과", cnt: 236, change: -2.8, negCnt: 67, trend: [244, 240, 236] },
+      { name: "외과 박의사", dept: "외과", cnt: 211, change: 1.7, negCnt: 61, trend: [202, 206, 211] },
+      { name: "신경외과 이의사", dept: "신경외과", cnt: 190, change: 0.8, negCnt: 55, trend: [186, 188, 190] },
+      { name: "재활의학과 최의사", dept: "재활의학과", cnt: 169, change: -1.4, negCnt: 49, trend: [174, 171, 169] }
+    ]
+  }
+};
+
+function renderGroupStackAndTable(group) {
+  renderSortToggle(group.sortToggleId, group.sortMode, group.sortFnName);
+
+  var rowsWithPos = group.rows.map(function (r) {
+    r.posCnt = r.cnt - r.negCnt;
+    return r;
+  });
+  var sortedRows = sortByMode(rowsWithPos, group.sortMode, "posCnt", "negCnt");
+
+  var barsRows = sortedRows.map(function (r) {
+    return { name: r.name, posCnt: r.posCnt, negCnt: r.negCnt };
+  });
+  renderCountBars(group.barsId, barsRows);
+
+  document.getElementById(group.tableId).innerHTML = sortedRows.map(function (r) {
+    var posCnt = r.posCnt;
+    var posPct = Math.round((posCnt / r.cnt) * 1000) / 10;
+    var negPct = Math.round((r.negCnt / r.cnt) * 1000) / 10;
+
+    var totalChange = r.trend[2] - r.trend[1];
+    var totalUp = totalChange > 0, totalFlat = totalChange === 0;
+    var totalSign = totalFlat ? "－" : (totalUp ? "▲" : "▼");
+
+    var posChange = r.change; // 긍정 비율 전월 대비(%p)
+    var negChange = -posChange;
+    var negUp = negChange > 0, negFlat = negChange === 0;
+    var negColor = negFlat ? "neutral" : (negUp ? "bad" : "good");
+    var negSign = negFlat ? "－" : (negUp ? "▲" : "▼");
+
+    var negTrend = [negPct - negChange, negPct - negChange * 0.5, negPct];
+
+    return "<tr style=\"border-top:0.5px solid var(--border)\">" +
+      "<td style=\"padding:7px 3px;font-weight:500;cursor:pointer;color:var(--text-accent);text-decoration:underline;text-decoration-color:var(--border-strong)\" onclick=\"openWardModal('" + r.name + "')\">" + r.name + "</td>" +
+      (group.showDept ? "<td style=\"padding:7px 3px;color:var(--text-secondary)\">" + (r.dept || "—") + "</td>" : "") +
+      "<td style=\"padding:7px 3px;text-align:right\">" + r.cnt.toLocaleString() + "건 <span class=\"neutral\">" + totalSign + Math.abs(totalChange) + "건</span></td>" +
+      "<td style=\"padding:7px 3px;text-align:right;color:#1baf7a\">" + posCnt.toLocaleString() + "(" + posPct.toFixed(1) + "%)</td>" +
+      "<td style=\"padding:7px 3px;text-align:right;color:#e24b4a\">" + r.negCnt.toLocaleString() + "(" + negPct.toFixed(1) + "%)</td>" +
+      "<td style=\"padding:7px 3px;text-align:right\" class=\"" + negColor + "\">" + negSign + Math.abs(negChange).toFixed(1) + "%p</td>" +
+      "<td style=\"padding:7px 3px;text-align:right\">" + sparkSvg(negTrend, negUp) + "</td>" +
+      "</tr>";
+  }).join("");
+}
+
+groupTables.dept.sortMode = "none";
+groupTables.dept.sortToggleId = "deptSortToggle";
+groupTables.dept.sortFnName = "setDeptSort";
+groupTables.doctor.sortMode = "none";
+groupTables.doctor.sortToggleId = "doctorSortToggle";
+groupTables.doctor.sortFnName = "setDoctorSort";
+
+function setDeptSort(mode) {
+  groupTables.dept.sortMode = mode;
+  renderGroupStackAndTable(groupTables.dept);
+}
+function setDoctorSort(mode) {
+  groupTables.doctor.sortMode = mode;
+  renderGroupStackAndTable(groupTables.doctor);
+}
+
+renderGroupStackAndTable(groupTables.dept);
+renderGroupStackAndTable(groupTables.doctor);
+</script>
+
+<script>
+var depts = [
+  { name: "간호부", sub: "5병동·12병동 담당", cnt: 148, change: 6.2 },
+  { name: "원무팀", sub: "외래 접수·수납", cnt: 96, change: -1.4 },
+  { name: "영상의학과", sub: "검사·촬영", cnt: 74, change: 3.0 },
+  { name: "물리치료실", sub: "재활치료", cnt: 61, change: 2.1 },
+  { name: "원무행정팀", sub: "입퇴원 행정", cnt: 41, change: -0.8 }
+];
+
+var staff = [
+  { name: "이OO 간호사", dept: "3병동", cnt: 32, change: 8.4 },
+  { name: "박OO 간호사", dept: "12병동", cnt: 27, change: 4.1 },
+  { name: "김OO 원무", dept: "원무팀", cnt: 22, change: -2.0 },
+  { name: "최OO 물리치료사", dept: "재활센터", cnt: 19, change: 3.5 },
+  { name: "정OO 간호사", dept: "5병동", cnt: 17, change: 1.2 }
+];
+
+function renderRankList(id, items, sub) {
+  var maxCnt = Math.max.apply(null, items.map(function (d) { return d.cnt; }));
+  document.getElementById(id).innerHTML = items.map(function (it, i) {
+    var pct = Math.round((it.cnt / maxCnt) * 100);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--border)">' +
+      '<span style="width:16px;flex-shrink:0;color:var(--text-muted);font-size:11px;font-weight:600">' + (i + 1) + '</span>' +
+      '<div style="flex:1;min-width:0">' +
+      '<div style="font-size:12px;font-weight:500">' + it.name + '</div>' +
+      '<div style="font-size:10px;color:var(--text-muted)">' + (sub ? it.dept : it.sub) + '</div>' +
+      '<div style="height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin-top:4px">' +
+      '<div style="height:100%;width:' + pct + '%;background:#1baf7a"></div></div>' +
+      '</div>' +
+      '<div style="text-align:right;flex-shrink:0">' +
+      '<div style="font-size:14px;font-weight:600">' + it.cnt + '건</div>' +
+      '</div>' +
+      '</div>';
+  }).join("");
+}
+
+renderRankList("deptList", depts, false);
+renderRankList("staffList", staff, true);
+
+var prevMonthRank = {
+  dept: [
+    { name: "간호부", sub: "5병동·12병동 담당", cnt: 139 },
+    { name: "원무팀", sub: "외래 접수·수납", cnt: 97 },
+    { name: "영상의학과", sub: "검사·촬영", cnt: 72 },
+    { name: "물리치료실", sub: "재활치료", cnt: 60 },
+    { name: "원무행정팀", sub: "입퇴원 행정", cnt: 41 }
+  ],
+  staff: [
+    { name: "이OO 간호사", sub: "3병동", cnt: 30 },
+    { name: "박OO 간호사", sub: "12병동", cnt: 26 },
+    { name: "김OO 원무", sub: "원무팀", cnt: 22 },
+    { name: "최OO 물리치료사", sub: "재활센터", cnt: 18 },
+    { name: "정OO 간호사", sub: "5병동", cnt: 17 }
+  ]
+};
+
+var prevRankTitles = { dept: "부서칭찬 전월 랭킹", staff: "직원칭찬 전월 랭킹" };
+
+function openPrevRankModal(type) {
+  var list = prevMonthRank[type];
+  var maxCnt = Math.max.apply(null, list.map(function (r) { return r.cnt; }));
+  var overlay = document.getElementById("prevRankModalOverlay");
+  var card = document.getElementById("prevRankModalCard");
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  var rowsHtml = list.map(function (r, i) {
+    var pct = Math.round((r.cnt / maxCnt) * 100);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--border)">' +
+      '<span style="width:16px;flex-shrink:0;color:var(--text-muted);font-size:11px;font-weight:600">' + (i + 1) + '</span>' +
+      '<div style="flex:1;min-width:0">' +
+      '<div style="font-size:12px;font-weight:500">' + r.name + '</div>' +
+      '<div style="font-size:10px;color:var(--text-muted)">' + r.sub + '</div>' +
+      '<div style="height:4px;border-radius:2px;background:var(--surface-1);overflow:hidden;margin-top:4px">' +
+      '<div style="height:100%;width:' + pct + '%;background:#1baf7a"></div></div>' +
+      '</div>' +
+      '<div style="font-size:14px;font-weight:600;flex-shrink:0">' + r.cnt + '건</div>' +
+      '</div>';
+  }).join("");
+
+  card.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">' +
+    '<p style="font-size:15px;font-weight:600;margin:0">' + prevRankTitles[type] + '</p>' +
+    '<i class="ti ti-x" style="font-size:18px;color:var(--text-muted);cursor:pointer" aria-hidden="true" onclick="closePrevRankModal()"></i>' +
+    '</div>' +
+    '<p style="font-size:11px;color:var(--text-muted);margin:0 0 14px">전월 기준 순위입니다. 이번 달 랭킹과 비교해 순위 변동을 확인해 보세요.</p>' +
+    rowsHtml;
+}
+
+function closePrevRankModal() {
+  var overlay = document.getElementById("prevRankModalOverlay");
+  overlay.style.display = "none";
+  overlay.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+</script>
+
+<script>
+var typeColor = {
+  "진료 및 치료·검사관련": "#2a78d6",
+  "인적응대관련": "#e24b4a",
+  "서비스제공관련": "#3aa0a0",
+  "시스템 및 서비스": "#7f77dd",
+  "환경관련": "#8a6d3b",
+  "비용관련": "#c98a2c",
+  "기타문의": "#898781",
+  "미분류": "#c9a227"
+};
+
+var kpi = [
+  { type: "진료 및 치료·검사관련", cnt: 2410, pct: 29.0, change: -1.2 },
+  { type: "인적응대관련", cnt: 1350, pct: 16.2, change: -0.9 },
+  { type: "서비스제공관련", cnt: 940, pct: 11.3, change: 0.4 },
+  { type: "시스템 및 서비스", cnt: 780, pct: 9.4, change: 2.1 },
+  { type: "환경관련", cnt: 705, pct: 8.5, change: 1.0 },
+  { type: "비용관련", cnt: 612, pct: 7.4, change: 0.6 },
+  { type: "기타문의", cnt: 286, pct: 3.4, change: -0.2 },
+  { type: "미분류", cnt: 42, pct: null, change: -3 }
+];
+
+var maxCnt = Math.max.apply(null, kpi.map(function (k) { return k.cnt; }));
+
+document.getElementById("typeGrid").innerHTML = kpi.map(function (k) {
+  var isUp = k.change > 0, isFlat = k.change === 0;
+  var colorClass = isFlat ? "neutral" : "neutral";
+  var sign = isFlat ? "－" : (isUp ? "▲" : "▼");
+  var line = k.pct === null
+    ? k.cnt.toLocaleString() + '건 · <span class="' + colorClass + '">' + sign + ' ' + Math.abs(k.change) + '건</span>'
+    : k.cnt.toLocaleString() + '건 · ' + k.pct + '% · <span class="' + colorClass + '">' + sign + ' ' + Math.abs(k.change).toFixed(1) + '%p</span>';
+
+  return '<div class="kpi-card">' +
+    '<div class="type-card-head"><span class="type-dot" style="background:' + typeColor[k.type] + '"></span><span class="type-name">' + k.type + '</span></div>' +
+    '<p class="type-line">' + line + '</p>' +
+    '</div>';
+}).join("");
+
+var flagData = {
+  "환자안전": { cnt: 12, change: 3,
+    list: [
+      { content: "환자가 침대에서 낙상할 뻔했습니다. 안전바가 없었어요.", meta: "3병동 · 2026.07.01" },
+      { content: "투약 시간이 잘못 안내된 것 같아 불안했습니다.", meta: "3병동 · 2026.06.28" },
+      { content: "억제대 없이 거동이 불편한 환자가 혼자 있었습니다.", meta: "12병동 · 2026.06.24" }
+    ] },
+  "감염관리": { cnt: 5, change: -1,
+    list: [
+      { content: "손 소독제가 비치되어 있지 않았습니다.", meta: "7병동 · 2026.07.01" },
+      { content: "면회객 마스크 착용 안내가 없었습니다.", meta: "5병동 · 2026.06.20" }
+    ] }
+};
+
+document.getElementById("flagRow2").innerHTML = Object.keys(flagData).map(function (name) {
+  var f = flagData[name];
+  var isUp = f.change > 0;
+  var color = isUp ? "up" : "down";
+  var sign = isUp ? "▲" : "▼";
+  return '<div onclick="showFlagList2(\'' + name + '\')" style="cursor:pointer;display:flex;align-items:center;gap:8px">' +
+    '<span style="font-size:12px;font-weight:600;padding:3px 12px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger)">' + name + '</span>' +
+    '<span style="font-size:14px;font-weight:600">' + f.cnt + '건</span>' +
+    '<span style="font-size:11px" class="' + color + '">' + sign + Math.abs(f.change) + '건 (전월 대비)</span>' +
+    '<i class="ti ti-chevron-right" style="font-size:14px;color:var(--text-muted)" aria-hidden="true"></i>' +
+    '</div>';
+}).join("");
+
+var openFlag2 = null;
+
+function showFlagList2(name) {
+  openFlag2 = openFlag2 === name ? null : name;
+  var panel = document.getElementById("flagListPanel2");
+  if (!openFlag2) { panel.innerHTML = ""; return; }
+  var f = flagData[openFlag2];
+  panel.innerHTML =
+    '<div style="background:var(--surface-1);border-radius:10px;padding:12px 14px">' +
+    '<p style="font-size:12px;font-weight:600;margin:0 0 8px">' + openFlag2 + ' 감지 VOC (' + f.cnt + '건 중 최근 ' + f.list.length + '건)</p>' +
+    f.list.map(function (r) {
+      return '<div style="padding:6px 0;border-top:0.5px solid var(--border);font-size:12px">' +
+        '<div style="color:var(--text-secondary)">"' + r.content + '"</div>' +
+        '<div style="color:var(--text-muted);font-size:11px">' + r.meta + '</div>' +
+        '</div>';
+    }).join("") +
+    '</div>';
+}
+</script>
+</body>
+</html>

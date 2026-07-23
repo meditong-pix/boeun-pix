@@ -1,0 +1,3623 @@
+<!DOCTYPE html>
+<!-- 이 파일 수정 후 sync-voc-statistics.ps1을 실행해 index.html의 file:// 내장본도 갱신합니다. -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOC 통계</title>
+  <style>
+    :root {
+      --surface-1: #ffffff;
+      --surface-2: #f8fafc;
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --text-success: #166534;
+      --bg-success: #ecfdf5;
+      --border: #e5e7eb;
+      --border-strong: #d1d5db;
+      --border-accent: #bfdbfe;
+      --radius: 8px;
+      --bg-warning: #fffbeb;
+      --text-warning: #92400e;
+    }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+      background: #f1f5f9;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    select {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #fff;
+      color: var(--text-primary);
+    }
+    * { box-sizing: border-box; }
+    .sec { margin-bottom: 22px; background: var(--surface-1); border-radius: 12px; padding: 16px; max-width: 100%; overflow: hidden; }
+    .sec-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+    .sec-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+    .new-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: var(--bg-success); color: var(--text-success); }
+    .top10-badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--text-muted); border: 0.5px solid var(--border); }
+    .filter-bar {
+      display: flex; align-items: flex-end; gap: 28px; margin-bottom: 18px; padding: 18px;
+      border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2);
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 7px; min-width: 120px; }
+    .filter-group.period { min-width: 270px; }
+    .filter-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .filter-select {
+      min-width: 120px; height: 42px; padding: 0 14px;
+      border: 1px solid var(--border-strong); border-radius: 9px;
+      background: #fff; color: var(--text-primary); font-weight: 600;
+    }
+    .period-tabs { display: flex; gap: 7px; flex-wrap: wrap; }
+    .period-tab {
+      min-width: 58px; height: 42px; padding: 0 13px;
+      border: 1px solid var(--border); border-radius: 9px; background: #fff;
+      color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .period-tab:hover { border-color: #a5b4fc; color: #4f46e5; }
+    .period-tab.active {
+      border-color: #6366f1; background: #eef2ff; color: #4f46e5;
+      box-shadow: inset 0 0 0 1px rgba(99,102,241,.08);
+    }
+    .filter-ai-action { margin-left: auto; display: flex; align-items: flex-end; }
+    .filter-ai-btn {
+      height: 42px; padding: 0 18px; border: 0; border-radius: 9px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff;
+      font-size: 12px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 7px 16px rgba(79,70,229,.2);
+    }
+    .filter-ai-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .filter-ai-btn span { margin-right: 6px; }
+    .voc-ai-dialog { width: min(1080px, 96vw); }
+    .voc-ai-grid { display: grid; grid-template-columns: minmax(280px, .85fr) minmax(0, 1.35fr); gap: 16px; }
+    .voc-ai-summary {
+      padding: 18px; border: 1px solid #ddd6fe; border-radius: 12px; background: #faf9ff;
+    }
+    .voc-ai-summary-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .voc-ai-icon {
+      width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 11px; background: #ede9fe; color: #6d28d9; font-size: 19px;
+    }
+    .voc-ai-section-title { margin: 0; font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .voc-ai-section-sub { margin: 2px 0 0; font-size: 11px; color: var(--text-muted); }
+    .voc-ai-summary-text { margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.85; }
+    .voc-ai-summary-text b { color: var(--text-primary); }
+    .voc-ai-copy {
+      margin-top: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
+      padding: 7px 12px; color: var(--text-secondary); font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .voc-ai-right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .voc-ai-insights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .voc-ai-insight {
+      padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2);
+    }
+    .voc-ai-insight .label { margin: 0 0 5px; font-size: 10px; font-weight: 700; color: #6366f1; }
+    .voc-ai-insight .value { margin: 0; font-size: 12px; font-weight: 800; color: var(--text-primary); line-height: 1.45; }
+    .voc-ai-insight .meta { margin: 5px 0 0; font-size: 10px; color: var(--text-muted); }
+    .voc-ai-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .voc-ai-metric { padding: 12px; border-top: 2px solid #c7d2fe; background: #fff; }
+    .voc-ai-metric .label { font-size: 10px; color: var(--text-muted); }
+    .voc-ai-metric .value { margin-top: 4px; font-size: 17px; font-weight: 800; color: var(--text-primary); }
+    .voc-ai-metric .delta { margin-top: 2px; font-size: 10px; font-weight: 700; }
+    .voc-ai-issues { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .voc-ai-issue {
+      display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center;
+      padding: 11px 12px; border-bottom: 1px solid var(--border); background: #fff;
+    }
+    .voc-ai-issue:last-child { border-bottom: 0; }
+    .voc-ai-severity { padding: 3px 7px; border-radius: 999px; font-size: 9px; font-weight: 800; white-space: nowrap; }
+    .voc-ai-severity.high { background: #fee2e2; color: #b91c1c; }
+    .voc-ai-severity.watch { background: #fef3c7; color: #b45309; }
+    .voc-ai-severity.good { background: #dcfce7; color: #15803d; }
+    .voc-ai-issue-title { font-size: 11px; font-weight: 800; color: var(--text-primary); }
+    .voc-ai-issue-desc { margin-top: 2px; font-size: 10px; color: var(--text-muted); line-height: 1.45; }
+    .voc-ai-issue-change { font-size: 10px; font-weight: 800; white-space: nowrap; }
+    @media (max-width: 720px) {
+      .voc-type-summary-head { align-items: flex-start; flex-direction: column; }
+      .filter-bar { align-items: stretch; gap: 14px; flex-direction: column; }
+      .filter-group.period { min-width: 0; }
+      .period-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .period-tab { min-width: 0; }
+      .filter-select { width: 100%; }
+      .filter-ai-action { margin-left: 0; }
+      .filter-ai-btn { width: 100%; }
+      .voc-ai-grid { grid-template-columns: 1fr; }
+      .voc-ai-insights, .voc-ai-metrics { grid-template-columns: 1fr 1fr; }
+    }
+    .ai-box { display: flex; gap: 14px; align-items: flex-start; }
+    .ai-box .icon { font-size: 32px; }
+    .ai-box p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+    .kpi { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+    .kpi.staff { border: 1px solid var(--border-accent); }
+    .kpi.unclassified { border: 1px dashed var(--border-strong); background: var(--surface-2); }
+    .kpi p.l { font-size: 11px; color: var(--text-muted); margin: 0 0 4px; }
+    .kpi p.v { font-size: 18px; font-weight: 500; margin: 0; }
+    .kpi p.pct { font-size: 11px; margin-top: 2px; }
+    .kpi p.pct.like { color: #2a78d6; }
+    .kpi p.pct.bad { color: #e24b4a; }
+    .kpi p.pct.mix { color: #eda100; }
+    .kpi p.pct.unc { color: #b85c00; }
+    .kpi p.pct.staff { color: #185fa5; }
+    .hier-box { background: var(--surface-2); border-radius: var(--radius); padding: 10px 14px; font-size: 11px; color: var(--text-secondary); margin-top: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .hier-box b { color: var(--text-primary); }
+    .two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; max-width: 100%; }
+    .card { background: var(--surface-2); border-radius: var(--radius); padding: 14px; min-width: 0; max-width: 100%; overflow: hidden; }
+    .card .ct { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin: 0 0 4px; }
+    .card .cs { font-size: 10px; color: var(--text-muted); margin: 0 0 10px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; font-size: 11px; color: var(--text-secondary); }
+    .legend span { display: flex; align-items: center; gap: 5px; }
+    .legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .tbl th { text-align: left; padding: 6px 8px; color: var(--text-muted); font-weight: 500; border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+    .tbl td { padding: 6px 8px; border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+    .tbl th.num, .tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .reception-tbl { table-layout: fixed; min-width: 300px; }
+    .type-reception-tbl { min-width: 410px; }
+    .type-keyword {
+      display: inline-block; max-width: 92px; overflow: hidden; text-overflow: ellipsis;
+      padding: 3px 7px; border-radius: 999px; background: var(--surface-2);
+      color: var(--text-secondary); font-size: 11px; white-space: nowrap; vertical-align: middle;
+    }
+    .tbl td.dim-name { font-weight: 700; color: var(--text-primary); max-width: 88px; overflow: hidden; text-overflow: ellipsis; }
+    .dim-tbl-wrap {
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      min-width: 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* VOC 분석 split view (병동·진료과·의사) */
+    .dim-split-hdr {
+      display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;
+    }
+    .dim-split-title { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .dim-split-count { font-size: 12px; color: var(--text-muted); }
+    .dim-split-top-badge {
+      font-size: 11px; padding: 2px 8px; border-radius: 999px;
+      background: var(--surface-2); color: var(--text-secondary); border: 0.5px solid var(--border);
+    }
+    .dim-split-sub { font-size: 13px; color: var(--text-secondary); margin: 0 0 14px; }
+    .dim-split-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+    .dim-split-legend-item {
+      display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);
+    }
+    .dim-split-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .dim-split-main { display: flex; flex-wrap: wrap; gap: 16px; max-width: 100%; }
+    .dim-split-panel {
+      flex: 1 1 340px; min-width: 0; background: var(--surface-2);
+      border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; overflow: hidden;
+    }
+    .dim-split-tbl-panel { flex: 1 1 380px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .dim-split-panel-title { font-size: 13px; font-weight: 500; margin: 0 0 10px; color: var(--text-secondary); }
+    .dim-split-chart-wrap { position: relative; width: 100%; height: 240px; min-width: 0; }
+    .dim-split-tbl {
+      width: 100%; min-width: 460px; font-size: 11px; border-collapse: collapse; table-layout: fixed;
+    }
+    .dim-split-tbl thead tr { color: var(--text-muted); border-bottom: 0.5px solid var(--border-strong); }
+    .dim-split-tbl thead td { padding: 5px 4px; font-weight: 500; }
+    .dim-split-tbl tbody tr { border-bottom: 0.5px solid var(--border); }
+    .dim-split-tbl tbody td { padding: 6px 4px; vertical-align: top; }
+    .dim-split-tbl .col-name { font-weight: 600; white-space: nowrap; width: 18%; }
+    .dim-split-tbl .col-total { text-align: right; width: 14%; }
+    .dim-split-tbl .col-type { text-align: right; width: 13.6%; }
+    .dim-split-kw { font-size: 9px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+    .dim-split-total-val { font-weight: 600; }
+    .dim-split-change { font-size: 9px; margin-top: 2px; }
+    .dim-split-change.up { color: #B4392B; }
+    .dim-split-change.down { color: #185FA5; }
+    .dim-split-change.flat { color: var(--text-muted); }
+    .dim-split-type-pct { font-weight: 500; }
+    .dim-split-type-cnt { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+    .dim-split-tbl-hint { font-size: 10px; color: var(--text-muted); margin: -4px 0 10px; }
+    .dim-type-clickable {
+      cursor: pointer; border-radius: 6px; transition: background .12s, box-shadow .12s;
+    }
+    .dim-type-clickable:hover { background: #f8fafc; }
+    .dim-type-clickable.active {
+      background: #f5f3ff; box-shadow: inset 0 0 0 1.5px #c4b5fd;
+    }
+    .dim-type-clickable:focus-visible { outline: 2px solid #7c3aed; outline-offset: 1px; }
+    .dim-kw-top5-panel {
+      display: none; margin-top: 12px; padding: 12px;
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    }
+    .dim-kw-top5-panel.show { display: block; }
+    .dim-kw-top5-title {
+      margin: 0 0 10px; font-size: 12px; font-weight: 700; color: var(--text-primary);
+    }
+    .dim-kw-top5-title .type-label { font-weight: 800; }
+    .dim-kw-top5-list { display: flex; flex-direction: column; gap: 6px; }
+    .dim-kw-top5-row {
+      display: grid; grid-template-columns: 22px 1fr auto; grid-template-rows: auto auto;
+      gap: 4px 8px; align-items: center; font-size: 11px;
+    }
+    .dim-kw-top5-rank {
+      width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: #fff; background: #7c3aed;
+    }
+    .dim-kw-top5-row:nth-child(1) .dim-kw-top5-rank { background: #5b21b6; }
+    .dim-kw-top5-row:nth-child(2) .dim-kw-top5-rank { background: #6d28d9; }
+    .dim-kw-top5-row:nth-child(3) .dim-kw-top5-rank { background: #7c3aed; }
+    .dim-kw-top5-name { font-weight: 600; color: var(--text-secondary); }
+    .dim-kw-top5-cnt { font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .dim-kw-top5-bar {
+      grid-column: 2 / 4; grid-row: 2; height: 4px; background: #f1f5f9; border-radius: 999px; overflow: hidden;
+    }
+    .dim-kw-top5-bar-fill { height: 100%; border-radius: 999px; background: #c4b5fd; }
+    /* 차원별(병동·진료과·의사) 확장 패널 */
+    .dim-expand-panel {
+      display: none; margin-top: 14px; background: var(--surface-1);
+      border: 0.5px solid var(--border); border-radius: 12px; padding: 14px 16px;
+    }
+    .dim-expand-panel.show { display: block; }
+    .dim-split-tbl tbody tr.dim-row-clickable { cursor: pointer; }
+    .dim-split-tbl tbody tr.dim-row-clickable:hover td { background: #f8fafc; }
+    .dim-split-tbl tbody tr.dim-row-clickable.active td { background: #EEEDFE; }
+    .dim-split-tbl tbody tr.dim-row-clickable.active .col-name { color: #3C3489; }
+    /* 그룹별 VOC 현황 */
+    .group-score-head {
+      display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;
+    }
+    .group-score-grid {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px;
+    }
+    .group-score-card {
+      min-width: 0; padding: 14px; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 12px; order: 1;
+    }
+    .group-score-grid > .dim-expand-panel { display: none !important; grid-column: 1 / -1; order: 2; margin-top: 0; }
+    .group-score-card-head {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px;
+    }
+    .group-score-card-title { margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .group-score-toggle {
+      display: inline-flex; flex-shrink: 0; padding: 2px; border: 1px solid var(--border);
+      border-radius: 8px; background: #fff;
+    }
+    .group-view-btn {
+      border: 0; border-radius: 6px; background: transparent; color: var(--text-muted);
+      padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;
+    }
+    .group-view-btn.active { background: #eef2ff; color: #4f46e5; }
+    .group-score-card-sub { margin: 0 0 10px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .group-score-card .dim-split-legend { gap: 7px 10px; margin-bottom: 8px; }
+    .group-score-card .dim-split-legend-item { gap: 4px; font-size: 10px; }
+    .group-score-card .dim-split-legend-dot { width: 7px; height: 7px; }
+    .group-score-view { display: none; }
+    .group-score-view.active { display: block; }
+    .group-score-card .dim-split-chart-wrap { height: 245px; }
+    .group-score-table {
+      width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11px;
+    }
+    .group-score-table thead { color: var(--text-muted); border-bottom: 1px solid var(--border-strong); }
+    .group-score-table th { padding: 7px 5px; text-align: left; font-weight: 600; white-space: nowrap; }
+    .group-score-table td { padding: 9px 5px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .group-score-table th:nth-child(1),
+    .group-score-table td:nth-child(1) { width: 34px; text-align: center; }
+    .group-score-table th:nth-child(3),
+    .group-score-table td:nth-child(3) { width: 56px; text-align: right; }
+    .group-score-table th:nth-child(4),
+    .group-score-table td:nth-child(4) { width: 62px; text-align: right; }
+    .group-score-name { font-weight: 700; color: var(--text-primary); }
+    .group-score-value { font-size: 13px; font-weight: 800; color: #4f46e5; }
+    .group-score-table tbody tr { cursor: pointer; }
+    .group-score-table tbody tr:hover td { background: #fff; }
+    .group-score-table tbody tr.active td { background: #EEEDFE; }
+    .group-detail-btn {
+      width: 100%; margin-top: 12px; padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: 8px; background: #fff;
+      color: var(--text-secondary); font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .group-detail-btn:hover { background: #f8fafc; color: #4f46e5; }
+    .group-score-detail-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+    .group-detail-modal {
+      position: absolute; left: 0; right: 0; top: 0; height: 100vh;
+      z-index: 1000; display: none;
+      align-items: center; justify-content: center; padding: 20px;
+      box-sizing: border-box; overflow: hidden;
+    }
+    .group-detail-modal.show { display: flex; }
+    .group-detail-backdrop { position: absolute; inset: 0; border: 0; background: rgba(15,23,42,.55); }
+    .group-detail-dialog {
+      position: relative; z-index: 1; width: min(940px, 96vw); max-height: 100%; overflow: auto;
+      box-sizing: border-box;
+      padding: 20px; border: 1px solid var(--border); border-radius: 16px;
+      background: #fff; box-shadow: 0 24px 70px rgba(15,23,42,.24);
+    }
+    .group-detail-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .group-detail-title { margin: 0; font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .group-detail-sub { margin: 3px 0 0; font-size: 12px; color: var(--text-muted); }
+    .group-detail-close {
+      width: 32px; height: 32px; border: 0; border-radius: 8px;
+      background: var(--surface-2); color: var(--text-secondary); font-size: 20px; cursor: pointer;
+    }
+    .group-detail-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 6px;
+    }
+    .group-detail-filters { display: flex; flex-wrap: wrap; gap: 5px; }
+    .group-detail-filter,
+    .group-detail-view-btn {
+      border: 1px solid var(--border); border-radius: 7px; background: #fff;
+      color: var(--text-muted); padding: 6px 10px; font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .group-detail-filter.active,
+    .group-detail-view-btn.active { border-color: #c7d2fe; background: #eef2ff; color: #4f46e5; }
+    .group-detail-view-toggle { display: inline-flex; gap: 4px; flex-shrink: 0; }
+    .group-detail-view { display: none; }
+    .group-detail-view.active { display: block; }
+    .group-detail-chart-wrap { position: relative; height: 360px; margin-top: 12px; }
+    #groupDetailTableView { overflow-x: auto; }
+    .group-detail-table { width: 100%; min-width: 760px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .group-detail-table th {
+      padding: 10px 8px; border-bottom: 1px solid var(--border-strong);
+      color: var(--text-muted); font-weight: 600; text-align: left; white-space: nowrap;
+    }
+    .group-detail-table td { padding: 13px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .group-detail-table th:nth-child(1), .group-detail-table td:nth-child(1) { width: 54px; text-align: center; }
+    .group-detail-table th:nth-child(3), .group-detail-table td:nth-child(3) { width: 110px; text-align: right; }
+    .group-detail-table th:nth-child(4), .group-detail-table td:nth-child(4) { width: 110px; text-align: right; }
+    .group-detail-table th:nth-child(5), .group-detail-table td:nth-child(5) { width: 150px; text-align: center; }
+    .group-detail-table th:nth-child(6), .group-detail-table td:nth-child(6) { width: 56px; text-align: center; }
+    .group-detail-rank { font-weight: 800; color: #6366f1; }
+    .group-detail-score { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+    .group-detail-response { color: var(--text-secondary); white-space: nowrap; }
+    .group-detail-open {
+      border: 0; background: transparent; color: #64748b; font-size: 20px; cursor: pointer;
+    }
+    .group-detail-table tbody tr { cursor: pointer; }
+    .group-detail-table tbody tr:hover td { background: #f8fafc; }
+    .group-item-dialog { width: min(1040px, 96vw); }
+    .group-item-body .dim-expand-panel {
+      display: block; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent;
+    }
+    @media (max-width: 980px) {
+      .group-score-grid { grid-template-columns: 1fr; }
+      .group-score-card .dim-split-chart-wrap { height: 280px; }
+    }
+    .voc-channel-badge {
+      display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px;
+      border-radius: 999px; border: 1px solid transparent; white-space: nowrap;
+    }
+    .voc-channel-badge.app { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    .voc-channel-badge.card { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .voc-channel-badge.phone { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+    .voc-channel-badge.kakao { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
+    .voc-channel-badge.web { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+    .voc-channel-badge.field { background: #ecfeff; color: #0e7490; border-color: #a5f3fc; }
+    .voc-channel-badge.etc { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+    .note { font-size: 10px; color: var(--text-muted); margin-top: 8px; }
+    .staff-wrap { display: grid; grid-template-columns: 1fr 280px; gap: 12px; }
+    .mini-stat-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 12px; }
+    .mini-stat { background: var(--surface-2); border-radius: 6px; padding: 8px; text-align: center; }
+    .mini-stat p.l { font-size: 9px; color: var(--text-muted); margin: 0; }
+    .mini-stat p.v { font-size: 12px; font-weight: 500; margin: 2px 0 0; }
+    @media (max-width: 1100px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .two-col, .staff-wrap { grid-template-columns: 1fr; }
+      .mini-stat-row { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* 전체 VOC 현황 */
+    .voc-ov-kpi-row {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px;
+    }
+    .voc-ov-kpi {
+      background: var(--surface-2); border-radius: var(--radius);
+      padding: 12px 12px 10px; min-height: 88px; display: flex; flex-direction: column;
+    }
+    .voc-ov-kpi .lbl { font-size: 11px; font-weight: 500; margin: 0 0 6px; }
+    .voc-ov-kpi .lbl.blue { color: #2a78d6; }
+    .voc-ov-kpi .lbl.green { color: #1baf7a; }
+    .voc-ov-kpi .lbl.pink { color: #e24b4a; }
+    .voc-ov-kpi .lbl.neutral { color: var(--text-muted); }
+    .voc-ov-kpi .val { font-size: 22px; font-weight: 500; color: var(--text-primary); margin: 0; line-height: 1.1; }
+    .voc-ov-kpi .sub { font-size: 10px; color: var(--text-muted); margin: 4px 0 0; }
+    .voc-ov-kpi .spark { margin-top: auto; height: 28px; }
+    .voc-ov-kpi .spark svg { width: 100%; height: 100%; display: block; }
+    .voc-ov-kpi.kw .val { font-size: 16px; margin-top: 4px; }
+    .voc-ov-kpi.kw .kw-count { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
+    .voc-kpi-board {
+      display: grid; grid-template-columns: minmax(0, 1fr) 240px;
+      gap: 14px; align-items: stretch; margin-bottom: 14px;
+    }
+    .voc-kpi-summary {
+      grid-column: 1 / -1;
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start;
+      min-width: 0;
+    }
+    .voc-kpi-summary-item {
+      position: relative; min-width: 0; padding: 16px 18px;
+      border: 1px solid #bfdbfe; border-radius: 12px; background: #eff6ff;
+    }
+    .voc-kpi-summary-item.analyzable {
+      border-color: #ddd6fe; background: #f5f3ff;
+    }
+    .voc-kpi-summary-item .lbl {
+      margin: 0 0 7px; font-size: 13px; font-weight: 600; color: #475569; line-height: 1.3;
+    }
+    .voc-kpi-summary-item .val {
+      margin: 0; font-size: 34px; font-weight: 700; color: #185fa5; line-height: 1.05;
+    }
+    .voc-kpi-summary-item.analyzable .val { color: #7c3aed; font-size: 34px; }
+    .voc-kpi-summary-item.analyzable { position: relative; z-index: 2; overflow: visible; }
+    .voc-kpi-summary-help {
+      margin: 7px 0 0; font-size: 11px; color: var(--text-muted); line-height: 1.45;
+    }
+    .voc-kpi-section-lbl {
+      margin: 0 0 8px; font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    }
+    .voc-kpi-target {
+      min-width: 0; padding: 12px;
+      border: 1px solid #bbf7d0; border-radius: var(--radius); background: #f0fdf4;
+    }
+    .voc-kpi-target-box {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0;
+      background: transparent; border: none; border-radius: 0;
+      padding: 0;
+    }
+    .voc-kpi-type-item { padding: 0 10px; min-width: 0; }
+    .voc-kpi-target-box .voc-kpi-type-item:first-child { padding-left: 0; }
+    .voc-kpi-target-box .voc-kpi-type-item:last-child { padding-right: 0; }
+    .voc-kpi-type-item + .voc-kpi-type-item { border-left: 1px solid #dcfce7; }
+    .voc-kpi-type-item .name {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--text-secondary); margin: 0 0 6px;
+    }
+    .voc-kpi-type-item .name i {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .voc-kpi-type-item .stat {
+      margin: 0; font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.2;
+    }
+    .voc-kpi-type-item .stat .pct {
+      font-size: 11px; font-weight: 500; color: var(--text-muted); margin-left: 4px;
+    }
+    .voc-kpi-excluded {
+      min-width: 0; padding: 12px;
+      border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2);
+    }
+    .voc-kpi-excluded-items { display: flex; justify-content: space-between; gap: 14px; }
+    .voc-kpi-excluded .voc-kpi-type-item { padding: 0; border: none; }
+    .voc-overall-panel {
+      padding: 18px 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2);
+    }
+    .voc-overall-period { margin: 0 0 12px; color: var(--text-muted); font-size: 11px; text-align: right; }
+    .voc-overall-headlines {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;
+    }
+    .voc-overall-headline { min-width: 0; padding: 14px 16px; border-radius: 10px; background: var(--surface-1); }
+    .voc-overall-headline .label { margin: 0 0 6px; color: var(--text-muted); font-size: 11px; }
+    .voc-overall-headline .value { display: inline; margin: 0; color: var(--text-primary); font-size: 16px; font-weight: 700; line-height: 1.1; }
+    .voc-overall-headline .change { display: inline; margin: 0 0 0 3px; color: #b4392b; font-size: 10px; font-weight: 600; }
+    .voc-overall-type-title { margin: 0 0 5px; color: var(--text-primary); font-size: 13px; font-weight: 600; }
+    .voc-overall-type-sub { margin: 0 0 10px; color: var(--text-muted); font-size: 11px; }
+    .voc-overall-types {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px;
+    }
+    .voc-overall-type-card { min-width: 0; padding: 11px 13px; border-radius: 10px; background: var(--surface-1); }
+    .voc-overall-type-name {
+      display: flex; align-items: center; gap: 6px; min-height: 28px; margin-bottom: 6px;
+      color: var(--text-secondary); font-size: 11px; line-height: 1.3;
+    }
+    .voc-overall-type-name i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .voc-overall-type-count { margin: 0 0 5px; color: var(--text-primary); font-size: 19px; font-weight: 600; }
+    .voc-overall-type-bar { height: 4px; margin-bottom: 5px; overflow: hidden; border-radius: 2px; background: var(--surface-2); }
+    .voc-overall-type-bar span { display: block; height: 100%; }
+    .voc-overall-type-meta { margin: 0; color: var(--text-muted); font-size: 10px; white-space: nowrap; }
+    .voc-overall-special { padding-top: 12px; border-top: 1px solid var(--border); }
+    .voc-overall-special-note { margin: 0 0 8px; color: var(--text-muted); font-size: 11px; }
+    .voc-overall-special-row { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+    .voc-overall-special-item { display: flex; align-items: center; gap: 8px; }
+    .voc-overall-special-badge {
+      padding: 3px 10px; border-radius: 999px; background: var(--bg-danger); color: var(--text-danger);
+      font-size: 11px; font-weight: 700;
+    }
+    .voc-overall-special-count { font-size: 13px; font-weight: 600; }
+    .voc-overall-special-change { color: #b4392b; font-size: 11px; }
+    .voc-overall-special-change.down { color: #185fa5; }
+    .voc-praise-ranking-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .voc-praise-ranking-card {
+      min-width: 0; padding: 18px 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2);
+    }
+    .voc-praise-ranking-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+    .voc-praise-ranking-title { margin: 0; color: var(--text-primary); font-size: 14px; font-weight: 600; }
+    .voc-praise-prev-btn {
+      flex-shrink: 0; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px;
+      background: var(--surface-2); color: var(--text-secondary); font-size: 11px; cursor: pointer;
+    }
+    .voc-praise-prev-btn:hover { background: var(--surface-1); }
+    .voc-praise-prev-btn.active { border-color: #1baf7a; background: #ecfdf5; color: #047857; }
+    .voc-praise-ranking-sub { margin: 0 0 12px; color: var(--text-muted); font-size: 11px; }
+    .voc-praise-rank-row {
+      display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border);
+    }
+    .voc-praise-rank-no { width: 16px; flex-shrink: 0; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+    .voc-praise-rank-main { flex: 1; min-width: 0; }
+    .voc-praise-rank-name { margin: 0; color: var(--text-primary); font-size: 12px; font-weight: 500; }
+    .voc-praise-rank-desc { margin: 1px 0 0; color: var(--text-muted); font-size: 10px; }
+    .voc-praise-rank-bar { height: 4px; margin-top: 4px; overflow: hidden; border-radius: 2px; background: var(--surface-1); }
+    .voc-praise-rank-bar span { display: block; height: 100%; background: #1baf7a; }
+    .voc-praise-rank-stat { flex-shrink: 0; text-align: right; }
+    .voc-praise-rank-count { margin: 0; color: var(--text-primary); font-size: 14px; font-weight: 600; }
+    .voc-praise-rank-change { margin: 1px 0 0; font-size: 10px; font-weight: 500; }
+    .kpi-tip {
+      position: relative; display: inline-flex; align-items: center; vertical-align: middle;
+    }
+    .kpi-tip-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; margin-left: 3px; padding: 0;
+      border: none; border-radius: 50%; background: #ede9fe; color: #7c3aed;
+      font-size: 9px; font-weight: 700; line-height: 1; cursor: help; flex-shrink: 0;
+    }
+    .kpi-tip-btn:focus-visible { outline: 2px solid #7c3aed; outline-offset: 1px; }
+    .kpi-tip-pop {
+      position: absolute; z-index: 30; left: 0; top: auto; bottom: calc(100% + 8px);
+      transform: none; width: max-content; max-width: 260px;
+      padding: 8px 10px; border-radius: 6px; background: #1e293b; color: #f8fafc;
+      font-size: 10px; font-weight: 400; line-height: 1.55; text-align: left;
+      white-space: normal; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+      opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .15s ease;
+    }
+    #vocStaffPraiseTip { left: auto; right: 0; }
+    .kpi-tip:hover .kpi-tip-pop,
+    .kpi-tip:focus-within .kpi-tip-pop { opacity: 1; visibility: visible; }
+    @media (max-width: 1100px) {
+      .voc-kpi-target-box { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .voc-kpi-type-item:nth-child(4) { border-left: none; }
+      .voc-kpi-type-item:nth-child(n+4) { margin-top: 10px; padding-top: 10px; border-top: 1px solid #dcfce7; }
+    }
+    @media (max-width: 820px) {
+      .voc-kpi-board { grid-template-columns: 1fr; }
+      .voc-kpi-summary,
+      .voc-kpi-target,
+      .voc-kpi-excluded { grid-column: 1; }
+      .voc-overall-headlines,
+      .voc-overall-types,
+      .voc-praise-ranking-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .voc-kpi-summary { grid-template-columns: 1fr; }
+      .voc-kpi-target { min-width: 0; }
+      .voc-kpi-target-box { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .voc-kpi-type-item { border-left: none !important; border-top: none !important; margin-top: 0 !important; padding-top: 0 !important; }
+      .voc-kpi-type-item:nth-child(n+3) { margin-top: 10px !important; padding-top: 10px !important; border-top: 1px solid #dcfce7 !important; }
+      .voc-classify-kw-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .voc-classify-ratio-hdr { flex-direction: column; }
+      .voc-overall-panel { padding: 14px; }
+      .voc-overall-headlines,
+      .voc-overall-types,
+      .voc-praise-ranking-grid { grid-template-columns: 1fr; }
+    }
+    .voc-classify-stack { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+    .voc-share-channel-row {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start;
+    }
+    .voc-channel-inner {
+      display: grid; grid-template-columns: minmax(170px, .75fr) minmax(0, 1.25fr); gap: 12px; margin-top: 12px;
+    }
+    .voc-channel-inner > div { min-width: 0; overflow: hidden; }
+    .voc-classify-share.voc-channel-share {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .voc-channel-share .voc-classify-donut-wrap {
+      width: 170px; height: 170px; margin: 0 auto;
+    }
+    .voc-channel-share .voc-classify-legend-list {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px 12px;
+    }
+    .simple-pie-legend {
+      display: flex; align-items: center; gap: 7px; min-width: 0;
+      color: var(--text-secondary); font-size: var(--fs-label); line-height: 1.35;
+    }
+    .simple-pie-legend i {
+      width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0;
+    }
+    .simple-pie-legend span {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .table-type-label { display: inline-flex; align-items: center; gap: 6px; }
+    .table-type-label i { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+    .voc-channel-card .note { margin-top: 10px; margin-bottom: 0; }
+    @media (max-width: 960px) {
+      .voc-share-channel-row { grid-template-columns: 1fr; }
+      .voc-channel-inner { grid-template-columns: 1fr; }
+    }
+    .voc-classify-chart-card {
+      background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px;
+    }
+    .voc-classify-chart-card .ct { margin: 0; font-size: 12px; font-weight: 500; color: #185fa5; }
+    .voc-classify-chart-card .cs { margin: 4px 0 0; font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+    .voc-type-summary-list { margin-top: 14px; }
+    .voc-type-summary-item { padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--border-strong); }
+    .voc-type-summary-item:first-child { padding-top: 0; margin-top: 0; border-top: 0; }
+    .voc-type-summary-head {
+      width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
+    }
+    .voc-type-summary-name { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; }
+    .voc-type-summary-name i { width: 9px; height: 9px; border-radius: 999px; flex-shrink: 0; }
+    .voc-type-summary-toggle { margin-left: 4px; color: #4f46e5; font-size: 11px; font-weight: 400; }
+    .voc-type-summary-stat { color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
+    .voc-type-summary-kws { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .voc-type-summary-kw {
+      padding: 3px 8px; border-radius: 999px; background: var(--surface-1);
+      color: var(--text-secondary); font-size: 11px; white-space: nowrap;
+    }
+    .voc-type-summary-quotes { margin-top: 8px; }
+    .voc-type-summary-quotes-title { margin: 0 0 4px; color: var(--text-muted); font-size: 11px; }
+    .voc-type-summary-quote { padding: 7px 0; border-top: 1px solid var(--border); }
+    .voc-type-summary-quote p { margin: 0 0 2px; color: var(--text-secondary); font-size: 11px; line-height: 1.5; }
+    .voc-type-summary-quote small { color: var(--text-muted); font-size: 10px; }
+    .voc-type-summary-legacy { display: none !important; }
+    .voc-type-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .voc-type-table th {
+      padding: 6px 4px; color: var(--text-secondary); font-weight: 500; text-align: left;
+    }
+    .voc-type-table td { padding: 8px 4px; border-top: 1px solid var(--border); vertical-align: middle; }
+    .voc-type-table .rank { width: 40px; color: var(--text-muted); }
+    .voc-type-table .type { width: 21%; font-weight: 600; }
+    .voc-type-table .num { width: 74px; text-align: right; font-weight: 600; white-space: nowrap; }
+    .voc-type-sentiment-bar { display: flex; height: 12px; overflow: hidden; border-radius: 3px; }
+    .voc-type-sentiment-bar .positive { background: #1baf7a; }
+    .voc-type-sentiment-bar .negative { background: #e24b4a; }
+    .voc-type-sentiment-bar.unclassified { background: #c9c4a0; }
+    .voc-type-sentiment-meta { margin-top: 3px; color: var(--text-muted); font-size: 10px; }
+    .voc-type-quotes-toggle {
+      margin-left: 6px; padding: 0; border: 0; background: transparent; color: var(--text-accent);
+      font-size: 10px; text-decoration: underline; cursor: pointer;
+    }
+    .voc-type-quotes-cell { padding: 10px 8px 14px 24px !important; background: var(--surface-1); }
+    .voc-type-quotes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .voc-type-quotes-heading { margin: 0 0 2px; font-size: 11px; font-weight: 700; }
+    .voc-type-quotes-heading.positive { color: #1baf7a; }
+    .voc-type-quotes-heading.negative { color: #e24b4a; }
+    .voc-type-quote { padding: 5px 0; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 11px; line-height: 1.5; }
+    .voc-type-table-flags { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .voc-type-score-grid {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px;
+    }
+    .voc-type-reception-card { padding: 20px 24px; background: var(--surface-2); }
+    .voc-type-reception-card .ct { color: var(--text-primary); font-size: 16px; }
+    .voc-type-reception-card .cs { margin-top: 4px; font-size: 12px; }
+    .voc-type-score-card { min-width: 0; padding: 12px 14px; border-radius: 10px; background: var(--surface-1); }
+    .voc-type-score-name {
+      display: flex; align-items: center; gap: 6px; margin: 0 0 8px;
+      color: var(--text-secondary); font-size: 12px; line-height: 1.35;
+    }
+    .voc-type-score-name i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .voc-type-score-stat {
+      margin: 0 0 6px; color: var(--text-primary); font-size: 13px; font-weight: 600; line-height: 1.35; white-space: nowrap;
+    }
+    .voc-type-score-stat .change { font-weight: 700; }
+    .voc-type-score-track { height: 3px; overflow: hidden; border-radius: 2px; background: var(--surface-1); }
+    .voc-type-score-track span { display: block; height: 100%; border-radius: inherit; }
+    @media (max-width: 720px) {
+      .voc-type-summary-head { align-items: flex-start; flex-direction: column; }
+      .voc-type-table { min-width: 650px; }
+      .voc-type-summary-list { overflow-x: auto; }
+      .voc-type-quotes-grid { grid-template-columns: 1fr; }
+      .voc-type-score-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 420px) {
+      .voc-type-score-grid { grid-template-columns: 1fr; }
+    }
+    .voc-classify-share { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; margin-top: 12px; }
+    .voc-type-share { grid-template-columns: 104px minmax(0, 1fr); gap: 12px; }
+    .voc-type-share .voc-classify-donut-wrap { height: 104px; }
+    .voc-classify-donut-wrap { position: relative; height: 150px; }
+    .voc-classify-donut-wrap canvas { width: 100% !important; height: 100% !important; }
+    .voc-classify-donut-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; pointer-events: none;
+    }
+    .voc-classify-donut-center .total { margin: 0; font-size: 18px; font-weight: 500; color: #185fa5; }
+    .voc-classify-donut-center .lbl { margin: 2px 0 0; font-size: 10px; color: var(--text-muted); }
+    .voc-classify-legend-list { display: flex; flex-direction: column; gap: 6px; }
+    .voc-classify-legend-item { display: grid; grid-template-columns: 72px 1fr 44px 80px; gap: 6px; align-items: center; font-size: 10px; }
+    .voc-type-share .voc-classify-legend-item {
+      grid-template-columns: 52px minmax(38px, 56px) 46px 88px;
+      justify-content: space-between;
+      column-gap: 6px;
+    }
+    .voc-type-share .voc-classify-legend-item .name { min-width: 0; }
+    .voc-type-share .voc-classify-legend-item .track { width: 100%; }
+    .voc-type-share .voc-classify-legend-item .cnt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .voc-type-share .voc-classify-legend-item .pct { justify-self: stretch; min-width: 0; }
+    .voc-classify-legend-item .name { display: inline-flex; align-items: center; gap: 5px; color: var(--text-secondary); white-space: nowrap; }
+    .voc-classify-legend-item .name i { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .voc-classify-legend-item .track { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .voc-classify-legend-item .fill { height: 100%; border-radius: 999px; }
+    .voc-classify-legend-item .cnt { text-align: right; color: var(--text-secondary); }
+    .voc-classify-legend-item .pct { text-align: right; color: var(--text-muted); }
+    .share-pct-wrap { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; line-height: 1.2; white-space: nowrap; }
+    .share-pct { font-variant-numeric: tabular-nums; }
+    .share-chg { font-size: 9px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+    .share-chg.up { color: #B4392B; }
+    .share-chg.down { color: #185FA5; }
+    .share-chg.flat { color: var(--text-muted); font-weight: 500; }
+    .tbl .share-pct-wrap { justify-content: flex-end; }
+    .tbl td.share-col { min-width: 92px; }
+    .voc-classify-trend-wrap { position: relative; height: 220px; margin-top: 12px; }
+    .voc-classify-ratio-hdr {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+    }
+    .voc-classify-ratio-legend {
+      display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px 10px; flex-shrink: 0;
+      font-size: 10px; color: var(--text-secondary);
+    }
+    .voc-classify-ratio-legend span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .voc-classify-ratio-legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+    .voc-classify-ratio-legend i.line-swatch {
+      width: 14px; height: 2px; border-radius: 1px; background: #1f3864;
+    }
+    .voc-classify-kw-grid {
+      display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 14px;
+    }
+    .voc-classify-kw-col {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 10px; min-height: 132px;
+    }
+    .voc-classify-kw-col .kw-hdr {
+      margin: 0 0 8px; font-size: 10px; font-weight: 500; color: var(--text-secondary); line-height: 1.45;
+    }
+    .voc-classify-kw-col .kw-total { display: block; font-size: 9px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+    .voc-classify-kw-row {
+      display: grid; grid-template-columns: auto 1fr auto; gap: 4px 6px; align-items: center;
+      padding: 5px 6px; border-radius: 5px; margin-bottom: 5px; font-size: 9px;
+    }
+    .voc-classify-kw-row:last-child { margin-bottom: 0; }
+    .voc-classify-kw-row .tag {
+      font-size: 8px; font-weight: 500; padding: 2px 5px; border-radius: 3px; white-space: nowrap;
+    }
+    .voc-classify-kw-row .kw { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .voc-classify-kw-row .cnt { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .voc-classify-kw-row.like { background: rgba(42,120,214,0.06); }
+    .voc-classify-kw-row.like .tag { background: #dbeafe; color: #1d4ed8; }
+    .voc-classify-kw-row.bad { background: rgba(226,75,74,0.06); }
+    .voc-classify-kw-row.bad .tag { background: #fee2e2; color: #b91c1c; }
+    .voc-classify-kw-row.mix { background: rgba(237,161,0,0.08); }
+    .voc-classify-kw-row.mix .tag { background: #fef3c7; color: #b45309; }
+    .voc-classify-kw-row.inq { background: rgba(127,119,221,0.08); }
+    .voc-classify-kw-row.inq .tag { background: #ede9fe; color: #6d28d9; }
+    .voc-classify-kw-row.req { background: rgba(27,175,122,0.08); }
+    .voc-classify-kw-row.req .tag { background: #d1fae5; color: #047857; }
+    .voc-classify-kw-row.staff { background: rgba(212,160,23,0.08); }
+    .voc-classify-kw-row.staff .tag { background: #fef3c7; color: #92400e; }
+    .voc-classify-kw-row.unc { background: rgba(156,163,175,0.1); }
+    .voc-classify-kw-row.unc .tag { background: #f3f4f6; color: #4b5563; }
+    @media (max-width: 1100px) {
+      .voc-classify-kw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 1000px) {
+      .voc-classify-share { grid-template-columns: 1fr; }
+      .voc-classify-donut-wrap { max-width: 180px; margin: 0 auto; }
+    }
+    .voc-rag-wrap { display: flex; flex-wrap: wrap; gap: 16px; max-width: 100%; }
+    .voc-rag-left { flex: 1 1 340px; min-width: 0; }
+    .voc-rag-right { flex: 1 1 420px; min-width: 0; }
+    .voc-rag-title { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .voc-rag-sub { font-size: 12px; color: var(--text-secondary); margin: 0 0 16px; line-height: 1.5; }
+    .voc-rag-section-label { font-size: 12px; font-weight: 600; margin: 0 0 8px; color: var(--text-secondary); }
+    .voc-rag-gender-bar {
+      display: flex; width: 100%; height: 18px; border-radius: 4px; overflow: hidden; margin-bottom: 6px;
+    }
+    .voc-rag-gender-bar .male { background: #2A66C7; }
+    .voc-rag-gender-bar .female { background: #E0629A; }
+    .voc-rag-gender-pct {
+      display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;
+    }
+    .voc-rag-gender-detail {
+      display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px;
+    }
+    .voc-rag-gender-detail .male { color: #2A66C7; }
+    .voc-rag-gender-detail .female { color: #E0629A; }
+    .voc-rag-gender-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+    .voc-rag-gender-tab {
+      font-size: 12px; padding: 5px 14px; height: auto; border-radius: 999px; cursor: pointer;
+      border: 0.5px solid var(--border-strong); background: var(--surface-2); color: var(--text-primary);
+    }
+    .voc-rag-gender-tab.active { background: #2A66C7; color: #fff; border-color: #2A66C7; }
+    .voc-rag-age-hdr {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+    }
+    .voc-rag-age-legend { display: flex; gap: 10px; font-size: 10px; color: var(--text-muted); }
+    .voc-rag-age-legend span { display: flex; align-items: center; gap: 4px; }
+    .voc-rag-age-legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+    .voc-rag-age-legend i.male { background: #2A66C7; }
+    .voc-rag-age-legend i.female { background: #E0629A; }
+    .voc-rag-age-list { display: flex; flex-direction: column; gap: 4px; }
+    .voc-rag-age-row {
+      display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 6px;
+      border-radius: 6px; background: transparent; border: 1px solid transparent; transition: all .12s;
+    }
+    .voc-rag-age-row:hover { background: #f8fafc; }
+    .voc-rag-age-row.active { background: #EAF1FC; border-color: #2A66C7; }
+    .voc-rag-age-row .age-lbl {
+      width: 64px; flex-shrink: 0; font-size: 12px; color: var(--text-primary);
+    }
+    .voc-rag-age-row.active .age-lbl { font-weight: 600; color: #1F4E8C; }
+    .voc-rag-age-track {
+      flex: 1; height: 12px; background: var(--surface-1); border-radius: 3px; overflow: hidden; min-width: 0;
+    }
+    .voc-rag-age-track-inner { display: flex; height: 100%; }
+    .voc-rag-age-track-inner .male { background: #2A66C7; }
+    .voc-rag-age-track-inner .female { background: #E0629A; }
+    .voc-rag-age-val {
+      width: 110px; text-align: right; flex-shrink: 0; font-size: 12px; color: var(--text-secondary);
+    }
+    .voc-rag-kw-hdr {
+      display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; gap: 8px;
+    }
+    .voc-rag-kw-hdr-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .voc-rag-kw-hdr-total { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .voc-rag-kw-section-title {
+      font-size: 12px; font-weight: 600; margin: 0 0 8px; color: var(--text-secondary);
+    }
+    .voc-rag-kw-section-title .muted { font-weight: 400; color: var(--text-muted); }
+    .voc-rag-kw-top5 { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+    .voc-rag-kw-row {
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+    }
+    .voc-rag-kw-rank { width: 14px; color: var(--text-muted); flex-shrink: 0; }
+    .voc-rag-kw-name {
+      width: 90px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-weight: 500; color: var(--text-secondary);
+    }
+    .voc-rag-kw-type {
+      width: 32px; flex-shrink: 0; font-size: 10px; padding: 1px 5px; border-radius: 999px; text-align: center;
+    }
+    .voc-rag-kw-bar {
+      flex: 1; height: 12px; background: var(--surface-1); border-radius: 3px; overflow: hidden; min-width: 0;
+    }
+    .voc-rag-kw-bar-fill { display: block; height: 100%; border-radius: 3px; }
+    .voc-rag-kw-cnt { width: 40px; text-align: right; flex-shrink: 0; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .voc-rag-pn-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 20px; }
+    .voc-rag-pn-title { margin: 0 0 5px; font-size: 11px; font-weight: 700; }
+    .voc-rag-pn-title.positive { color: #047857; }
+    .voc-rag-pn-title.negative { color: #b91c1c; }
+    .voc-rag-pn-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 10px; }
+    .voc-rag-pn-table th {
+      padding: 6px 4px; border-top: 1px solid var(--border); color: var(--text-muted);
+      font-weight: 500; text-align: left; background: var(--surface-1);
+    }
+    .voc-rag-pn-table td { padding: 7px 4px; border-top: 1px solid var(--border); color: var(--text-secondary); }
+    .voc-rag-pn-table .order { width: 34px; color: var(--text-muted); }
+    .voc-rag-pn-table .sentiment { width: 48px; }
+    .voc-rag-pn-table .category { width: 28%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .voc-rag-pn-table .keyword { font-weight: 600; color: var(--text-primary); }
+    .voc-rag-pn-table .metric { width: 82px; text-align: right; white-space: nowrap; }
+    .voc-rag-pn-table .change { width: 52px; text-align: right; font-weight: 600; white-space: nowrap; }
+    .voc-rag-pn-badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 9px; font-weight: 700; }
+    .voc-rag-pn-badge.positive { color: #047857; background: #d1fae5; }
+    .voc-rag-pn-badge.negative { color: #b91c1c; background: #fee2e2; }
+    .voc-rag-trend-hdr {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .voc-rag-trend-hdr .voc-rag-kw-section-title { margin: 0; }
+    .voc-rag-trend-mode-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .voc-rag-trend-mode-tab {
+      font-size: 11px; padding: 4px 10px; height: auto; border-radius: 999px; cursor: pointer;
+      border: 0.5px solid var(--border-strong); background: var(--surface-2);
+      color: var(--text-secondary); font-weight: 400;
+    }
+    .voc-rag-trend-mode-tab.active {
+      background: #eef2f6; color: var(--text-primary); border-color: #cbd5e1; font-weight: 600;
+    }
+    .voc-rag-trend-legend {
+      display: flex; gap: 10px; font-size: 10px; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap;
+    }
+    .voc-rag-trend-legend span { display: flex; align-items: center; gap: 4px; }
+    .voc-rag-trend-legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .voc-rag-trend-wrap { position: relative; width: 100%; height: 150px; min-width: 0; }
+    @media (max-width: 900px) {
+      .voc-rag-left, .voc-rag-right { flex: 1 1 100%; }
+    }
+    @media (max-width: 640px) {
+      .voc-ov-kpi-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* 카테고리·키워드 4종 기준 */
+    .multitag-banner {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: #fff8ec; border: 1px solid #f3dfb0; border-radius: 12px;
+      padding: 14px 18px; margin-bottom: 16px; font-size: 12px; color: #7a5b12; line-height: 1.65;
+    }
+    .multitag-banner .mt-icon { font-size: 16px; flex-shrink: 0; color: #c9902a; }
+    .multitag-banner b { color: #8a6410; }
+    .scope-note {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+      color: #1e88b5; background: #ebf5fb; border: 1px solid #d3e9f5;
+      padding: 5px 11px; border-radius: 8px; margin-bottom: 14px;
+    }
+    .footnote {
+      font-size: 11px; color: var(--text-muted); margin-top: 10px; line-height: 1.6;
+      padding-top: 10px; border-top: 1px dashed var(--border);
+    }
+    .footnote b { color: var(--text-primary); font-weight: 700; }
+    .voc-cat-main { display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px; }
+    .voc-cat-panel {
+      background: var(--surface-2); border-radius: var(--radius); padding: 14px;
+    }
+    .voc-cat-panel .ct { margin: 0; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+    .voc-cat-panel .cs { margin: 4px 0 12px; font-size: 10px; color: var(--text-muted); }
+    .voc-cat-list { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+    .voc-cat-row-hdr {
+      display: flex; justify-content: space-between; margin-bottom: 6px;
+      font-size: 12px; font-weight: 700; color: var(--text-primary);
+    }
+    .voc-cat-row-hdr b { color: var(--text-primary); }
+    .voc-cat-bar-track {
+      display: flex; height: 16px; border-radius: 8px; overflow: hidden; background: #f0f2f5;
+    }
+    .voc-cat-bar-track span { height: 100%; }
+    .voc-cat-type-legend {
+      display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px;
+      font-size: 11px; color: var(--text-muted);
+    }
+    .voc-cat-type-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .voc-cat-type-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+    .voc-cat-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .voc-cat-tbl th, .voc-cat-tbl td {
+      padding: 9px 8px; border-bottom: 0.5px solid var(--border);
+    }
+    .voc-cat-tbl th { text-align: right; color: var(--text-muted); font-weight: 500; font-size: 11px; background: #f7f9fb; }
+    .voc-cat-tbl th:first-child, .voc-cat-tbl td:first-child { text-align: left; }
+    .voc-cat-tbl td.catname { font-weight: 800; color: #1f3864; }
+    .voc-cat-tbl td.voccount { font-weight: 800; text-align: right; }
+    .voc-cat-tbl td.kw { text-align: left; color: var(--text-muted); }
+    .voc-cat-tbl tfoot td {
+      font-weight: 800; color: #1f3864; background: #f7f9fb; border-top: 2px solid var(--border);
+    }
+    .voc-cat-tbl-wrap { overflow-x: auto; }
+    @media (max-width: 900px) {
+      .voc-cat-main { grid-template-columns: 1fr; }
+    }
+
+    /* 카테고리 / 키워드 분석 v8 */
+    .ck-analysis { margin-top: 4px; }
+    .ck-header-top {
+      display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 4px;
+    }
+    .ck-title { margin: 0; font-size: 18px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+    .ck-date { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .ck-desc { margin: 0 0 4px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .ck-desc-note { margin: 0 0 14px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .ck-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .ck-chip {
+      font-size: 13px; padding: 6px 14px; height: auto; border-radius: 999px; cursor: pointer;
+      border: 0.5px solid var(--border-strong); background: var(--surface-2); color: var(--text-primary);
+      transition: all .12s;
+    }
+    .ck-chip:hover:not(.active) { background: #f1f5f9; }
+    .ck-chip.active { background: #534AB7; border-color: #534AB7; color: #fff; }
+    .ck-main { display: flex; flex-wrap: wrap; gap: 16px; }
+    .ck-panel-left {
+      flex: 1 1 280px; min-width: 260px; background: var(--surface-2);
+      border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; align-self: flex-start;
+    }
+    .ck-panel-right { flex: 1 1 320px; min-width: 0; }
+    .ck-panel-title { margin: 0 0 10px; font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .ck-donut-wrap { position: relative; width: 100%; height: 160px; margin-bottom: 12px; }
+    .ck-share-tbl { width: 100%; font-size: 12px; border-collapse: collapse; table-layout: fixed; }
+    .ck-share-tbl thead td { padding: 4px 2px; color: var(--text-muted); }
+    .ck-share-tbl tbody td { padding: 5px 2px; }
+    .ck-share-tbl tbody tr { cursor: pointer; }
+    .ck-share-tbl tbody tr.active { background: #EEEDFE; }
+    .ck-share-tbl tbody tr.active td.name { color: #3C3489; font-weight: 500; }
+    .ck-share-tbl .col-rank { width: 10%; }
+    .ck-share-tbl .col-name { width: 34%; }
+    .ck-share-tbl .col-count { width: 20%; text-align: right; font-variant-numeric: tabular-nums; }
+    .ck-share-tbl .col-pct { width: 18%; text-align: right; font-variant-numeric: tabular-nums; }
+    .ck-share-tbl .col-change { width: 18%; text-align: right; }
+    .ck-change-up { color: #B4392B; }
+    .ck-change-flat { color: var(--text-muted); }
+    .ck-panel-right { flex-basis: 640px; }
+    .ck-kw-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .ck-kw-card {
+      background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 12px 14px;
+    }
+    .ck-kw-card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px;
+      padding-bottom: 7px; border-bottom: 1px solid var(--border-strong);
+    }
+    .ck-kw-card-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; }
+    .ck-kw-card-badge {
+      width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0;
+    }
+    .ck-kw-card-total { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .ck-kw-block {
+      margin-bottom: 6px; padding-bottom: 6px; border-bottom: 0.5px solid var(--border); cursor: pointer;
+    }
+    .ck-kw-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .ck-kw-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .ck-kw-rank { width: 14px; flex-shrink: 0; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+    .ck-kw-name {
+      width: 84px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .ck-kw-bar-wrap {
+      flex: 1; height: 14px; background: var(--surface-1); border-radius: 3px; overflow: hidden;
+    }
+    .ck-kw-bar { display: block; height: 100%; }
+    .ck-kw-cnt { width: 38px; text-align: right; flex-shrink: 0; color: var(--text-secondary); }
+    .ck-kw-change { width: 52px; text-align: right; flex-shrink: 0; font-weight: 500; }
+    .ck-kw-toggle { width: 14px; text-align: right; flex-shrink: 0; color: var(--text-muted); font-size: 10px; }
+    .ck-kw-trend {
+      background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; margin: -2px 0 10px;
+    }
+    .ck-kw-trend-title { font-size: 11px; font-weight: 600; margin: 0 0 8px; }
+    .ck-kw-trend-inner { display: flex; flex-wrap: wrap; gap: 14px; }
+    .ck-kw-trend-chart { flex: 1 1 100%; min-width: 180px; position: relative; height: 130px; }
+    .ck-kw-trend-tbl { flex: 1 1 100%; min-width: 160px; font-size: 11px; border-collapse: collapse; width: 100%; }
+    .ck-kw-trend-tbl thead td { padding: 3px 2px; color: var(--text-muted); border-bottom: 0.5px solid var(--border-strong); }
+    .ck-kw-trend-tbl tbody td { padding: 3px 2px; border-bottom: 0.5px solid var(--border); }
+    .ck-kw-trend-tbl tbody tr.sel { background: var(--surface-2); }
+    .ck-kw-trend-tbl .cnt-cell { text-align: right; white-space: nowrap; }
+    .ck-kw-list-link {
+      text-align: center; font-size: 11px; color: var(--text-accent); cursor: pointer;
+      margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .ck-kw-list-link i { font-size: 13px; }
+    @media (max-width: 720px) {
+      .ck-kw-grid { grid-template-columns: 1fr; }
+    }
+    .ck-header-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .ck-excel-btn {
+      flex-shrink: 0; border: 1px solid var(--border); background: #fff; color: var(--text-secondary);
+      font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    }
+    .ck-excel-btn:hover { background: var(--surface-2); }
+
+    /* 목적별 통합 타이포그래피 */
+    :root {
+      --fs-page-title: 22px;
+      --fs-section-title: 17px;
+      --fs-card-title: 14px;
+      --fs-body: 13px;
+      --fs-label: 12px;
+      --fs-caption: 11px;
+    }
+    body { font-size: var(--fs-body); line-height: 1.5; }
+    .page-title {
+      margin: 0 0 2px; font-size: var(--fs-page-title); font-weight: 600; line-height: 1.35;
+    }
+    .page-subtitle {
+      margin: 0 0 16px; font-size: var(--fs-body); color: var(--text-muted); line-height: 1.5;
+    }
+    select { font-size: var(--fs-body); }
+
+    .sec-title,
+    .dim-split-title { font-size: var(--fs-section-title); font-weight: 600; }
+    .ck-title { font-size: 19px; }
+    .sec-sub,
+    .dim-split-sub,
+    .ck-desc,
+    .voc-rag-sub { font-size: var(--fs-body); line-height: 1.6; }
+
+    .card .ct,
+    .voc-classify-chart-card .ct,
+    .voc-cat-panel .ct,
+    .dim-split-panel-title,
+    .ck-panel-title { font-size: var(--fs-card-title); font-weight: 600; }
+    .card .cs,
+    .voc-classify-chart-card .cs,
+    .voc-cat-panel .cs { font-size: var(--fs-label); line-height: 1.55; }
+
+    .tbl,
+    .dim-split-tbl,
+    .voc-cat-tbl,
+    .ck-share-tbl,
+    .ck-kw-row,
+    .ck-kw-trend-tbl { font-size: var(--fs-label); line-height: 1.5; }
+    .tbl th,
+    .tbl td { padding-top: 8px; padding-bottom: 8px; }
+
+    .legend,
+    .dim-split-count,
+    .dim-split-legend-item,
+    .dim-split-top-badge,
+    .voc-rag-section-label,
+    .voc-rag-age-legend,
+    .voc-rag-trend-legend,
+    .ck-date,
+    .ck-excel-btn { font-size: var(--fs-label); }
+    .dim-split-kw,
+    .dim-split-change,
+    .dim-split-type-cnt,
+    .dim-split-tbl-hint,
+    .share-chg,
+    .note,
+    .footnote,
+    .mini-stat p.l,
+    .voc-ov-kpi .sub,
+    .kpi-tip-pop,
+    .voc-classify-donut-center .lbl,
+    .voc-classify-kw-col .kw-total,
+    .ck-kw-toggle,
+    .ck-kw-trend-title { font-size: var(--fs-caption); }
+
+    .voc-kpi-summary-item .lbl,
+    .voc-kpi-section-lbl,
+    .voc-kpi-type-item .name,
+    .voc-kpi-type-item .stat .pct,
+    .voc-ov-kpi .lbl,
+    .voc-ov-kpi .kw-count { font-size: var(--fs-label); }
+    .voc-kpi-type-item .stat { font-size: var(--fs-card-title); }
+
+    .voc-classify-legend-item { font-size: var(--fs-caption); }
+    .voc-classify-ratio-legend,
+    .voc-classify-kw-col .kw-hdr,
+    .voc-classify-kw-row { font-size: var(--fs-caption); }
+    .voc-classify-kw-row .tag,
+    .voc-rag-kw-type,
+    .ck-kw-type { font-size: 10px; }
+
+    .multitag-banner { font-size: var(--fs-body); }
+    .hier-box,
+    .voc-channel-badge,
+    .ck-desc-note { font-size: var(--fs-label); }
+    .new-badge,
+    .top10-badge { font-size: var(--fs-caption); }
+  </style>
+</head>
+<body>
+  <h2 class="sr-only">VOC 통계 페이지 최종본</h2>
+
+  <p class="page-title">VOC 통계</p>
+  <p class="page-subtitle">2026년 6월 기준으로 주요 접수 현황과 흐름을 확인하세요.</p>
+
+  <div class="filter-bar" aria-label="VOC 통계 조회 조건">
+    <div class="filter-group">
+      <label class="filter-label" for="filterYear">연도</label>
+      <select class="filter-select" id="filterYear">
+        <option value="2026">2026년</option>
+        <option value="2025">2025년</option>
+        <option value="2024">2024년</option>
+      </select>
+    </div>
+    <div class="filter-group period">
+      <span class="filter-label">조회 기간</span>
+      <div class="period-tabs" id="periodTabs" role="tablist" aria-label="조회 기간">
+        <button type="button" class="period-tab active" data-period="month" role="tab" aria-selected="true">월별</button>
+        <button type="button" class="period-tab" data-period="quarter" role="tab" aria-selected="false">분기별</button>
+        <button type="button" class="period-tab" data-period="half" role="tab" aria-selected="false">반기별</button>
+        <button type="button" class="period-tab" data-period="year" role="tab" aria-selected="false">연도별</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label" id="filterPeriodLabel" for="filterPeriodValue">월 선택</label>
+      <select class="filter-select" id="filterPeriodValue">
+        <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option>
+        <option value="4">4월</option><option value="5">5월</option><option value="6" selected>6월</option>
+        <option value="7">7월</option><option value="8">8월</option><option value="9">9월</option>
+        <option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+      </select>
+    </div>
+    <div class="filter-ai-action">
+      <button type="button" class="filter-ai-btn" id="vocAiAnalyzeBtn"><span>✦</span>AI 분석하기</button>
+    </div>
+  </div>
+  <script>
+    (function setupPeriodFilter() {
+      var tabs = document.querySelectorAll("#periodTabs .period-tab");
+      var label = document.getElementById("filterPeriodLabel");
+      var select = document.getElementById("filterPeriodValue");
+      var yearSelect = document.getElementById("filterYear");
+      var subtitle = document.querySelector(".page-subtitle");
+      var currentPeriod = "month";
+      var configs = {
+        month: {
+          label: "월 선택",
+          options: Array.from({ length: 12 }, function (_, i) { return { value: String(i + 1), text: (i + 1) + "월" }; }),
+          selected: "6",
+        },
+        quarter: {
+          label: "분기 선택",
+          options: [{ value: "1", text: "1분기" }, { value: "2", text: "2분기" }, { value: "3", text: "3분기" }, { value: "4", text: "4분기" }],
+          selected: "2",
+        },
+        half: {
+          label: "반기 선택",
+          options: [{ value: "1", text: "상반기" }, { value: "2", text: "하반기" }],
+          selected: "1",
+        },
+        year: {
+          label: "연도 선택",
+          options: [{ value: "all", text: "연도 전체" }],
+          selected: "all",
+        },
+      };
+
+      function updateSubtitle() {
+        if (!subtitle) return;
+        var year = yearSelect.value;
+        var periodText = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "";
+        subtitle.textContent = year + "년 " + periodText + " 기준으로 주요 접수 현황과 흐름을 확인하세요.";
+      }
+
+      function applyPeriod(period) {
+        currentPeriod = period;
+        var config = configs[period];
+        label.textContent = config.label;
+        select.innerHTML = config.options.map(function (option) {
+          return '<option value="' + option.value + '"' + (option.value === config.selected ? " selected" : "") + ">" + option.text + "</option>";
+        }).join("");
+        tabs.forEach(function (tab) {
+          var active = tab.getAttribute("data-period") === period;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", active);
+        });
+        updateSubtitle();
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () { applyPeriod(tab.getAttribute("data-period")); });
+      });
+      select.addEventListener("change", updateSubtitle);
+      yearSelect.addEventListener("change", function () {
+        if (currentPeriod === "year") applyPeriod("year");
+        else updateSubtitle();
+      });
+    })();
+  </script>
+
+  <div class="group-detail-modal" id="vocAiModal" aria-hidden="true">
+    <button type="button" class="group-detail-backdrop" id="vocAiBackdrop" aria-label="AI 분석 닫기"></button>
+    <div class="group-detail-dialog voc-ai-dialog" role="dialog" aria-modal="true" aria-labelledby="vocAiTitle">
+      <div class="group-detail-header">
+        <div>
+          <h3 class="group-detail-title" id="vocAiTitle">PIX AI 상세 분석</h3>
+          <p class="group-detail-sub" id="vocAiPeriodText">2026년 6월 VOC 분석</p>
+        </div>
+        <button type="button" class="group-detail-close" id="vocAiClose" aria-label="닫기">×</button>
+      </div>
+      <div class="voc-ai-grid">
+        <section class="voc-ai-summary">
+          <div class="voc-ai-summary-head">
+            <span class="voc-ai-icon">✦</span>
+            <div>
+              <p class="voc-ai-section-title">AI 요약</p>
+              <p class="voc-ai-section-sub" id="vocAiSummaryPeriod">2026년 6월 VOC 요약</p>
+            </div>
+          </div>
+          <p class="voc-ai-summary-text">
+            선택 기간 동안 전체 VOC는 <b>9,065건</b>이며, 이 중 분석 가능 VOC는 <b>8,939건</b>입니다.
+            유형별로는 좋아요 <b>4,110건(46.0%)</b>, 불편 <b>2,569건(28.7%)</b>,
+            문의 <b>925건(10.3%)</b>, 요청 <b>719건(8.0%)</b>, 복합 <b>616건(6.9%)</b>으로 집계되었습니다.<br><br>
+            전월 대비 좋아요 비중은 <b>1.2% 증가</b>했으며 불편은 <b>0.8% 감소</b>해 전반적인 고객 경험이 개선되었습니다.
+            다만 <b>대기시간</b>과 <b>응대 속도</b> 관련 불편이 주요 이슈로 유지되고 있어 병동·진료과별 집중 관리가 필요합니다.<br><br>
+            유입 채널은 메디통 픽스(앱)가 <b>3,450건(38.1%)</b>으로 가장 높고,
+            고객의견카드 <b>2,166건(23.9%)</b>이 뒤를 이었습니다.
+            직원칭찬 <b>126건</b>은 랭킹 집계에만 사용되며 VOC 유형 분석에서는 제외됩니다.
+          </p>
+          <button type="button" class="voc-ai-copy" id="vocAiCopy">▣ 요약 복사</button>
+        </section>
+        <section class="voc-ai-right">
+          <div>
+            <p class="voc-ai-section-title">AI 인사이트</p>
+            <div class="voc-ai-insights">
+              <div class="voc-ai-insight">
+                <p class="label">주요 신호</p>
+                <p class="value">대기시간 불편 집중</p>
+                <p class="meta">진료/치료 카테고리 우선 개선</p>
+              </div>
+              <div class="voc-ai-insight">
+                <p class="label">강점</p>
+                <p class="value">친절함·간호사 응대 증가</p>
+                <p class="meta">좋아요 유형 전월 대비 +1.2%</p>
+              </div>
+              <div class="voc-ai-insight">
+                <p class="label">모니터링</p>
+                <p class="value">문의·요청 비중 18.3%</p>
+                <p class="meta">검사 안내와 시설 개선 수요 지속</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="voc-ai-section-title">핵심 지표 변화</p>
+            <div class="voc-ai-metrics">
+              <div class="voc-ai-metric"><div class="label">전체 VOC</div><div class="value">9,065건</div><div class="delta ck-change-up">▲ 2.4%</div></div>
+              <div class="voc-ai-metric"><div class="label">좋아요 비중</div><div class="value">46.0%</div><div class="delta ck-change-up">▲ 1.2%</div></div>
+              <div class="voc-ai-metric"><div class="label">불편 비중</div><div class="value">28.7%</div><div class="delta" style="color:#185FA5;">▼ 0.8%</div></div>
+              <div class="voc-ai-metric"><div class="label">직원칭찬</div><div class="value">126건</div><div class="delta ck-change-up">▲ 4.1%</div></div>
+            </div>
+          </div>
+          <div>
+            <p class="voc-ai-section-title">AI 상세 판단</p>
+            <p class="voc-ai-section-sub">주요 이슈와 개선 우선순위를 VOC 변화율과 언급량 기준으로 제안합니다.</p>
+            <div class="voc-ai-issues">
+              <div class="voc-ai-issue">
+                <span class="voc-ai-severity high">우선 개선</span>
+                <div><div class="voc-ai-issue-title">대기시간 불편</div><div class="voc-ai-issue-desc">진료/치료와 병원생활 전반에서 반복 언급되어 안내 강화와 동선 개선이 필요합니다.</div></div>
+                <span class="voc-ai-issue-change" style="color:#B4392B;">▲ 8.4%</span>
+              </div>
+              <div class="voc-ai-issue">
+                <span class="voc-ai-severity watch">모니터링</span>
+                <div><div class="voc-ai-issue-title">검사 안내 문의</div><div class="voc-ai-issue-desc">검사 절차·결과 확인 시점에 대한 문의가 증가해 사전 안내 표준화가 필요합니다.</div></div>
+                <span class="voc-ai-issue-change" style="color:#B4392B;">▲ 4.0%</span>
+              </div>
+              <div class="voc-ai-issue">
+                <span class="voc-ai-severity good">긍정 신호</span>
+                <div><div class="voc-ai-issue-title">친절함·세심함</div><div class="voc-ai-issue-desc">간호사 응대와 설명 만족도가 상승해 우수 사례의 부서 확산을 권장합니다.</div></div>
+                <span class="voc-ai-issue-change" style="color:#15803d;">▲ 5.0%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function setupVocAiModal() {
+      var modal = document.getElementById("vocAiModal");
+      var openBtn = document.getElementById("vocAiAnalyzeBtn");
+      var lockedParentScroller = null;
+      var lockedParentOverflow = "";
+      var localOverflow = "";
+      if (!modal || !openBtn) return;
+
+      function currentPeriodText() {
+        var year = document.getElementById("filterYear");
+        var period = document.getElementById("filterPeriodValue");
+        var yearText = year.options[year.selectedIndex] ? year.options[year.selectedIndex].text : "2026년";
+        var periodText = period.options[period.selectedIndex] ? period.options[period.selectedIndex].text : "6월";
+        return yearText + " " + periodText;
+      }
+
+      function positionModal() {
+        var top = window.scrollY || 0;
+        var height = window.innerHeight || 800;
+        try {
+          if (window.frameElement && window.parent) {
+            var rect = window.frameElement.getBoundingClientRect();
+            var visibleTop = Math.max(0, -rect.top);
+            var visibleBottom = Math.min(rect.height, window.parent.innerHeight - rect.top);
+            if (visibleBottom > visibleTop) {
+              top = visibleTop;
+              height = visibleBottom - visibleTop;
+            }
+          }
+        } catch (_error) {}
+        modal.style.top = Math.max(0, top + 12) + "px";
+        modal.style.height = Math.max(280, height - 24) + "px";
+      }
+
+      function lockScroll() {
+        localOverflow = document.documentElement.style.overflow;
+        document.documentElement.style.overflow = "hidden";
+        try {
+          if (!window.frameElement || !window.parent) return;
+          var node = window.frameElement.parentElement;
+          while (node && node !== window.parent.document.body) {
+            var style = window.parent.getComputedStyle(node);
+            if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight) {
+              lockedParentScroller = node;
+              break;
+            }
+            node = node.parentElement;
+          }
+          if (!lockedParentScroller) lockedParentScroller = window.parent.document.documentElement;
+          lockedParentOverflow = lockedParentScroller.style.overflow;
+          lockedParentScroller.style.overflow = "hidden";
+        } catch (_error) {
+          lockedParentScroller = null;
+        }
+      }
+
+      function unlockScroll() {
+        document.documentElement.style.overflow = localOverflow;
+        if (lockedParentScroller) {
+          lockedParentScroller.style.overflow = lockedParentOverflow;
+          lockedParentScroller = null;
+        }
+      }
+
+      function openModal() {
+        var periodText = currentPeriodText();
+        document.getElementById("vocAiPeriodText").textContent = periodText + " VOC 분석";
+        document.getElementById("vocAiSummaryPeriod").textContent = periodText + " VOC 요약";
+        positionModal();
+        lockScroll();
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeModal() {
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden", "true");
+        unlockScroll();
+      }
+
+      openBtn.addEventListener("click", openModal);
+      document.getElementById("vocAiClose").addEventListener("click", closeModal);
+      document.getElementById("vocAiBackdrop").addEventListener("click", closeModal);
+      document.getElementById("vocAiCopy").addEventListener("click", function () {
+        var button = this;
+        var text = document.querySelector(".voc-ai-summary-text").innerText;
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+        button.textContent = "✓ 복사 완료";
+        setTimeout(function () { button.textContent = "▣ 요약 복사"; }, 1400);
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && modal.classList.contains("show")) closeModal();
+      });
+    })();
+  </script>
+
+  <div class="sec">
+    <p class="sec-title">전체 VOC 현황</p>
+    <p class="sec-sub">접수 규모, 칭찬/불편 흐름, 응답자 구성을 한 화면에서 확인합니다.</p>
+
+    <div class="voc-kpi-board">
+      <div class="voc-kpi-summary">
+        <div class="voc-kpi-summary-item">
+          <p class="lbl">전체 VOC 건수</p>
+          <p class="val" id="vocKpiTotal">9,065건</p>
+          <p class="voc-kpi-summary-help">모든 유입 채널의 접수 건수 합계</p>
+        </div>
+        <div class="voc-kpi-summary-item analyzable">
+          <p class="lbl">
+            분석 가능 VOC 건수
+            <span class="kpi-tip">
+              <button type="button" class="kpi-tip-btn" aria-describedby="vocKpiAnalyzableTip">?</button>
+              <span class="kpi-tip-pop" id="vocKpiAnalyzableTip" role="tooltip">신뢰할 수 있는 분석 결과를 위해 좋아요, 불편, 문의, 요청, 복합 유형의 VOC만 분석에 포함됩니다. 직원 칭찬과 미분류 VOC는 분석 대상에서 제외됩니다.</span>
+            </span>
+          </p>
+          <p class="val" id="vocKpiAnalyzable">8,939건</p>
+          <p class="voc-kpi-summary-help">좋아요·불편·문의·요청·복합 유형의 합계</p>
+        </div>
+      </div>
+
+      <div class="voc-kpi-target">
+        <p class="voc-kpi-section-lbl">VOC 유형 · 5종</p>
+        <div class="voc-kpi-target-box">
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#2a78d6"></i>좋아요</p>
+            <p class="stat">4,110건<span class="pct">46.0%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#e24b4a"></i>불편</p>
+            <p class="stat">2,569건<span class="pct">28.7%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#7f77dd"></i>문의</p>
+            <p class="stat">925건<span class="pct">10.3%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#1baf7a"></i>요청</p>
+            <p class="stat">719건<span class="pct">8.0%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#eda100"></i>복합</p>
+            <p class="stat">616건<span class="pct">6.9%</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="voc-kpi-excluded">
+        <p class="voc-kpi-section-lbl">별도 현황 · 2종</p>
+        <div class="voc-kpi-excluded-items">
+          <div class="voc-kpi-type-item">
+            <p class="name"><i style="background:#9ca3af"></i>미분류</p>
+            <p class="stat">0건<span class="pct">0.0%</span></p>
+          </div>
+          <div class="voc-kpi-type-item">
+            <p class="name">
+              <i style="background:#d4a017"></i>직원칭찬
+              <span class="kpi-tip">
+                <button type="button" class="kpi-tip-btn" aria-describedby="vocStaffPraiseTip">?</button>
+                <span class="kpi-tip-pop" id="vocStaffPraiseTip" role="tooltip">직원칭찬은 직원 칭찬 현황의 랭킹 집계에만 사용되며 VOC 유형 분석에는 활용되지 않습니다.</span>
+              </span>
+            </p>
+            <p class="stat">126건<span class="pct">1.4%</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="voc-classify-stack">
+      <div class="voc-share-channel-row">
+        <div class="voc-classify-chart-card voc-type-reception-card">
+          <p class="ct">유형별 접수</p>
+          <p class="cs">분석 가능 VOC를 좋아요·불편·문의·요청·복합 5개 유형으로 분류한 비중입니다.</p>
+          <div class="voc-channel-inner">
+            <div>
+              <p class="cs" style="margin-bottom:8px;">유형별 접수 비중</p>
+              <div class="voc-classify-share voc-channel-share">
+                <div class="voc-classify-donut-wrap">
+                  <canvas id="vocClassifyDonut" role="img" aria-label="유형별 VOC 접수 비중"></canvas>
+                  <div class="voc-classify-donut-center">
+                    <p class="total" id="vocClassifyDonutTotal">8,939건</p>
+                    <p class="lbl">분석 가능 VOC</p>
+                  </div>
+                </div>
+                <div class="voc-classify-legend-list" id="vocClassifyLegend"></div>
+              </div>
+            </div>
+            <div>
+              <p class="cs" style="margin-bottom:8px;">유형별 접수 건수와 분석 가능 VOC 대비 비율</p>
+              <div class="dim-tbl-wrap">
+                <table class="tbl reception-tbl type-reception-tbl">
+                  <thead>
+                    <tr>
+                      <th style="width:40px;">순위</th>
+                      <th>유형</th>
+                      <th style="width:96px;">대표 키워드</th>
+                      <th class="num" style="width:68px;">접수 건수</th>
+                      <th class="num" style="width:52px;">비율</th>
+                      <th class="num" style="width:48px;">증감</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vocClassifyBody"></tbody>
+                  <tfoot id="vocClassifyFoot"></tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="voc-classify-chart-card voc-channel-card">
+          <p class="ct">채널별 접수</p>
+          <p class="cs">유입 채널별 VOC 접수 규모와 비중을 확인합니다.</p>
+          <div class="voc-channel-inner">
+            <div>
+              <p class="cs" style="margin-bottom:8px;">채널별 접수 비중</p>
+              <div class="voc-classify-share voc-channel-share">
+                <div class="voc-classify-donut-wrap">
+                  <canvas id="vocChannelDonut" role="img" aria-label="채널별 VOC 접수 비중"></canvas>
+                  <div class="voc-classify-donut-center">
+                    <p class="total" id="vocChannelDonutTotal"></p>
+                    <p class="lbl">전체 접수</p>
+                  </div>
+                </div>
+                <div class="voc-classify-legend-list" id="vocChannelLegend"></div>
+              </div>
+            </div>
+            <div>
+              <p class="cs" style="margin-bottom:8px;">채널별 접수 건수와 전체 대비 비율</p>
+              <div class="dim-tbl-wrap">
+                <table class="tbl reception-tbl">
+                  <thead>
+                    <tr>
+                      <th style="width:40px;">순위</th>
+                      <th>채널</th>
+                      <th class="num" style="width:68px;">접수 건수</th>
+                      <th class="num" style="width:52px;">비율</th>
+                      <th class="num" style="width:48px;">증감</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vocChannelBody"></tbody>
+                  <tfoot id="vocChannelFoot"></tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="voc-classify-chart-card">
+        <div class="voc-classify-ratio-hdr">
+          <div>
+            <p class="ct">유형별 VOC 월별 추이</p>
+            <p class="cs">분석 가능 VOC 기준 5개 유형 비율(%)과 월별 접수 건수(선)를 함께 확인할 수 있습니다.</p>
+          </div>
+          <div class="voc-classify-ratio-legend" aria-hidden="true">
+            <span><i class="line-swatch"></i>접수 건수</span>
+            <span><i style="background:#2a78d6"></i>좋아요</span>
+            <span><i style="background:#e24b4a"></i>불편</span>
+            <span><i style="background:#eda100"></i>복합</span>
+            <span><i style="background:#7f77dd"></i>문의</span>
+            <span><i style="background:#1baf7a"></i>요청</span>
+          </div>
+        </div>
+        <div class="voc-classify-trend-wrap">
+          <canvas id="vocClassifyTrend" role="img" aria-label="유형별 VOC 월별 추이"></canvas>
+        </div>
+
+        <div class="voc-classify-kw-grid">
+          <div class="voc-classify-kw-col">
+            <p class="kw-hdr">1월 최다 키워드<span class="kw-total">14,967건</span></p>
+            <div class="voc-classify-kw-row like"><span class="tag">좋아요</span><span class="kw">소음 개선</span><span class="cnt">90건</span></div>
+            <div class="voc-classify-kw-row bad"><span class="tag">불편</span><span class="kw">안내 부족</span><span class="cnt">53건</span></div>
+            <div class="voc-classify-kw-row inq"><span class="tag">문의</span><span class="kw">퇴원 일정</span><span class="cnt">31건</span></div>
+          </div>
+          <div class="voc-classify-kw-col">
+            <p class="kw-hdr">2월 최다 키워드<span class="kw-total">14,845건</span></p>
+            <div class="voc-classify-kw-row like"><span class="tag">좋아요</span><span class="kw">시스템 이용</span><span class="cnt">88건</span></div>
+            <div class="voc-classify-kw-row bad"><span class="tag">불편</span><span class="kw">설명력 부족</span><span class="cnt">52건</span></div>
+            <div class="voc-classify-kw-row req"><span class="tag">요청</span><span class="kw">주차 공간</span><span class="cnt">22건</span></div>
+          </div>
+          <div class="voc-classify-kw-col">
+            <p class="kw-hdr">3월 최다 키워드<span class="kw-total">15,169건</span></p>
+            <div class="voc-classify-kw-row like"><span class="tag">좋아요</span><span class="kw">검사 결과 설명</span><span class="cnt">91건</span></div>
+            <div class="voc-classify-kw-row bad"><span class="tag">불편</span><span class="kw">전반적 간호서비스</span><span class="cnt">51건</span></div>
+            <div class="voc-classify-kw-row inq"><span class="tag">문의</span><span class="kw">면회 시간</span><span class="cnt">28건</span></div>
+          </div>
+          <div class="voc-classify-kw-col">
+            <p class="kw-hdr">4월 최다 키워드<span class="kw-total">15,234건</span></p>
+            <div class="voc-classify-kw-row like"><span class="tag">좋아요</span><span class="kw">신속함</span><span class="cnt">88건</span></div>
+            <div class="voc-classify-kw-row bad"><span class="tag">불편</span><span class="kw">의료진 소통</span><span class="cnt">61건</span></div>
+            <div class="voc-classify-kw-row mix"><span class="tag">복합</span><span class="kw">대기 안내</span><span class="cnt">24건</span></div>
+          </div>
+          <div class="voc-classify-kw-col">
+            <p class="kw-hdr">5월 최다 키워드<span class="kw-total">14,901건</span></p>
+            <div class="voc-classify-kw-row like"><span class="tag">좋아요</span><span class="kw">배려</span><span class="cnt">98건</span></div>
+            <div class="voc-classify-kw-row bad"><span class="tag">불편</span><span class="kw">병원 추천</span><span class="cnt">50건</span></div>
+            <div class="voc-classify-kw-row req"><span class="tag">요청</span><span class="kw">식사 변경</span><span class="cnt">19건</span></div>
+          </div>
+          <div class="voc-classify-kw-col">
+            <p class="kw-hdr">6월 최다 키워드<span class="kw-total">15,156건</span></p>
+            <div class="voc-classify-kw-row like"><span class="tag">좋아요</span><span class="kw">검사 안내</span><span class="cnt">91건</span></div>
+            <div class="voc-classify-kw-row bad"><span class="tag">불편</span><span class="kw">진료 태도</span><span class="cnt">49건</span></div>
+            <div class="voc-classify-kw-row inq"><span class="tag">문의</span><span class="kw">퇴원 안내</span><span class="cnt">27건</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="voc-rag-wrap">
+      <div class="voc-rag-left">
+        <h3 class="voc-rag-title">응답자 성별 및 연령 구성</h3>
+        <p class="voc-rag-sub">성별과 연령을 선택하면 우측 키워드·추이가 갱신됩니다.</p>
+
+        <p class="voc-rag-section-label">성별</p>
+        <div class="voc-rag-gender-bar" aria-hidden="true">
+          <span class="male" style="width:50%"></span>
+          <span class="female" style="width:50%"></span>
+        </div>
+        <div class="voc-rag-gender-pct">
+          <span>남 50%</span><span>여 50%</span>
+        </div>
+        <div class="voc-rag-gender-detail">
+          <span class="male">♂ 남 4,495명 (50%)</span>
+          <span class="female">♀ 여 4,444명 (50%)</span>
+        </div>
+        <div class="voc-rag-gender-tabs" id="genderTabs" role="tablist" aria-label="성별 선택"></div>
+
+        <div class="voc-rag-age-hdr">
+          <p class="voc-rag-section-label" style="margin:0;">연령</p>
+          <div class="voc-rag-age-legend">
+            <span><i class="male"></i>남</span>
+            <span><i class="female"></i>여</span>
+          </div>
+        </div>
+        <div class="voc-rag-age-list" id="ageList"></div>
+      </div>
+
+      <div class="voc-rag-right">
+        <h3 class="voc-rag-title">연령·성별 VOC 키워드</h3>
+        <p class="voc-rag-sub">선택한 연령대·성별에서 자주 언급된 키워드와 최근 추이를 확인합니다.</p>
+
+        <div class="voc-rag-kw-hdr">
+          <span class="voc-rag-kw-hdr-title" id="ageHeader"></span>
+          <span class="voc-rag-kw-hdr-total" id="ageTotal"></span>
+        </div>
+
+        <p class="voc-rag-kw-section-title">가장 많이 언급된 키워드 TOP5 <span class="muted">(유형 무관)</span></p>
+        <div class="voc-rag-kw-top5" id="top5Keywords"></div>
+
+        <div class="voc-rag-trend-hdr">
+          <p class="voc-rag-kw-section-title" id="trendTitle">월별 추이</p>
+          <div class="voc-rag-trend-mode-tabs" id="trendModeTabs" role="tablist" aria-label="월별 추이 유형"></div>
+        </div>
+        <div class="voc-rag-trend-legend" id="trendLegend"></div>
+        <div class="voc-rag-trend-wrap">
+          <canvas id="vocAgeTrendChart" role="img" aria-label="연령·성별 VOC 월별 추이"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="multitag-banner">
+      <span class="mt-icon">ⓘ</span>
+      <div>
+        카테고리·키워드는 VOC 1건에 여러 개가 함께 집계될 수 있어, 아래 합계가 전체 접수 건수와 다를 수 있습니다.
+        하나의 VOC에서 여러 키워드가 언급되면 각각 카운트되기 때문으로, 집계 오류가 아닙니다.
+        표준 키워드와 매칭되지 않은 문구는 미태깅으로 제외되므로, 미태깅 비율을 낮출수록 더 정확한 통계를 확보할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="ck-analysis">
+      <div class="ck-header">
+        <div class="ck-header-top">
+          <h2 class="ck-title">카테고리 / 키워드 분석</h2>
+          <div class="ck-header-actions">
+            <span class="ck-date">기준일: 2026년 6월</span>
+            <button type="button" class="ck-excel-btn" id="ckExcelBtn">⬇ 엑셀 다운로드</button>
+          </div>
+        </div>
+        <p class="ck-desc">카테고리를 선택하면 키워드별 건수·증감을 확인하고, 키워드를 클릭하면 6개월 추이를 볼 수 있습니다.</p>
+        <div class="ck-chips" id="ckCatChips" role="tablist" aria-label="카테고리 선택"></div>
+      </div>
+
+      <div class="ck-main">
+        <div class="ck-panel-left">
+          <p class="ck-panel-title">카테고리 비중</p>
+          <div class="ck-donut-wrap">
+            <canvas id="ckCatDonut" role="img" aria-label="카테고리별 VOC 비중 도넛 차트"></canvas>
+          </div>
+          <table class="ck-share-tbl">
+            <thead>
+              <tr>
+                <td class="col-rank">순위</td>
+                <td class="col-name">카테고리</td>
+                <td class="col-count">건수</td>
+                <td class="col-pct">비중</td>
+                <td class="col-change">증감</td>
+              </tr>
+            </thead>
+            <tbody id="ckCatShareBody"></tbody>
+          </table>
+        </div>
+
+        <div class="ck-panel-right">
+          <p class="ck-panel-title" id="ckKwPanelTitle"></p>
+          <div class="ck-kw-grid" id="ckKwGrid"></div>
+        </div>
+      </div>
+      <p class="footnote" id="catFootnote"></p>
+    </div>
+  </div>
+
+  <div class="sec group-score-sec">
+    <div class="group-score-head">
+      <p class="sec-title">그룹별 VOC 현황</p>
+      <span class="dim-split-count">· 총 15개</span>
+      <span class="dim-split-top-badge">Top 5</span>
+    </div>
+    <p class="sec-sub">병동·진료과·담당의사별 접수 건수와 비율, 전월 대비 변화를 그래프 또는 표로 확인하세요.</p>
+    <div class="group-score-grid">
+      <div class="group-score-card">
+        <div class="group-score-card-head">
+          <div>
+            <p class="group-score-card-title">병동별 VOC 현황</p>
+            <span class="dim-split-count" id="wardSplitCount">· 총 5개</span>
+          </div>
+          <div class="group-score-toggle" role="tablist" aria-label="병동 보기 방식">
+            <button type="button" class="group-view-btn active" data-dim-view="ward" data-view="chart">그래프</button>
+            <button type="button" class="group-view-btn" data-dim-view="ward" data-view="table">표</button>
+          </div>
+        </div>
+        <p class="group-score-card-sub">병동별 접수 건수(비율)와 전월 대비 변화를 확인합니다.</p>
+        <div class="dim-split-legend" id="wardSplitLegend" aria-label="접수 건수 범례"></div>
+        <div class="group-score-view active" id="wardChartView">
+          <div class="dim-split-chart-wrap">
+            <canvas id="c5" role="img" aria-label="병동별 VOC 접수 건수 막대 차트"></canvas>
+          </div>
+        </div>
+        <div class="group-score-view" id="wardTableView">
+          <table class="group-score-table">
+          <thead>
+            <tr>
+              <th>순위</th><th>병동</th><th>건수(비율)</th><th>전월 대비</th>
+            </tr>
+          </thead>
+          <tbody id="wardAnalysisBody"></tbody>
+        </table>
+        </div>
+        <button type="button" class="group-detail-btn" data-group-detail="ward">↗ 자세히 보기</button>
+      </div>
+    <div class="dim-expand-panel" id="wardExpandPanel">
+      <p class="voc-rag-kw-section-title" id="wardExpandKwTitle"></p>
+      <div class="voc-rag-kw-top5" id="wardExpandKwList"></div>
+      <div class="voc-rag-trend-hdr">
+        <p class="voc-rag-kw-section-title" id="wardExpandTrendTitle">직전 6개월 추이</p>
+        <div class="voc-rag-trend-mode-tabs" id="wardTrendModeTabs" role="tablist" aria-label="병동 월별 추이 유형"></div>
+      </div>
+      <div class="voc-rag-trend-legend" id="wardTrendLegend"></div>
+      <div class="voc-rag-trend-wrap">
+        <canvas id="wardTrendChart" role="img" aria-label="병동 VOC 월별 추이"></canvas>
+      </div>
+    </div>
+
+      <div class="group-score-card">
+        <div class="group-score-card-head">
+          <div>
+            <p class="group-score-card-title">진료과별 VOC 현황</p>
+            <span class="dim-split-count" id="deptSplitCount">· 총 5개</span>
+          </div>
+          <div class="group-score-toggle" role="tablist" aria-label="진료과 보기 방식">
+            <button type="button" class="group-view-btn active" data-dim-view="dept" data-view="chart">그래프</button>
+            <button type="button" class="group-view-btn" data-dim-view="dept" data-view="table">표</button>
+          </div>
+        </div>
+        <p class="group-score-card-sub">진료과별 접수 건수(비율)와 전월 대비 변화를 확인합니다.</p>
+        <div class="dim-split-legend" id="deptSplitLegend" aria-label="접수 건수 범례"></div>
+        <div class="group-score-view active" id="deptChartView">
+          <div class="dim-split-chart-wrap">
+            <canvas id="c6" role="img" aria-label="진료과별 VOC 접수 건수 막대 차트"></canvas>
+          </div>
+        </div>
+        <div class="group-score-view" id="deptTableView">
+          <table class="group-score-table">
+          <thead>
+            <tr>
+              <th>순위</th><th>진료과</th><th>건수(비율)</th><th>전월 대비</th>
+            </tr>
+          </thead>
+          <tbody id="deptAnalysisBody"></tbody>
+        </table>
+        </div>
+        <button type="button" class="group-detail-btn" data-group-detail="dept">↗ 자세히 보기</button>
+      </div>
+    <div class="dim-expand-panel" id="deptExpandPanel">
+      <p class="voc-rag-kw-section-title" id="deptExpandKwTitle"></p>
+      <div class="voc-rag-kw-top5" id="deptExpandKwList"></div>
+      <div class="voc-rag-trend-hdr">
+        <p class="voc-rag-kw-section-title" id="deptExpandTrendTitle">직전 6개월 추이</p>
+        <div class="voc-rag-trend-mode-tabs" id="deptTrendModeTabs" role="tablist" aria-label="진료과 월별 추이 유형"></div>
+      </div>
+      <div class="voc-rag-trend-legend" id="deptTrendLegend"></div>
+      <div class="voc-rag-trend-wrap">
+        <canvas id="deptTrendChart" role="img" aria-label="진료과 VOC 월별 추이"></canvas>
+      </div>
+    </div>
+
+      <div class="group-score-card">
+        <div class="group-score-card-head">
+          <div>
+            <p class="group-score-card-title">의사별 VOC 현황</p>
+            <span class="dim-split-count" id="doctorSplitCount">· 총 5개</span>
+          </div>
+          <div class="group-score-toggle" role="tablist" aria-label="의사 보기 방식">
+            <button type="button" class="group-view-btn active" data-dim-view="doctor" data-view="chart">그래프</button>
+            <button type="button" class="group-view-btn" data-dim-view="doctor" data-view="table">표</button>
+          </div>
+        </div>
+        <p class="group-score-card-sub">담당의사별 접수 건수(비율)와 전월 대비 변화를 확인합니다.</p>
+        <div class="dim-split-legend" id="doctorSplitLegend" aria-label="접수 건수 범례"></div>
+        <div class="group-score-view active" id="doctorChartView">
+          <div class="dim-split-chart-wrap">
+            <canvas id="c7" role="img" aria-label="의사별 VOC 접수 건수 막대 차트"></canvas>
+          </div>
+        </div>
+        <div class="group-score-view" id="doctorTableView">
+          <table class="group-score-table">
+          <thead>
+            <tr>
+              <th>순위</th><th>담당의사</th><th>건수(비율)</th><th>전월 대비</th>
+            </tr>
+          </thead>
+          <tbody id="doctorAnalysisBody"></tbody>
+        </table>
+        </div>
+        <button type="button" class="group-detail-btn" data-group-detail="doctor">↗ 자세히 보기</button>
+      </div>
+    <div class="dim-expand-panel" id="doctorExpandPanel">
+      <p class="voc-rag-kw-section-title" id="doctorExpandKwTitle"></p>
+      <div class="voc-rag-kw-top5" id="doctorExpandKwList"></div>
+      <div class="voc-rag-trend-hdr">
+        <p class="voc-rag-kw-section-title" id="doctorExpandTrendTitle">직전 6개월 추이</p>
+        <div class="voc-rag-trend-mode-tabs" id="doctorTrendModeTabs" role="tablist" aria-label="의사 월별 추이 유형"></div>
+      </div>
+      <div class="voc-rag-trend-legend" id="doctorTrendLegend"></div>
+      <div class="voc-rag-trend-wrap">
+        <canvas id="doctorTrendChart" role="img" aria-label="의사 VOC 월별 추이"></canvas>
+      </div>
+    </div>
+    </div>
+    <p class="note">* 환자의 병동·진료과·담당의사 기준 집계입니다. 직원 개인 칭찬은 아래 "직원 칭찬 현황"에서 확인하세요.</p>
+  </div>
+
+  <div class="group-detail-modal" id="groupDetailModal" aria-hidden="true">
+    <button type="button" class="group-detail-backdrop" id="groupDetailBackdrop" aria-label="상세 닫기"></button>
+    <div class="group-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="groupDetailTitle">
+      <div class="group-detail-header">
+        <div>
+          <h3 class="group-detail-title" id="groupDetailTitle">그룹별 VOC 현황 전체</h3>
+          <p class="group-detail-sub" id="groupDetailSub"></p>
+        </div>
+        <button type="button" class="group-detail-close" id="groupDetailClose" aria-label="닫기">×</button>
+      </div>
+      <div class="group-detail-toolbar">
+        <div class="group-detail-filters" id="groupDetailFilters">
+          <button type="button" class="group-detail-filter active" data-sort="countDesc">건수 높은순</button>
+          <button type="button" class="group-detail-filter" data-sort="countAsc">건수 낮은순</button>
+          <button type="button" class="group-detail-filter" data-sort="changeDesc">상승순</button>
+          <button type="button" class="group-detail-filter" data-sort="changeAsc">하락순</button>
+        </div>
+        <div class="group-detail-view-toggle" role="tablist" aria-label="상세 보기 방식">
+          <button type="button" class="group-detail-view-btn" data-detail-view="chart">그래프</button>
+          <button type="button" class="group-detail-view-btn active" data-detail-view="table">표</button>
+        </div>
+      </div>
+      <div class="group-detail-view" id="groupDetailChartView">
+        <div class="group-detail-chart-wrap"><canvas id="groupDetailChart" role="img" aria-label="그룹별 전체 VOC 접수 건수 그래프"></canvas></div>
+      </div>
+      <div class="group-detail-view active" id="groupDetailTableView">
+        <table class="group-detail-table">
+          <thead>
+            <tr><th>순위</th><th>항목</th><th>건수(비율)</th><th>전월 대비</th><th>대표 키워드</th><th>상세</th></tr>
+          </thead>
+          <tbody id="groupDetailBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="group-detail-modal" id="groupItemModal" aria-hidden="true">
+    <button type="button" class="group-detail-backdrop" id="groupItemBackdrop" aria-label="목록으로 돌아가기"></button>
+    <div class="group-detail-dialog group-item-dialog" role="dialog" aria-modal="true" aria-labelledby="groupItemTitle">
+      <div class="group-detail-header">
+        <div>
+          <h3 class="group-detail-title" id="groupItemTitle">항목 상세 분석</h3>
+          <p class="group-detail-sub" id="groupItemSub">유형별 대표 키워드 TOP5와 최근 6개월 추이</p>
+        </div>
+        <button type="button" class="group-detail-close" id="groupItemClose" aria-label="목록으로 돌아가기">×</button>
+      </div>
+      <div class="group-item-body" id="groupItemBody"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title">직원 칭찬 현황 <span class="new-badge">신규</span></p>
+    <p class="sec-sub">좋아요 유형에서 직원명이 특정된 건만 반영됩니다.</p>
+    <div class="staff-wrap">
+      <table class="tbl">
+        <thead><tr><th>순위</th><th>직원명</th><th>소속(부서)</th><th>접수 건수</th></tr></thead>
+        <tbody>
+          <tr><td>🥇</td><td>김OO 간호사</td><td>3층 병동</td><td>24건</td></tr>
+          <tr><td>🥈</td><td>이OO 주임</td><td>원무과</td><td>19건</td></tr>
+          <tr><td>🥉</td><td>박OO 간호사</td><td>5층 병동</td><td>15건</td></tr>
+          <tr><td>4</td><td>최OO 간호사</td><td>간호팀</td><td>12건</td></tr>
+          <tr><td>5</td><td>정OO 간호사</td><td>3층 병동</td><td>10건</td></tr>
+        </tbody>
+      </table>
+      <div class="card" style="padding:8px">
+        <p class="ct">부서별 분포</p>
+        <div style="position:relative;height:160px"><canvas id="c8" role="img" aria-label="부서별 직원 칭찬 분포"></canvas></div>
+      </div>
+    </div>
+    <p class="note">* 총 126건. 위 병동·진료과·의사별 분석과는 별도 집계입니다.</p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    (function () {
+      var TYPE_COLOR = { "좋아요": "#2a78d6", "불편": "#e24b4a", "문의": "#7f77dd", "요청": "#1baf7a", "복합": "#eda100", "미분류": "#9ca3af", "직원칭찬": "#d4a017" };
+      var TYPE_BG = { "좋아요": "#DBEAFE", "불편": "#FEE2E2", "문의": "#EDE9FE", "요청": "#D1FAE5", "복합": "#FEF3C7", "미분류": "#F3F4F6", "직원칭찬": "#FEF3C7" };
+      var MALE = "#2A66C7";
+      var FEMALE = "#E0629A";
+
+      var KW_TEMPLATE = {
+        "좋아요": [["친절함", 110], ["정겸", 95], ["세심함", 84]],
+        "불편": [["대기시간", 90], ["소음", 85], ["응대 불친절", 60]],
+        "문의": [["검사 결과", 45], ["퇴원 일정", 40], ["식단", 36]],
+        "요청": [["대기시간 단축", 35], ["주차 공간", 30], ["소음 개선", 20]],
+        "복합": [["대기 안내", 28], ["종합 의견", 22], ["이용 편의", 18]],
+      };
+      var BASE_ANALYZABLE = 1100;
+      var BASE_TYPE_PCT = { "좋아요": 0.365, "불편": 0.265, "문의": 0.160, "요청": 0.145, "복합": 0.065 };
+      var GENDER_BIAS = {
+        "전체": { "좋아요": 1.0, "불편": 1.0, "문의": 1.0, "요청": 1.0, "복합": 1.0, scale: 1.0 },
+        "남": { "좋아요": 0.85, "불편": 1.18, "문의": 1.02, "요청": 1.05, "복합": 0.95, scale: 0.5 },
+        "여": { "좋아요": 1.15, "불편": 0.82, "문의": 0.98, "요청": 0.95, "복합": 1.08, scale: 0.5 },
+      };
+      var TREND_MODES = [
+        { key: "emotion", label: "좋아요·불편·복합", types: ["좋아요", "불편", "복합"] },
+        { key: "ask_req", label: "문의·요청", types: ["문의", "요청"] },
+        { key: "all", label: "전체보기", types: ["좋아요", "불편", "문의", "요청", "복합"] },
+      ];
+
+      var ages = [
+        { label: "20대 미만", total: 75, pct: 1, malePct: 48 },
+        { label: "20대", total: 1181, pct: 13, malePct: 44 },
+        { label: "30대", total: 1207, pct: 14, malePct: 49 },
+        { label: "40대", total: 1351, pct: 15, malePct: 52 },
+        { label: "50대", total: 1288, pct: 14, malePct: 51 },
+        { label: "60대 이상", total: 3837, pct: 43, malePct: 51 },
+      ];
+      var maxTotal = Math.max.apply(null, ages.map(function (a) { return a.total; }));
+
+      var ageListEl = document.getElementById("ageList");
+      var genderTabsEl = document.getElementById("genderTabs");
+      var ageHeaderEl = document.getElementById("ageHeader");
+      var ageTotalEl = document.getElementById("ageTotal");
+      var top5KeywordsEl = document.getElementById("top5Keywords");
+      var trendLegendEl = document.getElementById("trendLegend");
+      var trendTitleEl = document.getElementById("trendTitle");
+      var trendModeTabsEl = document.getElementById("trendModeTabs");
+      var trendChart = null;
+      var selectedAge = "30대";
+      var selectedGender = "전체";
+      var trendMode = "emotion";
+
+      function fmt(n) { return Math.round(n).toLocaleString(); }
+
+      function buildGenderTabs() {
+        genderTabsEl.innerHTML = ["전체", "남", "여"].map(function (g) {
+          var isSel = g === selectedGender;
+          return (
+            '<button type="button" class="voc-rag-gender-tab' + (isSel ? " active" : "") + '" data-gender="' + g + '" role="tab" aria-selected="' + isSel + '">' + g + "</button>"
+          );
+        }).join("");
+        genderTabsEl.querySelectorAll(".voc-rag-gender-tab").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            selectedGender = btn.getAttribute("data-gender");
+            render();
+          });
+        });
+      }
+
+      function buildTrendModeTabs() {
+        trendModeTabsEl.innerHTML = TREND_MODES.map(function (m) {
+          var isSel = m.key === trendMode;
+          return (
+            '<button type="button" class="voc-rag-trend-mode-tab' + (isSel ? " active" : "") + '" data-mode="' + m.key + '" role="tab" aria-selected="' + isSel + '">' + m.label + "</button>"
+          );
+        }).join("");
+        trendModeTabsEl.querySelectorAll(".voc-rag-trend-mode-tab").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            trendMode = btn.getAttribute("data-mode");
+            render();
+          });
+        });
+      }
+
+      function buildAgeList() {
+        ageListEl.innerHTML = ages.map(function (a) {
+          var isSel = a.label === selectedAge;
+          var barPct = Math.round((a.total / maxTotal) * 100);
+          var maleWidth = a.malePct;
+          var femaleWidth = 100 - a.malePct;
+          return (
+            '<div class="voc-rag-age-row' + (isSel ? " active" : "") + '" data-age="' + a.label + '" title="' + a.label + " — 남 " + a.malePct + "% · 여 " + (100 - a.malePct) + '%">' +
+            '<span class="age-lbl">' + a.label + "</span>" +
+            '<span class="voc-rag-age-track">' +
+            '<span class="voc-rag-age-track-inner" style="width:' + barPct + '%;">' +
+            '<span class="male" style="width:' + maleWidth + '%;"></span>' +
+            '<span class="female" style="width:' + femaleWidth + '%;"></span>' +
+            "</span></span>" +
+            '<span class="voc-rag-age-val">' + fmt(a.total) + "명 (" + a.pct + "%)</span>" +
+            "</div>"
+          );
+        }).join("");
+        ageListEl.querySelectorAll(".voc-rag-age-row").forEach(function (row) {
+          row.addEventListener("click", function () {
+            selectedAge = row.getAttribute("data-age");
+            render();
+          });
+        });
+      }
+
+      function dataFor(age, gender) {
+        var ageScale = age.total / 1207;
+        var g = GENDER_BIAS[gender];
+        var analyzable = Math.round(BASE_ANALYZABLE * ageScale * g.scale);
+        var types = ["좋아요", "불편", "문의", "요청", "복합"].map(function (t) {
+          var cnt = Math.round(BASE_ANALYZABLE * BASE_TYPE_PCT[t] * ageScale * g.scale * g[t]);
+          var kws = KW_TEMPLATE[t].map(function (k) {
+            return [k[0], Math.max(1, Math.round(k[1] * ageScale * g.scale * g[t])), k[2], k[3]];
+          });
+          return { type: t, count: cnt, keywords: kws };
+        });
+        return { analyzable: analyzable, types: types };
+      }
+
+      function genTrendForType(base, seed) {
+        var months = ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"];
+        var n = months.length;
+        var values = [];
+        for (var i = 0; i < n; i++) {
+          var isLast = i === n - 1;
+          var v = isLast ? base : Math.round(base * (1 - 0.03 * (n - 1 - i) + 0.04 * Math.sin(seed * 1.5 + i)));
+          values.push(Math.max(1, v));
+        }
+        return { months: months, values: values };
+      }
+
+      function render() {
+        buildGenderTabs();
+        buildAgeList();
+        buildTrendModeTabs();
+        var age = ages.filter(function (a) { return a.label === selectedAge; })[0];
+        if (!age) return;
+        var data = dataFor(age, selectedGender);
+
+        ageHeaderEl.textContent = selectedAge + (selectedGender === "전체" ? "" : " · " + selectedGender) + " 응답자 기준";
+        ageTotalEl.textContent = fmt(age.total * (selectedGender === "전체" ? 1 : 0.5)) + "명";
+
+        var allKw = [];
+        data.types.forEach(function (t) {
+          t.keywords.forEach(function (k) {
+            allKw.push({ name: k[0], count: k[1], type: t.type });
+          });
+        });
+        allKw.sort(function (a, b) { return b.count - a.count; });
+        var top5 = allKw.slice(0, 5);
+        var maxK = top5.length ? top5[0].count : 1;
+        top5KeywordsEl.innerHTML = top5.map(function (k, i) {
+          var pct = Math.round((k.count / maxK) * 100);
+          return (
+            '<div class="voc-rag-kw-row">' +
+            '<span class="voc-rag-kw-rank">' + (i + 1) + "</span>" +
+            '<span class="voc-rag-kw-name">' + k.name + "</span>" +
+            '<span class="voc-rag-kw-type" style="background:' + TYPE_BG[k.type] + ";color:" + TYPE_COLOR[k.type] + ';">' + k.type + "</span>" +
+            '<span class="voc-rag-kw-bar"><span class="voc-rag-kw-bar-fill" style="width:' + pct + "%;background:" + TYPE_COLOR[k.type] + ';"></span></span>' +
+            '<span class="voc-rag-kw-cnt">' + fmt(k.count) + "건</span>" +
+            "</div>"
+          );
+        }).join("");
+
+        var seedBase = ages.indexOf(age) + 1 + (selectedGender === "남" ? 10 : selectedGender === "여" ? 20 : 0);
+        var mode = TREND_MODES.filter(function (m) { return m.key === trendMode; })[0] || TREND_MODES[0];
+        var typesToShow = mode.types;
+
+        if (trendTitleEl) {
+          trendTitleEl.innerHTML = '월별 추이 <span class="muted">(' + typesToShow.join(" · ") + ")</span>";
+        }
+
+        trendLegendEl.innerHTML = typesToShow.map(function (t) {
+          return (
+            '<span><i style="background:' + TYPE_COLOR[t] + ';"></i>' + t + "</span>"
+          );
+        }).join("");
+
+        var datasets = typesToShow.map(function (tname, i) {
+          var t = data.types.filter(function (x) { return x.type === tname; })[0];
+          var base = t ? t.count : 100;
+          var trend = genTrendForType(base, seedBase + i * 5);
+          return {
+            label: tname,
+            data: trend.values,
+            borderColor: TYPE_COLOR[tname],
+            backgroundColor: TYPE_COLOR[tname],
+            tension: 0.3,
+            pointRadius: 3,
+            borderWidth: 2,
+            months: trend.months,
+          };
+        });
+
+        var ctx = document.getElementById("vocAgeTrendChart");
+        if (trendChart) trendChart.destroy();
+        trendChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: datasets[0].months,
+            datasets: datasets.map(function (d) {
+              return {
+                label: d.label,
+                data: d.data,
+                borderColor: d.borderColor,
+                backgroundColor: d.backgroundColor,
+                tension: d.tension,
+                pointRadius: d.pointRadius,
+                borderWidth: d.borderWidth,
+              };
+            }),
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: "#898781", font: { size: 11 } }, grid: { display: false } },
+              y: { beginAtZero: false, ticks: { color: "#898781", font: { size: 11 } }, grid: { color: "#e1e0d9" } },
+            },
+          },
+        });
+      }
+
+      render();
+    })();
+  </script>
+  <script>
+    const tc = "#898781";
+    const gc = "rgba(0,0,0,0.06)";
+    const base = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: tc, font: { size: 11 } } },
+        y: { grid: { color: gc }, ticks: { color: tc, font: { size: 11 } } },
+      },
+    };
+    const baseH = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: gc }, ticks: { color: tc, font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { color: tc, font: { size: 11 } } },
+      },
+    };
+
+    var WARD_ANALYSIS = [
+      { name: "12병동", total: 16210, totalMoM: 5.6, like: 7555, bad: 4506, inq: 1621, req: 1264, mix: 1086, unc: 178, keyword: "간호사 응대" },
+      { name: "3병동", total: 15322, totalMoM: 2.4, like: 7139, bad: 4260, inq: 1532, req: 1195, mix: 1027, unc: 169, keyword: "의사 설명" },
+      { name: "내과 중환자실", total: 14622, totalMoM: -1.2, like: 6812, bad: 4065, inq: 1462, req: 1140, mix: 980, unc: 163, keyword: "환자 확인" },
+      { name: "5병동", total: 14230, totalMoM: 0.9, like: 6628, bad: 3956, inq: 1423, req: 1110, mix: 953, unc: 160, keyword: "친절도" },
+      { name: "7병동", total: 13680, totalMoM: -0.4, like: 6375, bad: 3803, inq: 1368, req: 1067, mix: 916, unc: 151, keyword: "병실 청결" },
+    ];
+    var DIM_SPLIT_TYPES = [
+      { key: "like", label: "좋아요", color: "#2a78d6" },
+      { key: "bad", label: "불편", color: "#e24b4a" },
+      { key: "inq", label: "문의", color: "#7f77dd" },
+      { key: "req", label: "요청", color: "#1baf7a" },
+      { key: "mix", label: "복합", color: "#eda100" },
+    ];
+    var DEPT_ANALYSIS = [
+      { name: "외과", total: 13900, totalMoM: 2.1, like: 6472, bad: 3864, inq: 1390, req: 1084, mix: 931, unc: 159, keyword: "진료 태도" },
+      { name: "정형외과", total: 13271, totalMoM: 3.8, like: 9800, bad: 810, inq: 1100, req: 850, mix: 623, unc: 88, keyword: "검사 안내" },
+      { name: "내과", total: 12770, totalMoM: -0.6, like: 5952, bad: 3550, inq: 1277, req: 996, mix: 855, unc: 140, keyword: "대기시간" },
+      { name: "신경외과", total: 11980, totalMoM: 1.5, like: 5583, bad: 3330, inq: 1198, req: 934, mix: 803, unc: 132, keyword: "수술 설명" },
+      { name: "재활의학과", total: 11240, totalMoM: -1.1, like: 5238, bad: 3125, inq: 1124, req: 877, mix: 753, unc: 123, keyword: "치료 안내" },
+    ];
+    var DIM_EXPAND_TYPE_COLOR = { "좋아요": "#2a78d6", "불편": "#e24b4a", "문의": "#7f77dd", "요청": "#1baf7a", "복합": "#eda100", "미분류": "#9ca3af", "직원칭찬": "#d4a017" };
+    var DIM_EXPAND_TYPE_BG = { "좋아요": "#DBEAFE", "불편": "#FEE2E2", "문의": "#EDE9FE", "요청": "#D1FAE5", "복합": "#FEF3C7", "미분류": "#F3F4F6", "직원칭찬": "#FEF3C7" };
+    var DIM_TYPE_KEY_MAP = { "좋아요": "like", "불편": "bad", "문의": "inq", "요청": "req", "복합": "mix" };
+    var DIM_TREND_MODES = [
+      { key: "emotion", label: "좋아요·불편·복합", types: ["좋아요", "불편", "복합"] },
+      { key: "ask_req", label: "문의·요청", types: ["문의", "요청"] },
+      { key: "all", label: "전체보기", types: ["좋아요", "불편", "문의", "요청", "복합"] },
+    ];
+    var WARD_KW_DATA = {
+      "12병동": [
+        ["간호사 응대", "좋아요", 2850], ["친절함", "좋아요", 2100], ["의사 설명", "문의", 980],
+        ["대기시간", "불편", 870], ["소음", "불편", 620],
+      ],
+      "3병동": [
+        ["의사 설명", "문의", 1920], ["간호사 응대", "좋아요", 1750], ["친절함", "좋아요", 1420],
+        ["대기시간", "불편", 810], ["병실 청결", "좋아요", 680],
+      ],
+      "내과 중환자실": [
+        ["환자 확인", "문의", 1680], ["간호사 응대", "좋아요", 1540], ["응대 속도", "불편", 920],
+        ["친절함", "좋아요", 880], ["투약 안내", "문의", 650],
+      ],
+      "5병동": [
+        ["친절도", "좋아요", 1980], ["간호사 응대", "좋아요", 1650], ["대기시간", "불편", 740],
+        ["소음", "불편", 590], ["면회 안내", "문의", 480],
+      ],
+      "7병동": [
+        ["병실 청결", "좋아요", 1760], ["간호사 응대", "좋아요", 1490], ["소음", "불편", 810],
+        ["식사 안내", "문의", 620], ["시설 요청", "요청", 510],
+      ],
+    };
+    var DEPT_KW_DATA = {
+      "외과": [
+        ["진료 태도", "좋아요", 2200], ["친절함", "좋아요", 1683], ["세심함", "좋아요", 1165],
+        ["대기시간", "불편", 950], ["배려", "좋아요", 841],
+      ],
+      "정형외과": [
+        ["검사 안내", "좋아요", 2600], ["친절함", "좋아요", 2150], ["세심함", "좋아요", 1780],
+        ["배려", "좋아요", 1320], ["응대", "좋아요", 980],
+      ],
+      "내과": [
+        ["대기시간", "불편", 1450], ["친절함", "좋아요", 1200], ["소음", "불편", 890],
+        ["검사 결과", "문의", 760], ["응대 불친절", "불편", 610],
+      ],
+      "신경외과": [
+        ["수술 설명", "문의", 1380], ["진료 태도", "좋아요", 1160], ["대기시간", "불편", 840],
+        ["검사 안내", "문의", 690], ["예약 변경", "요청", 540],
+      ],
+      "재활의학과": [
+        ["치료 안내", "좋아요", 1290], ["치료사 친절", "좋아요", 1080], ["대기시간", "불편", 760],
+        ["운동 방법", "문의", 640], ["일정 변경", "요청", 490],
+      ],
+    };
+    var DOCTOR_KW_DATA = {
+      "정형외과 원장": [
+        ["친절함", "좋아요", 95], ["세심함", "좋아요", 72], ["회진 설명", "좋아요", 58],
+        ["대기시간", "불편", 42], ["검사 안내", "문의", 28],
+      ],
+      "내과 김의사": [
+        ["회진 설명", "좋아요", 68], ["친절함", "좋아요", 55], ["설명력", "좋아요", 44],
+        ["대기시간", "불편", 38], ["검사 결과", "문의", 22],
+      ],
+      "외과 박의사": [
+        ["수술 설명", "좋아요", 62], ["진료 태도", "좋아요", 49], ["세심함", "좋아요", 36],
+        ["대기시간", "불편", 31], ["회복 안내", "문의", 19],
+      ],
+      "신경외과 이의사": [
+        ["검사 설명", "좋아요", 58], ["친절함", "좋아요", 45], ["수술 안내", "문의", 34],
+        ["대기시간", "불편", 27], ["예약 요청", "요청", 16],
+      ],
+      "재활의학과 최의사": [
+        ["치료 설명", "좋아요", 53], ["세심함", "좋아요", 41], ["운동 안내", "문의", 30],
+        ["대기시간", "불편", 24], ["일정 요청", "요청", 14],
+      ],
+    };
+    var dimExpandState = {
+      ward: { openName: null, viewMode: "chart", trendMode: "emotion", barChart: null, trendChart: null },
+      dept: { openName: null, viewMode: "chart", trendMode: "emotion", barChart: null, trendChart: null },
+      doctor: { openName: null, viewMode: "chart", trendMode: "emotion", barChart: null, trendChart: null },
+    };
+    var DOCTOR_ANALYSIS = [
+      { name: "정형외과 원장", total: 317, totalMoM: 4.2, like: 141, bad: 88, inq: 32, req: 25, mix: 21, unc: 10, keyword: "친절함" },
+      { name: "내과 김의사", total: 240, totalMoM: -2.8, like: 107, bad: 67, inq: 24, req: 19, mix: 19, unc: 4, keyword: "회진 설명" },
+      { name: "외과 박의사", total: 218, totalMoM: 1.7, like: 97, bad: 61, inq: 22, req: 17, mix: 14, unc: 7, keyword: "수술 설명" },
+      { name: "신경외과 이의사", total: 196, totalMoM: 0.8, like: 87, bad: 55, inq: 20, req: 15, mix: 13, unc: 6, keyword: "검사 설명" },
+      { name: "재활의학과 최의사", total: 174, totalMoM: -1.4, like: 78, bad: 49, inq: 17, req: 14, mix: 11, unc: 5, keyword: "치료 설명" },
+    ];
+
+    function dimSplitAnalyzableTotal(row) {
+      return row.like + row.bad + row.inq + row.req + row.mix;
+    }
+
+    function dimSplitPct(count, total) {
+      if (!total) return "0.0";
+      return ((count / total) * 100).toFixed(1);
+    }
+
+    function dimSplitChangeHtml(change) {
+      var cls = change > 0 ? "up" : (change < 0 ? "down" : "flat");
+      var sign = change > 0 ? "▲" : (change < 0 ? "▼" : "－");
+      return '<div class="dim-split-change ' + cls + '">' + sign + " " + Math.abs(change).toFixed(1) + "%</div>";
+    }
+
+    function renderDimSplitLegend(legendElId) {
+      document.getElementById(legendElId).innerHTML =
+        '<span class="dim-split-legend-item"><span class="dim-split-legend-dot" style="background:#6366f1;"></span>접수 건수</span>';
+    }
+
+    function dimGenTrend(base, seed) {
+      var months = ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"];
+      var values = [];
+      for (var i = 0; i < months.length; i++) {
+        var isLast = i === months.length - 1;
+        var v = isLast ? base : Math.round(base * (1 - 0.03 * (months.length - 1 - i) + 0.04 * Math.sin(seed * 1.5 + i)));
+        values.push(Math.max(1, v));
+      }
+      return { months: months, values: values };
+    }
+
+    function dimPlainTypeCell(row, typeKey, typeMeta) {
+      var analyzableTotal = dimSplitAnalyzableTotal(row);
+      var count = row[typeKey];
+      return (
+        '<td class="col-type">' +
+        '<div class="dim-split-type-pct" style="color:' + typeMeta.color + ';">' + dimSplitPct(count, analyzableTotal) + "%</div>" +
+        '<div class="dim-split-type-cnt">(' + count.toLocaleString() + ")</div>" +
+        "</td>"
+      );
+    }
+
+    function renderDimExpandPanel(opts, state, row) {
+      var panel = document.getElementById(opts.expandPanelId);
+      var kwTitle = document.getElementById(opts.expandKwTitleId);
+      var kwList = document.getElementById(opts.expandKwListId);
+      var trendTitle = document.getElementById(opts.expandTrendTitleId);
+      var modeTabs = document.getElementById(opts.trendModeTabsId);
+      var trendLegend = document.getElementById(opts.trendLegendId);
+      if (!panel || !row) return;
+
+      var keywords = opts.kwData[row.name] || [];
+      var maxKw = keywords.length ? Math.max.apply(null, keywords.map(function (k) { return k[2]; })) : 1;
+
+      kwTitle.innerHTML = row.name + ' 가장 많이 언급된 키워드 TOP5 <span class="muted">(유형 무관)</span>';
+      kwList.innerHTML = keywords.map(function (k, i) {
+        var pct = Math.round((k[2] / maxKw) * 100);
+        return (
+          '<div class="voc-rag-kw-row">' +
+          '<span class="voc-rag-kw-rank">' + (i + 1) + "</span>" +
+          '<span class="voc-rag-kw-name">' + k[0] + "</span>" +
+          '<span class="voc-rag-kw-type" style="background:' + DIM_EXPAND_TYPE_BG[k[1]] + ";color:" + DIM_EXPAND_TYPE_COLOR[k[1]] + ';">' + k[1] + "</span>" +
+          '<span class="voc-rag-kw-bar"><span class="voc-rag-kw-bar-fill" style="width:' + pct + "%;background:" + DIM_EXPAND_TYPE_COLOR[k[1]] + ';"></span></span>' +
+          '<span class="voc-rag-kw-cnt">' + k[2].toLocaleString() + "건</span>" +
+          "</div>"
+        );
+      }).join("");
+
+      var mode = DIM_TREND_MODES.filter(function (m) { return m.key === state.trendMode; })[0] || DIM_TREND_MODES[0];
+      trendTitle.innerHTML = '직전 6개월 추이 <span class="muted">(' + mode.types.join(" · ") + ")</span>";
+
+      modeTabs.innerHTML = DIM_TREND_MODES.map(function (m) {
+        var isSel = m.key === state.trendMode;
+        return (
+          '<button type="button" class="voc-rag-trend-mode-tab' + (isSel ? " active" : "") + '" data-mode="' + m.key + '" role="tab" aria-selected="' + isSel + '">' + m.label + "</button>"
+        );
+      }).join("");
+      modeTabs.querySelectorAll(".voc-rag-trend-mode-tab").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          state.trendMode = btn.getAttribute("data-mode");
+          renderDimExpandPanel(opts, state, row);
+        });
+      });
+
+      trendLegend.innerHTML = mode.types.map(function (t) {
+        return '<span><i style="background:' + DIM_EXPAND_TYPE_COLOR[t] + ';"></i>' + t + "</span>";
+      }).join("");
+
+      var seedBase = opts.rows.findIndex(function (d) { return d.name === row.name; }) + 1;
+      var datasets = mode.types.map(function (tname, i) {
+        var typeKey = DIM_TYPE_KEY_MAP[tname];
+        var base = row[typeKey] || 100;
+        var trend = dimGenTrend(base, seedBase + i * 5);
+        return {
+          label: tname,
+          data: trend.values,
+          borderColor: DIM_EXPAND_TYPE_COLOR[tname],
+          backgroundColor: DIM_EXPAND_TYPE_COLOR[tname],
+          tension: 0.3,
+          pointRadius: 3,
+          borderWidth: 2,
+          months: trend.months,
+        };
+      });
+
+      var ctx = document.getElementById(opts.trendChartId);
+      if (ctx) {
+        if (state.trendChart) state.trendChart.destroy();
+        state.trendChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: datasets[0].months,
+            datasets: datasets.map(function (d) {
+              return {
+                label: d.label,
+                data: d.data,
+                borderColor: d.borderColor,
+                backgroundColor: d.backgroundColor,
+                tension: d.tension,
+                pointRadius: d.pointRadius,
+                borderWidth: d.borderWidth,
+              };
+            }),
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: "#898781", font: { size: 11 } }, grid: { display: false } },
+              y: { beginAtZero: false, ticks: { color: "#898781", font: { size: 11 } }, grid: { color: "#e1e0d9" } },
+            },
+          },
+        });
+      }
+
+      panel.classList.add("show");
+    }
+
+    function renderDimExpandSplitView(opts, state) {
+      var rows = opts.rows.slice().sort(function (a, b) { return dimSplitAnalyzableTotal(b) - dimSplitAnalyzableTotal(a); });
+      opts.rows = rows;
+      var groupTotal = rows.reduce(function (sum, row) { return sum + dimSplitAnalyzableTotal(row); }, 0);
+
+      document.getElementById(opts.countElId).textContent = "· 총 " + rows.length + "개";
+      renderDimSplitLegend(opts.legendElId);
+
+      function applyViewMode() {
+        var chartView = document.getElementById(opts.chartViewId);
+        var tableView = document.getElementById(opts.tableViewId);
+        if (chartView) chartView.classList.toggle("active", state.viewMode === "chart");
+        if (tableView) tableView.classList.toggle("active", state.viewMode === "table");
+        document.querySelectorAll('[data-dim-view="' + opts.viewKey + '"]').forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-view") === state.viewMode);
+          btn.setAttribute("aria-selected", btn.getAttribute("data-view") === state.viewMode);
+          btn.onclick = function () {
+            state.viewMode = btn.getAttribute("data-view");
+            applyViewMode();
+            if (state.viewMode === "chart" && state.barChart) state.barChart.resize();
+          };
+        });
+      }
+      applyViewMode();
+
+      var panel = document.getElementById(opts.expandPanelId);
+      if (panel && (!state.openName || !rows.some(function (r) { return r.name === state.openName; }))) {
+        panel.classList.remove("show");
+        state.openName = null;
+      }
+
+      document.getElementById(opts.bodyElId).innerHTML = rows.map(function (r, i) {
+        var count = dimSplitAnalyzableTotal(r);
+        var ratio = groupTotal ? (count / groupTotal) * 100 : 0;
+        return (
+          "<tr>" +
+          "<td>" + (i + 1) + "</td>" +
+          '<td><span class="group-score-name">' + r.name + '</span><div class="dim-split-kw">대표 키워드 · ' + r.keyword + "</div></td>" +
+          '<td><span class="group-score-value">' + count.toLocaleString() + '</span><div class="dim-split-kw">' + ratio.toFixed(1) + "%</div></td>" +
+          "<td>" + dimSplitChangeHtml(r.totalMoM) + "</td>" +
+          "</tr>"
+        );
+      }).join("");
+
+      if (state.barChart) state.barChart.destroy();
+      state.barChart = new Chart(document.getElementById(opts.chartElId), {
+        type: "bar",
+        data: {
+          labels: rows.map(function (r) { return r.name; }),
+          datasets: [{
+            label: "접수 건수",
+            data: rows.map(function (r) { return dimSplitAnalyzableTotal(r); }),
+            backgroundColor: "#6366f1",
+            borderRadius: 6,
+            maxBarThickness: 34,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  var row = rows[ctx.dataIndex];
+                  var count = dimSplitAnalyzableTotal(row);
+                  var ratio = groupTotal ? (count / groupTotal) * 100 : 0;
+                  return " 접수: " + count.toLocaleString() + "건 (" + ratio.toFixed(1) + "%) · 전월 대비 " + (row.totalMoM > 0 ? "+" : "") + row.totalMoM.toFixed(1) + "%";
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: "#52514e", font: { size: 10 }, maxRotation: 0, minRotation: 0,
+                callback: function (_value, index) {
+                  var label = rows[index].name;
+                  return label.length > 6 ? label.slice(0, 6) + "…" : label;
+                },
+              },
+              grid: { display: false },
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: "#898781", font: { size: 10 }, callback: function (value) { return value.toLocaleString(); } },
+              grid: { color: "#e1e0d9" },
+            },
+          },
+        },
+      });
+    }
+
+    var WARD_EXPAND_OPTS = {
+      rows: WARD_ANALYSIS,
+      viewKey: "ward",
+      chartViewId: "wardChartView",
+      tableViewId: "wardTableView",
+      countElId: "wardSplitCount",
+      legendElId: "wardSplitLegend",
+      bodyElId: "wardAnalysisBody",
+      chartElId: "c5",
+      expandPanelId: "wardExpandPanel",
+      expandKwTitleId: "wardExpandKwTitle",
+      expandKwListId: "wardExpandKwList",
+      expandTrendTitleId: "wardExpandTrendTitle",
+      trendModeTabsId: "wardTrendModeTabs",
+      trendLegendId: "wardTrendLegend",
+      trendChartId: "wardTrendChart",
+      kwData: WARD_KW_DATA,
+    };
+    var DEPT_EXPAND_OPTS = {
+      rows: DEPT_ANALYSIS,
+      viewKey: "dept",
+      chartViewId: "deptChartView",
+      tableViewId: "deptTableView",
+      countElId: "deptSplitCount",
+      legendElId: "deptSplitLegend",
+      bodyElId: "deptAnalysisBody",
+      chartElId: "c6",
+      expandPanelId: "deptExpandPanel",
+      expandKwTitleId: "deptExpandKwTitle",
+      expandKwListId: "deptExpandKwList",
+      expandTrendTitleId: "deptExpandTrendTitle",
+      trendModeTabsId: "deptTrendModeTabs",
+      trendLegendId: "deptTrendLegend",
+      trendChartId: "deptTrendChart",
+      kwData: DEPT_KW_DATA,
+    };
+    var DOCTOR_EXPAND_OPTS = {
+      rows: DOCTOR_ANALYSIS,
+      viewKey: "doctor",
+      chartViewId: "doctorChartView",
+      tableViewId: "doctorTableView",
+      countElId: "doctorSplitCount",
+      legendElId: "doctorSplitLegend",
+      bodyElId: "doctorAnalysisBody",
+      chartElId: "c7",
+      expandPanelId: "doctorExpandPanel",
+      expandKwTitleId: "doctorExpandKwTitle",
+      expandKwListId: "doctorExpandKwList",
+      expandTrendTitleId: "doctorExpandTrendTitle",
+      trendModeTabsId: "doctorTrendModeTabs",
+      trendLegendId: "doctorTrendLegend",
+      trendChartId: "doctorTrendChart",
+      kwData: DOCTOR_KW_DATA,
+    };
+
+    renderDimExpandSplitView(WARD_EXPAND_OPTS, dimExpandState.ward);
+    renderDimExpandSplitView(DEPT_EXPAND_OPTS, dimExpandState.dept);
+    renderDimExpandSplitView(DOCTOR_EXPAND_OPTS, dimExpandState.doctor);
+
+    (function setupGroupDetailModal() {
+      var modal = document.getElementById("groupDetailModal");
+      if (!modal) return;
+      var titleEl = document.getElementById("groupDetailTitle");
+      var subEl = document.getElementById("groupDetailSub");
+      var bodyEl = document.getElementById("groupDetailBody");
+      var chartView = document.getElementById("groupDetailChartView");
+      var tableView = document.getElementById("groupDetailTableView");
+      var itemModal = document.getElementById("groupItemModal");
+      var itemTitleEl = document.getElementById("groupItemTitle");
+      var itemBodyEl = document.getElementById("groupItemBody");
+      var itemPanel = null;
+      var itemPanelHome = null;
+      var detailChart = null;
+      var currentKey = "ward";
+      var currentSort = "countDesc";
+      var currentView = "table";
+      var lockedParentScroller = null;
+      var lockedParentOverflow = "";
+      var localOverflow = "";
+      var configs = {
+        ward: { label: "병동별", itemLabel: "병동", rows: WARD_ANALYSIS, state: dimExpandState.ward, opts: WARD_EXPAND_OPTS },
+        dept: { label: "진료과별", itemLabel: "진료과", rows: DEPT_ANALYSIS, state: dimExpandState.dept, opts: DEPT_EXPAND_OPTS },
+        doctor: { label: "의사별", itemLabel: "담당의사", rows: DOCTOR_ANALYSIS, state: dimExpandState.doctor, opts: DOCTOR_EXPAND_OPTS },
+      };
+
+      function sortedRows() {
+        var rows = configs[currentKey].rows.slice();
+        var sorters = {
+          countDesc: function (a, b) { return dimSplitAnalyzableTotal(b) - dimSplitAnalyzableTotal(a); },
+          countAsc: function (a, b) { return dimSplitAnalyzableTotal(a) - dimSplitAnalyzableTotal(b); },
+          changeDesc: function (a, b) { return b.totalMoM - a.totalMoM; },
+          changeAsc: function (a, b) { return a.totalMoM - b.totalMoM; },
+        };
+        return rows.sort(sorters[currentSort] || sorters.countDesc);
+      }
+
+      function monthChangeHtml(change) {
+        var cls = change > 0 ? "up" : (change < 0 ? "down" : "flat");
+        var sign = change > 0 ? "▲" : (change < 0 ? "▼" : "－");
+        return '<span class="dim-split-change ' + cls + '">' + sign + " " + (change > 0 ? "+" : "") + change.toFixed(1) + "%</span>";
+      }
+
+      function openRowDetail(row) {
+        var config = configs[currentKey];
+        config.state.openName = row.name;
+        var panel = document.getElementById(config.opts.expandPanelId);
+        if (!panel || !itemModal || !itemBodyEl) return;
+        itemPanel = panel;
+        itemPanelHome = panel.parentElement;
+        itemBodyEl.appendChild(panel);
+        itemTitleEl.textContent = config.label + " · " + row.name + " 상세 분석";
+        renderDimExpandPanel(config.opts, config.state, row);
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden", "true");
+        itemModal.style.top = modal.style.top;
+        itemModal.style.height = modal.style.height;
+        itemModal.classList.add("show");
+        itemModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeItemModal() {
+        if (!itemModal || !itemModal.classList.contains("show")) return;
+        itemModal.classList.remove("show");
+        itemModal.setAttribute("aria-hidden", "true");
+        if (itemPanel) {
+          itemPanel.classList.remove("show");
+          if (itemPanelHome) itemPanelHome.appendChild(itemPanel);
+        }
+        configs[currentKey].state.openName = null;
+        itemPanel = null;
+        itemPanelHome = null;
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+      }
+
+      function renderTable(rows) {
+        var groupTotal = rows.reduce(function (sum, row) { return sum + dimSplitAnalyzableTotal(row); }, 0);
+        bodyEl.innerHTML = rows.map(function (row, index) {
+          var count = dimSplitAnalyzableTotal(row);
+          var ratio = groupTotal ? (count / groupTotal) * 100 : 0;
+          return (
+            '<tr data-detail-name="' + row.name + '" tabindex="0">' +
+            '<td><span class="group-detail-rank">' + (index + 1) + "</span></td>" +
+            '<td><span class="group-score-name">' + row.name + '</span><div class="dim-split-kw">대표 키워드 · ' + row.keyword + "</div></td>" +
+            '<td><span class="group-detail-score">' + count.toLocaleString() + '</span><div class="dim-split-kw">' + ratio.toFixed(1) + "%</div></td>" +
+            "<td>" + monthChangeHtml(row.totalMoM) + "</td>" +
+            '<td><span class="group-detail-response">' + row.keyword + "</span></td>" +
+            '<td><button type="button" class="group-detail-open" data-detail-name="' + row.name + '" aria-label="' + row.name + ' 상세 열기">›</button></td>' +
+            "</tr>"
+          );
+        }).join("");
+        bodyEl.querySelectorAll("tr[data-detail-name]").forEach(function (tr) {
+          function openSelectedRow() {
+            var row = configs[currentKey].rows.find(function (r) { return r.name === tr.getAttribute("data-detail-name"); });
+            if (row) openRowDetail(row);
+          }
+          tr.addEventListener("click", openSelectedRow);
+          tr.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openSelectedRow();
+            }
+          });
+        });
+      }
+
+      function renderChart(rows) {
+        var ctx = document.getElementById("groupDetailChart");
+        if (!ctx) return;
+        var groupTotal = rows.reduce(function (sum, row) { return sum + dimSplitAnalyzableTotal(row); }, 0);
+        if (detailChart) detailChart.destroy();
+        detailChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: rows.map(function (r) { return r.name; }),
+            datasets: [{
+              label: "접수 건수",
+              data: rows.map(function (r) { return dimSplitAnalyzableTotal(r); }),
+              backgroundColor: "#6366f1",
+              borderRadius: 7,
+              maxBarThickness: 54,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            onClick: function (_evt, elements) {
+              if (elements.length) openRowDetail(rows[elements[0].index]);
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function (ctx) {
+                    var count = dimSplitAnalyzableTotal(rows[ctx.dataIndex]);
+                    var ratio = groupTotal ? (count / groupTotal) * 100 : 0;
+                    return " 접수: " + count.toLocaleString() + "건 (" + ratio.toFixed(1) + "%)";
+                  },
+                },
+              },
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: "#52514e", font: { size: 11 } } },
+              y: { beginAtZero: true, ticks: { color: "#898781", callback: function (value) { return value.toLocaleString(); } }, grid: { color: "#e1e0d9" } },
+            },
+          },
+        });
+      }
+
+      function applyDetailView(rows) {
+        chartView.classList.toggle("active", currentView === "chart");
+        tableView.classList.toggle("active", currentView === "table");
+        document.querySelectorAll("[data-detail-view]").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-detail-view") === currentView);
+        });
+        if (currentView === "chart") renderChart(rows);
+      }
+
+      function renderModal() {
+        var config = configs[currentKey];
+        var rows = sortedRows();
+        titleEl.textContent = config.label + " VOC 현황 전체";
+        subEl.textContent = "전체 " + rows.length + "개 " + config.itemLabel + "의 접수 건수(비율)와 전월 대비 현황을 확인합니다.";
+        renderTable(rows);
+        applyDetailView(rows);
+      }
+
+      function positionModalInVisibleArea() {
+        var top = window.scrollY || 0;
+        var height = window.innerHeight || 800;
+        try {
+          if (window.frameElement && window.parent) {
+            var frameRect = window.frameElement.getBoundingClientRect();
+            var parentHeight = window.parent.innerHeight;
+            var visibleTop = Math.max(0, -frameRect.top);
+            var visibleBottom = Math.min(frameRect.height, parentHeight - frameRect.top);
+            if (visibleBottom > visibleTop) {
+              top = visibleTop;
+              height = visibleBottom - visibleTop;
+            }
+          }
+        } catch (_error) {
+          top = window.scrollY || 0;
+          height = window.innerHeight || 800;
+        }
+        modal.style.top = Math.max(0, top + 12) + "px";
+        modal.style.height = Math.max(280, height - 24) + "px";
+      }
+
+      function lockPageScroll() {
+        localOverflow = document.documentElement.style.overflow;
+        document.documentElement.style.overflow = "hidden";
+        try {
+          if (!window.frameElement || !window.parent) return;
+          var node = window.frameElement.parentElement;
+          while (node && node !== window.parent.document.body) {
+            var style = window.parent.getComputedStyle(node);
+            if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight) {
+              lockedParentScroller = node;
+              break;
+            }
+            node = node.parentElement;
+          }
+          if (!lockedParentScroller) lockedParentScroller = window.parent.document.documentElement;
+          lockedParentOverflow = lockedParentScroller.style.overflow;
+          lockedParentScroller.style.overflow = "hidden";
+        } catch (_error) {
+          lockedParentScroller = null;
+        }
+      }
+
+      function unlockPageScroll() {
+        document.documentElement.style.overflow = localOverflow;
+        if (lockedParentScroller) {
+          lockedParentScroller.style.overflow = lockedParentOverflow;
+          lockedParentScroller = null;
+        }
+      }
+
+      function openModal(key) {
+        currentKey = key;
+        currentSort = "countDesc";
+        currentView = "table";
+        positionModalInVisibleArea();
+        lockPageScroll();
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+        document.querySelectorAll(".group-detail-filter").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-sort") === currentSort);
+        });
+        renderModal();
+      }
+
+      function closeModal() {
+        if (itemModal && itemModal.classList.contains("show")) {
+          itemModal.classList.remove("show");
+          itemModal.setAttribute("aria-hidden", "true");
+          if (itemPanel) {
+            itemPanel.classList.remove("show");
+            if (itemPanelHome) itemPanelHome.appendChild(itemPanel);
+          }
+          itemPanel = null;
+          itemPanelHome = null;
+        }
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden", "true");
+        unlockPageScroll();
+      }
+
+      document.querySelectorAll("[data-group-detail]").forEach(function (btn) {
+        btn.addEventListener("click", function () { openModal(btn.getAttribute("data-group-detail")); });
+      });
+      document.querySelectorAll(".group-detail-filter").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          currentSort = btn.getAttribute("data-sort");
+          document.querySelectorAll(".group-detail-filter").forEach(function (b) { b.classList.toggle("active", b === btn); });
+          renderModal();
+        });
+      });
+      document.querySelectorAll("[data-detail-view]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          currentView = btn.getAttribute("data-detail-view");
+          applyDetailView(sortedRows());
+        });
+      });
+      document.getElementById("groupDetailClose").addEventListener("click", closeModal);
+      document.getElementById("groupDetailBackdrop").addEventListener("click", closeModal);
+      document.getElementById("groupItemClose").addEventListener("click", closeItemModal);
+      document.getElementById("groupItemBackdrop").addEventListener("click", closeItemModal);
+      document.addEventListener("keydown", function (event) {
+        if (event.key !== "Escape") return;
+        if (itemModal && itemModal.classList.contains("show")) closeItemModal();
+        else if (modal.classList.contains("show")) closeModal();
+      });
+    })();
+
+    var CHANNEL_ANALYSIS = [
+      { name: "메디통 픽스(앱)", count: 3450, cls: "app", color: "#2a78d6", change: 2.4 },
+      { name: "고객의견카드", count: 2166, cls: "card", color: "#1baf7a", change: -0.6 },
+      { name: "직접 전화", count: 1289, cls: "phone", color: "#eda100", change: 1.1 },
+      { name: "카카오톡·채널톡", count: 988, cls: "kakao", color: "#db2777", change: 0.8 },
+      { name: "홈페이지", count: 626, cls: "web", color: "#7f77dd", change: -0.3 },
+      { name: "현장 상담", count: 380, cls: "field", color: "#0891b2", change: -1.2 },
+      { name: "기타", count: 166, cls: "etc", color: "#9ca3af", change: 0 },
+    ];
+    var CLASSIFY_SHARE = [
+      {
+        name: "좋아요", keyword: "친절함", count: 4110, change: 1.2, color: "#2a78d6",
+        keywords: [["친절함", 612], ["의사 설명", 480], ["치료 결과", 355]],
+        quotes: [
+          ["의사 설명 부분이 특히 좋았습니다. 안내가 친절하고 이해하기 쉬웠어요.", "채널: 직접입력 · 성별: 여성 · 연령대: 40대 · 병동: 3병동 · 진료과: 정형외과 · 담당의사: 김OO · 일시: 2026.06.28 09:12"],
+          ["치료 결과에 만족합니다. 설명도 자세해서 믿음이 갔어요.", "채널: 메디통 픽스(앱) · 성별: 남성 · 연령대: 50대 · 병동: 7병동 · 진료과: 내과 · 담당의사: 이OO · 일시: 2026.06.27 14:35"],
+          ["진료 태도가 친절했고 설명도 명확했습니다.", "채널: 직접입력 · 성별: 여성 · 연령대: 30대 · 병동: 3병동 · 진료과: 신경과 · 담당의사: 박OO · 일시: 2026.06.26 11:08"],
+          ["간호사분들이 바쁜 와중에도 친절하게 응대해 주셨습니다.", "채널: 고객의견카드 · 성별: 여성 · 연령대: 50대 · 병동: 5병동 · 진료과: 정형외과 · 담당의사: 최OO · 일시: 2026.06.16 16:42"],
+          ["직원분들이 항상 밝게 인사해 주셔서 좋았습니다.", "채널: 직접입력 · 성별: 남성 · 연령대: 60대 이상 · 병동: 3병동 · 진료과: 내과 · 담당의사: 김OO · 일시: 2026.06.14 10:21"],
+        ],
+      },
+      {
+        name: "불편", keyword: "대기시간", count: 2569, change: -0.8, color: "#e24b4a",
+        keywords: [["대기시간", 401], ["회진 시간", 288], ["치료 속도", 190]],
+        quotes: [
+          ["회진 및 대기 시간이 불규칙하여 하루 종일 기다려야 했습니다.", "채널: 직접 전화 · 성별: 여성 · 연령대: 60대 이상 · 병동: 3병동 · 진료과: 내과 · 담당의사: 김OO · 일시: 2026.06.28 15:10"],
+          ["수술 당일 대기 시간이 공지된 것보다 훨씬 길었습니다.", "채널: 고객의견카드 · 성별: 남성 · 연령대: 50대 · 병동: 12병동 · 진료과: 외과 · 담당의사: 한OO · 일시: 2026.06.24 08:55"],
+          ["회진 시간이 매번 달라서 예측하기 어렵습니다.", "채널: 홈페이지 · 성별: 여성 · 연령대: 40대 · 병동: 3병동 · 진료과: 신경과 · 담당의사: 박OO · 일시: 2026.06.18 18:03"],
+          ["검사 결과에 대한 항목별 설명이 부족했습니다.", "채널: 직접입력 · 성별: 남성 · 연령대: 30대 · 병동: 5병동 · 진료과: 정형외과 · 담당의사: 최OO · 일시: 2026.06.12 13:47"],
+          ["치료 진행이 예상보다 늦어 답답했습니다.", "채널: 직접입력 · 성별: 여성 · 연령대: 50대 · 병동: 5병동 · 진료과: 내과 · 담당의사: 이OO · 일시: 2026.06.11 10:32"],
+        ],
+      },
+      {
+        name: "문의", keyword: "의사 설명", count: 925, change: 0.4, color: "#7f77dd",
+        keywords: [["퇴원 절차", 142], ["처방", 118], ["회진", 96]],
+        quotes: [
+          ["퇴원 절차가 어떻게 되는지 궁금합니다.", "채널: 직접입력 · 성별: 여성 · 연령대: 40대 · 병동: 5병동 · 진료과: 내과 · 담당의사: 이OO · 일시: 2026.06.24 09:40"],
+          ["처방 관련해서 문의드립니다.", "채널: 메디통 픽스(앱) · 성별: 남성 · 연령대: 60대 이상 · 병동: 3병동 · 진료과: 내과 · 담당의사: 김OO · 일시: 2026.06.20 17:15"],
+          ["회진 시간이 정해져 있는지 궁금합니다.", "채널: 직접입력 · 성별: 여성 · 연령대: 50대 · 병동: 12병동 · 진료과: 외과 · 담당의사: 한OO · 일시: 2026.06.15 12:08"],
+          ["검사 결과는 언제 나오는지 궁금합니다.", "채널: 고객의견카드 · 성별: 남성 · 연령대: 30대 · 병동: 7병동 · 진료과: 신경과 · 담당의사: 박OO · 일시: 2026.06.10 11:25"],
+          ["보험 서류는 어떻게 받는지 궁금합니다.", "채널: 직접입력 · 성별: 여성 · 연령대: 40대 · 병동: 5병동 · 진료과: 정형외과 · 담당의사: 최OO · 일시: 2026.06.07 14:50"],
+        ],
+      },
+      {
+        name: "요청", keyword: "시설 개선", count: 719, change: 0.6, color: "#1baf7a",
+        keywords: [["시설 개선", 128], ["의료진 소통", 104], ["통증 관리", 89]],
+        quotes: [
+          ["의료진과 소통할 수 있는 시간을 늘려주세요.", "채널: 홈페이지 · 성별: 여성 · 연령대: 50대 · 병동: 5병동 · 진료과: 내과 · 담당의사: 이OO · 일시: 2026.06.22 16:18"],
+          ["통증 관리를 좀 더 세심하게 챙겨주세요.", "채널: 직접입력 · 성별: 남성 · 연령대: 60대 이상 · 병동: 12병동 · 진료과: 외과 · 담당의사: 한OO · 일시: 2026.06.19 09:05"],
+          ["치료 계획을 미리 자세히 알려주세요.", "채널: 메디통 픽스(앱) · 성별: 여성 · 연령대: 40대 · 병동: 3병동 · 진료과: 신경과 · 담당의사: 박OO · 일시: 2026.06.14 13:22"],
+          ["편의시설이 좀 더 있었으면 좋겠습니다.", "채널: 홈페이지 · 성별: 남성 · 연령대: 30대 · 병동: 7병동 · 진료과: 정형외과 · 담당의사: 최OO · 일시: 2026.06.09 19:11"],
+          ["회진 시 질문할 시간을 더 주세요.", "채널: 고객의견카드 · 성별: 여성 · 연령대: 50대 · 병동: 7병동 · 진료과: 내과 · 담당의사: 김OO · 일시: 2026.06.08 10:46"],
+        ],
+      },
+      { name: "복합", keyword: "응대·대기", count: 616, change: -0.4, color: "#eda100" },
+    ];
+
+    function shareChangeHtml(change) {
+      if (change == null || change === 0) {
+        return '<span class="share-chg flat">－</span>';
+      }
+      var cls = change > 0 ? "up" : "down";
+      var sign = change > 0 ? "▲" : "▼";
+      return '<span class="share-chg ' + cls + '">' + sign + Math.abs(change).toFixed(1) + "%</span>";
+    }
+
+    function renderShareLegendItem(item, opts) {
+      opts = opts || {};
+      var showChange = opts.showChange !== false;
+      var changeHtml = showChange && item.change != null ? shareChangeHtml(item.change) : "";
+      return (
+        '<div class="voc-classify-legend-item">' +
+        '<span class="name"><i style="background:' + item.color + '"></i>' + item.name + "</span>" +
+        '<div class="track"><div class="fill" style="width:' + item.pct + "%;background:" + item.color + '"></div></div>' +
+        '<span class="cnt">' + item.count.toLocaleString() + "건</span>" +
+        '<span class="pct"><span class="share-pct-wrap"><span class="share-pct">' + item.pct.toFixed(1) + "%</span>" + changeHtml + "</span></span>" +
+        "</div>"
+      );
+    }
+
+    var classifyTotal = CLASSIFY_SHARE.reduce(function (s, r) { return s + r.count; }, 0);
+    var channelTotal = CHANNEL_ANALYSIS.reduce(function (s, r) { return s + r.count; }, 0);
+    var unclassifiedTotal = 0;
+    var staffPraiseTotal = 126;
+    CLASSIFY_SHARE.forEach(function (r) {
+      r.pct = (r.count / classifyTotal) * 100;
+    });
+    if (classifyTotal + unclassifiedTotal + staffPraiseTotal !== channelTotal) {
+      console.warn("전체 VOC 구성 합계와 채널 합계가 일치하지 않습니다.", classifyTotal + unclassifiedTotal + staffPraiseTotal, channelTotal);
+    }
+
+    document.getElementById("vocClassifyLegend").innerHTML = CLASSIFY_SHARE.map(function (r) {
+      return (
+        '<div class="simple-pie-legend">' +
+        '<i style="background:' + r.color + '"></i>' +
+        "<span>" + r.name + "</span>" +
+        "</div>"
+      );
+    }).join("");
+    document.getElementById("vocClassifyBody").innerHTML = CLASSIFY_SHARE.map(function (r, i) {
+      return (
+        "<tr>" +
+        "<td>" + (i + 1) + "</td>" +
+        '<td><span class="table-type-label"><i style="background:' + r.color + '"></i>' + r.name + "</span></td>" +
+        '<td><span class="type-keyword" title="' + r.keyword + '">' + r.keyword + "</span></td>" +
+        '<td class="num" style="font-weight:700;">' + r.count.toLocaleString() + "</td>" +
+        '<td class="num"><span class="share-pct">' + r.pct.toFixed(1) + "%</span></td>" +
+        '<td class="num">' + shareChangeHtml(r.change) + "</td>" +
+        "</tr>"
+      );
+    }).join("");
+    document.getElementById("vocClassifyFoot").innerHTML =
+      "<tr>" +
+      '<td colspan="3" style="font-weight:800;">합계</td>' +
+      '<td class="num" style="font-weight:800;">' + classifyTotal.toLocaleString() + "</td>" +
+      '<td class="num" colspan="2" style="font-weight:800;">100.0%</td>' +
+      "</tr>";
+    var vocKpiTotalEl = document.getElementById("vocKpiTotal");
+    var vocKpiAnalyzableEl = document.getElementById("vocKpiAnalyzable");
+    if (vocKpiTotalEl) vocKpiTotalEl.textContent = channelTotal.toLocaleString() + "건";
+    if (vocKpiAnalyzableEl) vocKpiAnalyzableEl.textContent = classifyTotal.toLocaleString() + "건";
+    document.getElementById("vocClassifyDonutTotal").textContent = classifyTotal.toLocaleString() + "건";
+
+    var channelSorted = CHANNEL_ANALYSIS.slice().sort(function (a, b) { return b.count - a.count; });
+
+    document.getElementById("vocChannelBody").innerHTML = channelSorted.map(function (r, i) {
+      var pct = ((r.count / channelTotal) * 100).toFixed(1);
+      return (
+        "<tr>" +
+        "<td>" + (i + 1) + "</td>" +
+        '<td><span class="voc-channel-badge ' + r.cls + '">' + r.name + "</span></td>" +
+        '<td class="num" style="font-weight:700;">' + r.count.toLocaleString() + "</td>" +
+        '<td class="num"><span class="share-pct">' + pct + "%</span></td>" +
+        '<td class="num">' + shareChangeHtml(r.change) + "</td>" +
+        "</tr>"
+      );
+    }).join("");
+
+    document.getElementById("vocChannelFoot").innerHTML =
+      "<tr>" +
+      '<td colspan="2" style="font-weight:800;">합계</td>' +
+      '<td class="num" style="font-weight:800;">' + channelTotal.toLocaleString() + "</td>" +
+      '<td class="num" colspan="2" style="font-weight:800;">100.0%</td>' +
+      "</tr>";
+
+    var channelDonutTotalEl = document.getElementById("vocChannelDonutTotal");
+    if (channelDonutTotalEl) channelDonutTotalEl.textContent = channelTotal.toLocaleString() + "건";
+
+    document.getElementById("vocChannelLegend").innerHTML = channelSorted.map(function (r) {
+      return (
+        '<div class="simple-pie-legend">' +
+        '<i style="background:' + r.color + '"></i>' +
+        "<span>" + r.name + "</span>" +
+        "</div>"
+      );
+    }).join("");
+
+    new Chart(document.getElementById("vocChannelDonut"), {
+      type: "doughnut",
+      data: {
+        labels: channelSorted.map(function (r) { return r.name; }),
+        datasets: [{
+          data: channelSorted.map(function (r) { return r.count; }),
+          backgroundColor: channelSorted.map(function (r) { return r.color; }),
+          borderWidth: 2,
+          borderColor: "#fff",
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "68%",
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (ctx) {
+                var pct = ((ctx.parsed / channelTotal) * 100).toFixed(1);
+                return " " + ctx.parsed.toLocaleString() + "건 (" + pct + "%)";
+              },
+            },
+          },
+        },
+      },
+    });
+
+    var classifyColors = {
+      like: "#2a78d6",
+      bad: "#e24b4a",
+      mix: "#eda100",
+      inq: "#7f77dd",
+      req: "#1baf7a",
+      staff: "#d4a017",
+      unc: "#9ca3af",
+    };
+
+    var catFootnoteEl = document.getElementById("catFootnote");
+    if (catFootnoteEl) {
+      catFootnoteEl.textContent =
+        "카테고리·키워드 합계는 전체 VOC 건수와 별도로 집계되어 일치하지 않을 수 있습니다. VOC 1건에 언급된 키워드·문구가 여러 개면 각각 카운트되기 때문입니다. 매칭되지 않은 키워드·문구는 미태깅으로 분류되며, VOC 접수 목록에서 수동으로 분류할 수 있습니다.";
+    }
+
+    var ckExcelBtn = document.getElementById("ckExcelBtn");
+    if (ckExcelBtn) {
+      ckExcelBtn.addEventListener("click", function () {
+        alert("카테고리·키워드 분석 엑셀 파일을 다운로드합니다. (Mock)");
+      });
+    }
+
+    var CK_PURPLE = "#534AB7";
+    var CK_PURPLE_LIGHT = ["#CECBF6", "#AFA9EC", "#DAD8FA", "#EEEDFE", "#C2BEEF", "#B8B3ED", "#E0DEF9"];
+    var CK_TYPE_COLOR = { "좋아요": "#2a78d6", "불편": "#e24b4a", "문의": "#7f77dd", "요청": "#1baf7a", "복합": "#eda100", "미분류": "#9ca3af", "직원칭찬": "#d4a017" };
+    var CK_TYPE_BG = { "좋아요": "#DBEAFE", "불편": "#FEE2E2", "문의": "#EDE9FE", "요청": "#D1FAE5", "복합": "#FEF3C7", "미분류": "#F3F4F6", "직원칭찬": "#FEF3C7" };
+
+    /* kw: 유형별 TOP5. 각 항목 [키워드명, 건수, 전월대비 증감%] */
+    var CK_CATEGORIES = [
+      { name: "진료/치료", count: 2339, share: 25.8, change: "-",
+        kw: {
+          "좋아요": [["치료 결과", 97, 2.1], ["회복 경과", 61, 1.4], ["진료 신뢰", 44, 0.8], ["설명 이해도", 33, 0.5], ["수술 만족", 27, 1.9]],
+          "불편": [["대기시간", 110, -5.2], ["진료 태도", 74, -3.6], ["진료 지연", 52, -2.9], ["소통 부족", 38, -1.1], ["재진 안내", 24, -0.7]],
+          "문의": [["의사 설명", 132, 8.4], ["검사 안내", 89, 4.0], ["처방 문의", 58, 2.6], ["진료 일정", 41, 1.3], ["결과 확인", 30, 0.9]],
+          "요청": [["진료과 변경", 36, 3.0], ["재진 예약", 28, 1.7], ["소견서 발급", 22, 1.0], ["진료 시간 조정", 18, 0.6], ["담당의 지정", 14, 0.4]]
+        } },
+      { name: "간호/원무", count: 1940, share: 21.4, change: "-",
+        kw: {
+          "좋아요": [["간호사 응대", 101, 3.3], ["처치 친절", 58, 1.6], ["회진 설명", 42, 1.0], ["콜벨 응답", 31, 0.7], ["원무 안내", 25, 0.5]],
+          "불편": [["응답 속도", 68, -2.8], ["콜벨 지연", 45, -2.0], ["교대 인수인계", 27, -0.9], ["대기 안내 부족", 21, -0.6], ["소음", 17, -0.4]],
+          "문의": [["접수 절차", 84, 1.9], ["입퇴원 안내", 53, 1.1], ["보험 서류", 37, 0.8], ["면회 규정", 29, 0.5], ["병실 배정", 22, 0.3]],
+          "요청": [["수납", 52, 6.0], ["예약 변경", 47, 2.4], ["병실 이동", 33, 1.5], ["보호자 등록", 26, 0.9], ["진단서 발급", 19, 0.5]]
+        } },
+      { name: "시설/환경", count: 1686, share: 18.6, change: "▲2",
+        kw: {
+          "좋아요": [["병실 청결", 88, 1.2], ["편의시설 만족", 39, 0.9], ["채광·환기", 26, 0.4], ["소음 관리", 18, 0.2], ["휴게공간", 14, 0.1]],
+          "불편": [["주차", 71, -6.0], ["화장실 청결", 63, -4.1], ["실내 온도", 41, -1.8], ["엘리베이터 대기", 29, -1.0], ["안내표지 부족", 20, -0.6]],
+          "문의": [["시설 환경", 58, 0.8], ["편의시설 위치", 34, 0.5], ["주차 요금", 25, 0.3], ["와이파이", 19, 0.2], ["매점 운영시간", 12, 0.1]],
+          "요청": [["편의시설", 44, 3.5], ["주차공간 확대", 30, 1.6], ["휴게실 개선", 21, 0.9], ["냉난방 조정", 16, 0.5], ["안내표지 보완", 11, 0.3]]
+        } },
+      { name: "직원서비스", count: 1287, share: 14.2, change: "-",
+        kw: {
+          "좋아요": [["친절도", 118, 5.0], ["응대 태도", 49, 0.6], ["배려", 38, 1.0], ["세심한 안내", 27, 0.6], ["신속 응대", 21, 0.4]],
+          "불편": [["의사소통", 55, -1.5], ["불친절 응대", 31, -0.9], ["설명 불충분", 24, -0.6], ["호출 무응답", 17, -0.4], ["태도 불량", 12, -0.3]],
+          "문의": [["설명", 66, 2.2], ["담당자 확인", 35, 0.9], ["절차 안내", 24, 0.5], ["연락처 문의", 16, 0.3], ["교육 자료", 10, 0.1]],
+          "요청": [["재교육 요청", 20, 1.1], ["담당자 배정", 15, 0.7], ["응대 개선", 12, 0.5], ["안내문 보완", 9, 0.3], ["피드백 반영", 7, 0.2]]
+        } },
+      { name: "기타", count: 888, share: 9.8, change: "-",
+        kw: {
+          "좋아요": [["병원 추천", 42, 2.9], ["재방문 의사", 35, 1.1], ["브랜드 신뢰", 24, 0.3], ["전반적 만족", 18, 0.5], ["직원 전반 친절", 13, 0.2]],
+          "불편": [["절차 복잡", 22, -1.0], ["안내 미흡", 16, -0.6], ["비용 부담", 12, -0.4], ["소통 채널 부족", 8, -0.2], ["대기 전반", 6, -0.1]],
+          "문의": [["병원 이미지", 28, -0.5], ["운영 정책 문의", 17, 0.3], ["행사·프로그램", 11, 0.2], ["기타 문의", 7, 0.1], ["연계 서비스", 5, 0.1]],
+          "요청": [["시스템 이용", 31, 4.2], ["앱 기능 요청", 19, 1.2], ["안내 채널 확대", 13, 0.6], ["설문 개선", 9, 0.3], ["기타 건의", 6, 0.2]]
+        } },
+      { name: "안전사고", count: 671, share: 7.4, change: "-",
+        kw: {
+          "좋아요": [["신속 조치", 12, 0.5], ["안전 관리 신뢰", 8, 0.2], ["예방 안내 만족", 5, 0.1], ["직원 대응력", 4, 0.1], ["재발 방지 설명", 3, 0.1]],
+          "불편": [["낙상", 19, -1.0], ["투약 오류", 14, -2.3], ["대응 지연", 9, -0.6], ["안전장치 미흡", 6, -0.3], ["보호자 미통지", 4, -0.2]],
+          "문의": [["환자 확인", 11, 0.4], ["의료기기 안전", 9, 0.1], ["사고 경위 확인", 6, 0.2], ["보상 절차 문의", 4, 0.1], ["재발 방지 문의", 3, 0.1]],
+          "요청": [["억제대 관리", 7, 0.6], ["안전바 설치 요청", 5, 0.3], ["야간 순회 강화", 4, 0.2], ["낙상 예방 교육", 3, 0.1], ["보호자 상주 요청", 2, 0.1]]
+        } },
+      { name: "감염관리", count: 435, share: 4.8, change: "-",
+        kw: {
+          "좋아요": [["위생관리 신뢰", 7, 0.2], ["방역 안내 만족", 5, 0.1], ["소독 관리", 4, 0.1], ["마스크 착용 안내", 3, 0.1], ["손 위생 캠페인", 2, 0.1]],
+          "불편": [["위생관리", 13, -0.8], ["격리 절차 불편", 8, -0.4], ["방문 제한 불만", 6, -0.3], ["소독 냄새", 4, -0.2], ["안내 미흡", 3, -0.1]],
+          "문의": [["격리 조치", 8, 0.2], ["감염 의심 증상 대응", 6, 0.1], ["면회 제한 문의", 5, 0.1], ["소독 주기 문의", 3, 0.1], ["백신 접종 안내", 2, 0.1]],
+          "요청": [["손 위생", 10, 0.5], ["방역 수칙 안내", 5, 0.3], ["소독 강화 요청", 4, 0.2], ["안내문 부착 요청", 3, 0.1], ["보호구 비치 요청", 2, 0.1]]
+        } },
+    ];
+
+    var CK_OVERALL_KW = {
+      "좋아요": [["친절도", 118, 5.0], ["간호사 응대", 101, 3.3], ["치료 결과", 97, 2.1], ["병실 청결", 88, 1.2], ["병원 추천", 42, 2.9]],
+      "불편": [["대기시간", 110, -5.2], ["주차", 71, -6.0], ["진료 태도", 74, -3.6], ["화장실 청결", 63, -4.1], ["응답 속도", 68, -2.8]],
+      "문의": [["의사 설명", 132, 8.4], ["검사 안내", 89, 4.0], ["접수 절차", 84, 1.9], ["설명", 66, 2.2], ["시설 환경", 58, 0.8]],
+      "요청": [["수납", 52, 6.0], ["예약 변경", 47, 2.4], ["편의시설", 44, 3.5], ["시스템 이용", 31, 4.2], ["병실 이동", 33, 1.5]]
+    };
+
+    var ckSelected = "1위 진료/치료";
+    var ckOpenKey = null;
+    var ckDonutChart = null;
+    var ckTrendChart = null;
+
+    function ckFmt1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+
+    function ckIsSelected(catName) {
+      return ckSelected === "전체" ? false : ckSelected.indexOf(catName) > -1;
+    }
+
+    function ckCurrentKeywords() {
+      if (ckSelected === "전체") return CK_OVERALL_KW;
+      var cat = CK_CATEGORIES.filter(function (c) { return ckSelected.indexOf(c.name) > -1; })[0];
+      return cat ? cat.kw : CK_OVERALL_KW;
+    }
+
+    function ckGenTrend(base, seed) {
+      var months = ["26-01", "26-02", "26-03", "26-04", "26-05", "26-06"];
+      var rows = [];
+      for (var i = 0; i < months.length; i++) {
+        var isLast = i === months.length - 1;
+        var v = isLast ? base : Math.round(base * (1 - 0.04 * (months.length - 1 - i) + 0.05 * Math.sin(seed * 1.6 + i)));
+        rows.push({ month: months[i], value: Math.max(1, v) });
+      }
+      for (var j = 1; j < rows.length; j++) {
+        rows[j].change = ((rows[j].value - rows[j - 1].value) / rows[j - 1].value * 100);
+      }
+      rows[0].change = null;
+      return rows;
+    }
+
+    function ckRenderShareTable() {
+      document.getElementById("ckCatShareBody").innerHTML = CK_CATEGORIES.map(function (c, i) {
+        var isSel = ckIsSelected(c.name);
+        var changeCls = c.change.indexOf("▲") > -1 ? "ck-change-up" : "ck-change-flat";
+        return (
+          '<tr class="ck-cat-row' + (isSel ? " active" : "") + '" data-cat="' + (i + 1) + '위 ' + c.name + '">' +
+          '<td style="font-weight:500;">' + (i + 1) + "</td>" +
+          '<td class="name">' + c.name + "</td>" +
+          '<td class="col-count">' + c.count.toLocaleString() + "건</td>" +
+          '<td class="col-pct">' + ckFmt1(c.share) + "%</td>" +
+          '<td class="col-change ' + changeCls + '">' + c.change + "</td>" +
+          "</tr>"
+        );
+      }).join("");
+    }
+
+    function ckBindTableRows() {
+      document.querySelectorAll("#ckCatShareBody .ck-cat-row").forEach(function (row) {
+        row.addEventListener("click", function () {
+          ckSelected = row.getAttribute("data-cat");
+          ckOpenKey = null;
+          ckRenderAll();
+        });
+      });
+    }
+
+    function ckRenderChips() {
+      var chips = [{ key: "전체", label: "전체" }].concat(
+        CK_CATEGORIES.map(function (c, i) { return { key: (i + 1) + "위 " + c.name, label: (i + 1) + "위 " + c.name }; })
+      );
+      document.getElementById("ckCatChips").innerHTML = chips.map(function (chip) {
+        var active = ckSelected === chip.key;
+        return '<button type="button" class="ck-chip' + (active ? " active" : "") + '" data-cat="' + chip.key + '">' + chip.label + "</button>";
+      }).join("");
+
+      document.querySelectorAll("#ckCatChips .ck-chip").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          ckSelected = btn.getAttribute("data-cat");
+          ckOpenKey = null;
+          ckRenderAll();
+        });
+      });
+    }
+
+    function ckRenderDonut() {
+      var ctx = document.getElementById("ckCatDonut");
+      if (!ctx) return;
+      var labels = CK_CATEGORIES.map(function (c) { return c.name; });
+      var values = CK_CATEGORIES.map(function (c) { return c.share; });
+      var colors = CK_CATEGORIES.map(function (c, i) {
+        return ckIsSelected(c.name) ? CK_PURPLE : CK_PURPLE_LIGHT[i % CK_PURPLE_LIGHT.length];
+      });
+      if (ckDonutChart) ckDonutChart.destroy();
+      ckDonutChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: labels,
+          datasets: [{ data: values, backgroundColor: colors, borderColor: "#fcfcfb", borderWidth: 2 }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "62%",
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  var category = CK_CATEGORIES[ctx.dataIndex];
+                  return ctx.label + ": " + category.count.toLocaleString() + "건 (" + ckFmt1(ctx.parsed) + "%)";
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    var CK_TYPE_ORDER = ["좋아요", "불편", "문의", "요청"];
+
+    function ckRenderTrendBlock(container, name, cnt, seed) {
+      var trend = ckGenTrend(cnt, seed);
+      var detail = document.createElement("div");
+      detail.className = "ck-kw-trend";
+      detail.innerHTML =
+        '<p class="ck-kw-trend-title">' + name + " 6개월 추이</p>" +
+        '<div class="ck-kw-trend-inner">' +
+        '<div class="ck-kw-trend-chart"><canvas id="ckKwTrendChart"></canvas></div>' +
+        '<table class="ck-kw-trend-tbl">' +
+        "<thead><tr><td>월</td><td class=\"cnt-cell\">건수</td></tr></thead><tbody>" +
+        trend.map(function (t, ti) {
+          var isSel = ti === trend.length - 1;
+          var pctStr = t.change === null ? "" :
+            ' <span style="color:' + (t.change > 0 ? "#B4392B" : "#185FA5") + ';">(' +
+            (t.change > 0 ? "+" : "") + t.change.toFixed(1) + "%)</span>";
+          return (
+            '<tr class="' + (isSel ? "sel" : "") + '">' +
+            '<td style="font-weight:' + (isSel ? "600" : "400") + ';">' + t.month + "</td>" +
+            '<td class="cnt-cell">' + t.value + "건" + pctStr + "</td>" +
+            "</tr>"
+          );
+        }).join("") +
+        "</tbody></table></div>";
+      container.appendChild(detail);
+
+      setTimeout(function () {
+        var trendCtx = document.getElementById("ckKwTrendChart");
+        if (!trendCtx) return;
+        if (ckTrendChart) ckTrendChart.destroy();
+        ckTrendChart = new Chart(trendCtx, {
+          type: "line",
+          data: {
+            labels: trend.map(function (t) { return t.month; }),
+            datasets: [{
+              data: trend.map(function (t) { return t.value; }),
+              borderColor: CK_PURPLE,
+              backgroundColor: CK_PURPLE,
+              tension: 0.3,
+              pointRadius: 3,
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: "#898781", font: { size: 10 }, maxRotation: 45 }, grid: { display: false } },
+              y: { beginAtZero: false, ticks: { color: "#898781", font: { size: 11 } }, grid: { color: "#e1e0d9" } },
+            },
+          },
+        });
+      }, 0);
+    }
+
+    function ckRenderKeywords() {
+      var grouped = ckCurrentKeywords();
+      var titleEl = document.getElementById("ckKwPanelTitle");
+      var gridEl = document.getElementById("ckKwGrid");
+      if (!titleEl || !gridEl) return;
+
+      titleEl.textContent = (ckSelected === "전체" ? "전체" : ckSelected.replace(/^\d+위 /, "")) + " 유형별 키워드 TOP5";
+      gridEl.innerHTML = "";
+
+      CK_TYPE_ORDER.forEach(function (type) {
+        var list = grouped[type] || [];
+        var maxCnt = Math.max.apply(null, list.map(function (k) { return k[1]; }).concat([1]));
+        var totalCnt = list.reduce(function (s, k) { return s + k[1]; }, 0);
+
+        var card = document.createElement("div");
+        card.className = "ck-kw-card";
+        card.innerHTML =
+          '<div class="ck-kw-card-head">' +
+          '<span class="ck-kw-card-title"><span class="ck-kw-card-badge" style="background:' + CK_TYPE_COLOR[type] + ';"></span>' + type + " TOP5</span>" +
+          '<span class="ck-kw-card-total">' + totalCnt.toLocaleString() + "건</span>" +
+          "</div>";
+        var bodyEl = document.createElement("div");
+        card.appendChild(bodyEl);
+        gridEl.appendChild(card);
+
+        list.forEach(function (kw, idx) {
+          var name = kw[0], cnt = kw[1], change = kw[2];
+          var pct = Math.round((cnt / maxCnt) * 100);
+          var isUp = change > 0, isFlat = change === 0;
+          var changeColor = isFlat ? "var(--text-muted)" : (isUp ? "#B4392B" : "#185FA5");
+          var sign = isFlat ? "－" : (isUp ? "▲" : "▼");
+          var openKey = type + "::" + name;
+          var isOpen = ckOpenKey === openKey;
+
+          var block = document.createElement("div");
+          block.className = "ck-kw-block";
+          block.innerHTML =
+            '<div class="ck-kw-row">' +
+            '<span class="ck-kw-rank">' + (idx + 1) + "</span>" +
+            '<span class="ck-kw-name">' + name + "</span>" +
+            '<span class="ck-kw-bar-wrap"><span class="ck-kw-bar" style="width:' + pct + "%;background:" + CK_TYPE_COLOR[type] + ';"></span></span>' +
+            '<span class="ck-kw-cnt">' + cnt + "건</span>" +
+            '<span class="ck-kw-change" style="color:' + changeColor + ';">' + sign + " " + Math.abs(change).toFixed(1) + "%</span>" +
+            '<span class="ck-kw-toggle">' + (isOpen ? "▲" : "▾") + "</span>" +
+            "</div>";
+
+          block.addEventListener("click", function () {
+            ckOpenKey = isOpen ? null : openKey;
+            ckRenderKeywords();
+          });
+          bodyEl.appendChild(block);
+
+          if (isOpen) ckRenderTrendBlock(bodyEl, name, cnt, idx + 1);
+        });
+
+        var listLink = document.createElement("div");
+        listLink.className = "ck-kw-list-link";
+        listLink.innerHTML = 'VOC 접수 목록에서 &quot;' + type + '&quot; 보기 <i class="ti ti-external-link" aria-hidden="true"></i>';
+        listLink.addEventListener("click", function () {
+          alert("VOC 접수 목록 화면으로 이동하여 '" + type + "' 유형으로 필터가 적용됩니다. (목업 동작)");
+        });
+        bodyEl.appendChild(listLink);
+      });
+    }
+
+    function ckRenderAll() {
+      ckRenderChips();
+      ckRenderShareTable();
+      ckRenderDonut();
+      ckRenderKeywords();
+      ckBindTableRows();
+    }
+
+    ckRenderAll();
+
+    new Chart(document.getElementById("vocClassifyDonut"), {
+      type: "doughnut",
+      data: {
+        labels: CLASSIFY_SHARE.map(function (c) { return c.name; }),
+        datasets: [{
+          data: CLASSIFY_SHARE.map(function (c) { return c.count; }),
+          backgroundColor: CLASSIFY_SHARE.map(function (c) { return c.color; }),
+          borderWidth: 2,
+          borderColor: "#fff",
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "68%",
+        plugins: { legend: { display: false } },
+      },
+    });
+
+    var ratioMonths = ["1월", "2월", "3월", "4월", "5월", "6월"];
+    var ratioTotal = [8174, 8328, 8486, 8612, 8754, 8939];
+    var ratioLike = [44.8, 45.1, 45.3, 45.6, 45.7, CLASSIFY_SHARE[0].pct];
+    var ratioBad = [30.2, 29.9, 29.6, 29.3, 29.0, CLASSIFY_SHARE[1].pct];
+    var ratioMix = [6.6, 6.7, 6.7, 6.8, 6.9, CLASSIFY_SHARE[4].pct];
+    var ratioInq = [10.5, 10.4, 10.4, 10.3, 10.3, CLASSIFY_SHARE[2].pct];
+    var ratioReq = [7.9, 7.9, 8.0, 8.0, 8.1, CLASSIFY_SHARE[3].pct];
+
+    var vocTrendLineOnTop = {
+      id: "vocTrendLineOnTop",
+      afterDatasetsDraw: function (chart) {
+        var lineIndex = chart.data.datasets.findIndex(function (d) { return d.type === "line"; });
+        if (lineIndex < 0) return;
+        var meta = chart.getDatasetMeta(lineIndex);
+        if (meta.hidden || !meta.controller) return;
+        meta.controller.draw();
+      },
+    };
+
+    new Chart(document.getElementById("vocClassifyTrend"), {
+      data: {
+        labels: ratioMonths,
+        datasets: [
+          {
+            type: "line",
+            label: "접수 건수",
+            data: ratioTotal,
+            borderColor: "#1f3864",
+            backgroundColor: "#1f3864",
+            borderWidth: 2.5,
+            pointRadius: 5,
+            pointHoverRadius: 6,
+            pointBackgroundColor: "#fff",
+            pointBorderColor: "#1f3864",
+            pointBorderWidth: 2,
+            tension: 0.25,
+            yAxisID: "yCount",
+            order: 100,
+            clip: false,
+          },
+          { type: "bar", label: "좋아요", data: ratioLike, backgroundColor: classifyColors.like, stack: "ratio", borderRadius: 0, yAxisID: "y", order: 0 },
+          { type: "bar", label: "불편", data: ratioBad, backgroundColor: classifyColors.bad, stack: "ratio", yAxisID: "y", order: 0 },
+          { type: "bar", label: "복합", data: ratioMix, backgroundColor: classifyColors.mix, stack: "ratio", yAxisID: "y", order: 0 },
+          { type: "bar", label: "문의", data: ratioInq, backgroundColor: classifyColors.inq, stack: "ratio", yAxisID: "y", order: 0 },
+          { type: "bar", label: "요청", data: ratioReq, backgroundColor: classifyColors.req, stack: "ratio", borderRadius: { topLeft: 3, topRight: 3 }, yAxisID: "y", order: 0 },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        datasets: {
+          bar: { order: 0 },
+          line: { order: 100 },
+        },
+        elements: {
+          line: { borderWidth: 2.5 },
+          point: { radius: 5, hoverRadius: 6 },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            itemSort: function (a, b) {
+              if (a.dataset.type === "line") return -1;
+              if (b.dataset.type === "line") return 1;
+              return 0;
+            },
+            callbacks: {
+              label: function (ctx) {
+                if (ctx.dataset.type === "line") {
+                  return " " + ctx.dataset.label + ": " + ctx.parsed.y.toLocaleString() + "건";
+                }
+                return " " + ctx.dataset.label + ": " + ctx.parsed.y.toFixed(1) + "%";
+              },
+            },
+          },
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { color: tc, font: { size: 11 } } },
+          y: {
+            stacked: true,
+            position: "left",
+            min: 0,
+            max: 100,
+            grid: { color: gc },
+            ticks: {
+              color: tc,
+              font: { size: 11 },
+              stepSize: 20,
+              callback: function (v) { return v + "%"; },
+            },
+          },
+          yCount: {
+            position: "right",
+            min: 14700,
+            max: 15400,
+            grid: { drawOnChartArea: false },
+            ticks: {
+              color: "#1f3864",
+              font: { size: 11, weight: "600" },
+              callback: function (v) { return v.toLocaleString(); },
+            },
+          },
+        },
+      },
+      plugins: [vocTrendLineOnTop],
+    });
+
+    var staffPraiseChartEl = document.getElementById("c8");
+    if (staffPraiseChartEl) new Chart(staffPraiseChartEl, {
+      type: "doughnut",
+      data: {
+        labels: ["3층 병동", "원무과", "5층 병동", "간호팀"],
+        datasets: [{ data: [66, 30, 23, 7], backgroundColor: ["#2a78d6", "#1baf7a", "#eda100", "#4a3aa7"], borderWidth: 2, borderColor: "#fff" }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "60%",
+        plugins: {
+          legend: {
+            display: true,
+            position: "right",
+            labels: {
+              boxWidth: 10,
+              boxHeight: 10,
+              padding: 12,
+              color: "#4b5563",
+              font: { size: 11 },
+              generateLabels: function (chart) {
+                var labels = chart.data.labels;
+                var dataset = chart.data.datasets[0];
+                return labels.map(function (label, index) {
+                  return {
+                    text: label + "  " + dataset.data[index].toLocaleString() + "건",
+                    fillStyle: dataset.backgroundColor[index],
+                    strokeStyle: dataset.backgroundColor[index],
+                    lineWidth: 0,
+                    hidden: false,
+                    index: index,
+                  };
+                });
+              },
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (ctx) {
+                return " " + ctx.label + ": " + ctx.parsed.toLocaleString() + "건";
+              },
+            },
+          },
+        },
+      },
+    });
+  </script>
+</body>
+</html>
