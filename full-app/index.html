@@ -26,10 +26,6 @@
 <!-- VOC_MENU_MASTER_SYNC_END -->
     <script type="module">
       (async function () {
-        const params = new URLSearchParams(window.location.search || "");
-        const isLocal = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(window.location.hostname);
-        const isFilePreview = window.location.protocol === "file:";
-        if (!isLocal && !isFilePreview && !params.has("agentation")) return;
         if (window.__AGENTATION_CDN_LOADED__) return;
         window.__AGENTATION_CDN_LOADED__ = true;
 
