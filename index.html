@@ -3042,7 +3042,7 @@ renderRows();
 <!-- VOC_PAGES_BUNDLE_END -->
 <script>
 /**
- * PIX VOC pages - unified embedded HTML loader
+ * PIX VOC pages - unified embedded HTML loader (light DOM)
  * HTML source: template tags above (VOC_PAGES_BUNDLE)
  */
 (function (global) {
@@ -3061,95 +3061,186 @@ renderRows();
     return el ? el.innerHTML : "";
   }
 
-  function createVocIframePage(deps, config) {
+  /* ---- VOC light-DOM render helpers (shared: full-app + index.html + ps1) ---- */
+  var VOC_EMBED_CLASS = "voc-embed-root";
+  var VOC_EMBED_SCOPE = "." + VOC_EMBED_CLASS;
+
+  function scopeVocSelectorText(selectorText) {
+    if (!selectorText) return VOC_EMBED_SCOPE;
+    var parts = selectorText.split(",");
+    var out = [];
+    var roots = ["body", "html", ":root"];
+    for (var i = 0; i < parts.length; i++) {
+      var s = parts[i].replace(/^\s+|\s+$/g, "");
+      if (!s) continue;
+      if (s === "body" || s === "html" || s === ":root") {
+        out.push(VOC_EMBED_SCOPE);
+        continue;
+      }
+      if (s === "*") {
+        out.push(VOC_EMBED_SCOPE + " *");
+        continue;
+      }
+      if (s.charAt(0) === "*") {
+        out.push(VOC_EMBED_SCOPE + " " + s);
+        continue;
+      }
+      var replaced = null;
+      for (var r = 0; r < roots.length; r++) {
+        var token = roots[r];
+        if (s.indexOf(token) === 0) {
+          var rest = s.slice(token.length);
+          var nc = rest.charAt(0);
+          if (rest === "" || nc === " " || nc === "." || nc === "#" || nc === ":" ||
+              nc === "[" || nc === ">" || nc === "+" || nc === "~") {
+            replaced = VOC_EMBED_SCOPE + rest;
+            break;
+          }
+        }
+      }
+      out.push(replaced !== null ? replaced : VOC_EMBED_SCOPE + " " + s);
+    }
+    return out.join(", ");
+  }
+
+  function scopeVocRuleList(rules) {
+    var out = [];
+    for (var i = 0; i < rules.length; i++) {
+      var rule = rules[i];
+      var type = rule.type;
+      if (type === 1) {
+        out.push(scopeVocSelectorText(rule.selectorText) + " { " + rule.style.cssText + " }");
+      } else if (type === 4) {
+        var cond = rule.conditionText || (rule.media && rule.media.mediaText) || "all";
+        out.push("@media " + cond + " { " + scopeVocRuleList(rule.cssRules) + " }");
+      } else if (type === 12) {
+        out.push("@supports " + rule.conditionText + " { " + scopeVocRuleList(rule.cssRules) + " }");
+      } else if (type === 7) {
+        out.push(rule.cssText);
+      } else if (rule.cssText) {
+        out.push(rule.cssText);
+      }
+    }
+    return out.join("\n");
+  }
+
+  function scopeVocCss(cssText) {
+    if (!cssText) return "";
+    var probe = document.createElement("style");
+    probe.textContent = cssText;
+    (document.head || document.documentElement).appendChild(probe);
+    var scoped = "";
+    try {
+      scoped = scopeVocRuleList(probe.sheet.cssRules);
+    } catch (_error) {
+      scoped = "";
+    }
+    if (probe.parentNode) probe.parentNode.removeChild(probe);
+    return scoped;
+  }
+
+  function runVocEmbedScripts(host, doc) {
+    var nodes = doc.querySelectorAll("script");
+    var externals = [];
+    var inlines = [];
+    for (var i = 0; i < nodes.length; i++) {
+      var src = nodes[i].getAttribute("src");
+      if (src) {
+        if (externals.indexOf(src) === -1) externals.push(src);
+      } else {
+        var code = nodes[i].textContent || "";
+        if (code.replace(/^\s+|\s+$/g, "")) inlines.push(code);
+      }
+    }
+    function runInlines() {
+      for (var j = 0; j < inlines.length; j++) {
+        try {
+          var el = document.createElement("script");
+          el.textContent = inlines[j];
+          host.appendChild(el);
+        } catch (error) {
+          try { console.error("[voc-embed] inline script failed", error); } catch (_e) {}
+        }
+      }
+    }
+    var idx = 0;
+    function loadNext() {
+      if (idx >= externals.length) { runInlines(); return; }
+      var src = externals[idx++];
+      if (/chart/i.test(src) && window.Chart) { loadNext(); return; }
+      var s = document.createElement("script");
+      s.src = src;
+      s.onload = loadNext;
+      s.onerror = function () {
+        try { console.warn("[voc-embed] failed to load " + src); } catch (_e) {}
+        loadNext();
+      };
+      (document.head || document.documentElement).appendChild(s);
+    }
+    loadNext();
+  }
+
+  function mountVocLightDom(host, html) {
+    if (!host || host.__vocMounted) return;
+    host.__vocMounted = true;
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(html || "", "text/html");
+    } catch (_error) {
+      return;
+    }
+    if (!doc || !doc.body) return;
+    var styles = doc.querySelectorAll("style");
+    for (var i = 0; i < styles.length; i++) {
+      var scoped = scopeVocCss(styles[i].textContent || "");
+      if (scoped) {
+        var styleEl = document.createElement("style");
+        styleEl.setAttribute("data-voc-embed", "1");
+        styleEl.textContent = scoped;
+        host.appendChild(styleEl);
+      }
+    }
+    var bodyClone = document.importNode(doc.body, true);
+    var deadScripts = bodyClone.querySelectorAll("script");
+    for (var d = 0; d < deadScripts.length; d++) {
+      if (deadScripts[d].parentNode) deadScripts[d].parentNode.removeChild(deadScripts[d]);
+    }
+    while (bodyClone.firstChild) {
+      host.appendChild(bodyClone.firstChild);
+    }
+    runVocEmbedScripts(host, doc);
+  }
+
+  function createVocLightDomPage(deps, config) {
     var React = deps.React;
     var useRef = deps.useRef || React.useRef;
+    var useEffect = deps.useEffect || React.useEffect;
 
-    return function VocIframePage() {
-      var frameRef = useRef(null);
-      var embeddedHtml = readVocEmbeddedHtml(config.templateKey);
+    return function VocLightDomPage() {
+      var hostRef = useRef(null);
 
-      function handleLoad() {
-        var frame = frameRef.current;
-        if (!frame) return;
-        function resizeFrame() {
-          try {
-            var doc = frame.contentDocument;
-            if (!doc) return;
-            var lastElement = doc.body && doc.body.lastElementChild;
-            var lastBottom = lastElement ? lastElement.getBoundingClientRect().bottom : 0;
-            var minHeight = config.minHeight || 900;
-            var height = Math.max(
-              doc.documentElement ? doc.documentElement.scrollHeight : 0,
-              doc.documentElement ? doc.documentElement.offsetHeight : 0,
-              doc.body ? doc.body.scrollHeight : 0,
-              doc.body ? doc.body.offsetHeight : 0,
-              lastBottom + 24,
-              minHeight
-            );
-            frame.style.height = Math.ceil(height + 8) + "px";
-          } catch (_error) {}
-        }
-        resizeFrame();
-        if (frame.__vocResizeObserver) frame.__vocResizeObserver.disconnect();
-        try {
-          frame.__vocResizeObserver = new ResizeObserver(resizeFrame);
-          frame.__vocResizeObserver.observe(frame.contentDocument.documentElement);
-          if (frame.contentDocument.body) frame.__vocResizeObserver.observe(frame.contentDocument.body);
-        } catch (_error) {}
-        if (frame.__vocMutationObserver) frame.__vocMutationObserver.disconnect();
-        try {
-          frame.__vocMutationObserver = new MutationObserver(resizeFrame);
-          frame.__vocMutationObserver.observe(frame.contentDocument.body, { childList: true, subtree: true, attributes: true });
-        } catch (_error) {}
-        global.setTimeout(resizeFrame, 250);
-        global.setTimeout(resizeFrame, 1000);
-        global.setTimeout(resizeFrame, 2500);
-      }
+      useEffect(function () {
+        mountVocLightDom(hostRef.current, readVocEmbeddedHtml(config.templateKey));
+      }, []);
 
-      return React.createElement(
-        "div",
-        { className: "h-full w-full flex flex-col min-h-0 animate-fadeIn" },
-        React.createElement("iframe", {
-          ref: frameRef,
-          title: config.title,
-          srcDoc: embeddedHtml,
-          className: "block w-full border-0 bg-transparent rounded-xl",
-          scrolling: "auto",
-          style: {
-            minHeight: String(config.minHeight || 900) + "px",
-            height: String(config.minHeight || 900) + "px",
-            width: "100%",
-            flex: "0 0 auto"
-          },
-          onLoad: handleLoad
-        })
-      );
+      return React.createElement("div", {
+        ref: hostRef,
+        className: "voc-embed-root animate-fadeIn",
+        style: { width: "100%" }
+      });
     };
   }
 
   function registerVocPixStatisticsPage(deps) {
-    return createVocIframePage(deps, {
-      title: "VOC \uD1B5\uACC4",
-      templateKey: "statistics",
-      minHeight: 5600
-    });
+    return createVocLightDomPage(deps, { title: "VOC \uD1B5\uACC4", templateKey: "statistics" });
   }
 
   function registerVocPixSettingsPage(deps) {
-    return createVocIframePage(deps, {
-      title: "VOC \uC124\uC815",
-      templateKey: "settings",
-      minHeight: 900
-    });
+    return createVocLightDomPage(deps, { title: "VOC \uC124\uC815", templateKey: "settings" });
   }
 
   function registerVocPixInboxPage(deps) {
-    return createVocIframePage(deps, {
-      title: "VOC \uC811\uC218 \uBAA9\uB85D",
-      templateKey: "inbox",
-      minHeight: 1200
-    });
+    return createVocLightDomPage(deps, { title: "VOC \uC811\uC218 \uBAA9\uB85D", templateKey: "inbox" });
   }
 
   global.registerVocPixStatisticsPage = registerVocPixStatisticsPage;
