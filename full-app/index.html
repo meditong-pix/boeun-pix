@@ -24,6 +24,30 @@
     <script src="js/inline-05.js"></script>
     <script src="js/inline-06.js"></script>
 <!-- VOC_MENU_MASTER_SYNC_END -->
+    <script type="module">
+      (async function () {
+        const params = new URLSearchParams(window.location.search || "");
+        const isLocal = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(window.location.hostname);
+        const isFilePreview = window.location.protocol === "file:";
+        if (!isLocal && !isFilePreview && !params.has("agentation")) return;
+        if (window.__AGENTATION_CDN_LOADED__) return;
+        window.__AGENTATION_CDN_LOADED__ = true;
+
+        try {
+          const [{ default: React }, { createRoot }, { Agentation }] = await Promise.all([
+            import("https://esm.sh/react@18.3.1"),
+            import("https://esm.sh/react-dom@18.3.1/client"),
+            import("https://esm.sh/agentation@3.0.2?deps=react@18.3.1,react-dom@18.3.1"),
+          ]);
+          const mount = document.createElement("div");
+          mount.id = "agentation-root";
+          document.body.appendChild(mount);
+          createRoot(mount).render(React.createElement(Agentation));
+        } catch (error) {
+          console.warn("Agentation CDN failed to load", error);
+        }
+      })();
+    </script>
   </body>
 </html>
 
