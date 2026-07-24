@@ -3175,17 +3175,6 @@ renderRows();
     <script>
       (function () {
         var root = document.getElementById("root");
-        if (window.__CARELINK_FILE_PROTOCOL__) {
-          var bar = document.createElement("div");
-          bar.setAttribute("role", "status");
-          bar.style.cssText =
-            "position:fixed;left:0;right:0;top:0;z-index:999999;padding:10px 14px;background:#fff7ed;border-bottom:1px solid #fdba74;color:#9a3412;font:700 12px/1.5 'Noto Sans KR',sans-serif;text-align:center";
-          bar.innerHTML =
-            'file:// 로 열렸습니다. 일부 기능이 제한될 수 있습니다. ' +
-            '<code style="background:#ffedd5;padding:1px 6px;border-radius:4px">serve.ps1</code> 실행 후 ' +
-            '<a href="http://127.0.0.1:5173/" style="color:#c2410c;text-decoration:underline">http://127.0.0.1:5173/</a> 사용을 권장합니다.';
-          document.body.appendChild(bar);
-        }
         if (root && !root.innerHTML.trim()) {
           root.innerHTML =
             '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Noto Sans KR,sans-serif;color:#334155">' +
@@ -6117,6 +6106,26 @@ if(String(routePath||"").startsWith("/admin/templates")){return/*#__PURE__*/Reac
       })();
     </script>
 <!-- VOC_MENU_MASTER_SYNC_END -->
+    <script type="module">
+      (async function () {
+        if (window.__AGENTATION_CDN_LOADED__) return;
+        window.__AGENTATION_CDN_LOADED__ = true;
+
+        try {
+          const [{ default: React }, { createRoot }, { Agentation }] = await Promise.all([
+            import("https://esm.sh/react@18.3.1"),
+            import("https://esm.sh/react-dom@18.3.1/client"),
+            import("https://esm.sh/agentation@3.0.2?deps=react@18.3.1,react-dom@18.3.1"),
+          ]);
+          const mount = document.createElement("div");
+          mount.id = "agentation-root";
+          document.body.appendChild(mount);
+          createRoot(mount).render(React.createElement(Agentation));
+        } catch (error) {
+          console.warn("Agentation CDN failed to load", error);
+        }
+      })();
+    </script>
   </body>
 </html>
 

@@ -1,17 +1,6 @@
 
       (function () {
         var root = document.getElementById("root");
-        if (window.__CARELINK_FILE_PROTOCOL__) {
-          var bar = document.createElement("div");
-          bar.setAttribute("role", "status");
-          bar.style.cssText =
-            "position:fixed;left:0;right:0;top:0;z-index:999999;padding:10px 14px;background:#fff7ed;border-bottom:1px solid #fdba74;color:#9a3412;font:700 12px/1.5 'Noto Sans KR',sans-serif;text-align:center";
-          bar.innerHTML =
-            'file:// 로 열렸습니다. 일부 기능이 제한될 수 있습니다. ' +
-            '<code style="background:#ffedd5;padding:1px 6px;border-radius:4px">serve.ps1</code> 실행 후 ' +
-            '<a href="http://127.0.0.1:5173/" style="color:#c2410c;text-decoration:underline">http://127.0.0.1:5173/</a> 사용을 권장합니다.';
-          document.body.appendChild(bar);
-        }
         if (root && !root.innerHTML.trim()) {
           root.innerHTML =
             '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Noto Sans KR,sans-serif;color:#334155">' +
