@@ -2880,7 +2880,7 @@ function flagBadgeHtml(flag) {
 }
 
 /* 공통 정책: 일시 표시는 YY-MM-DD 형식으로 통일 */
-function formatDate(str) {
+function formatVocDate(str) {
   if (!str || str === "-") return str;
   var datePart = str.split(" ")[0];
   var parts = datePart.split("-");
@@ -2906,8 +2906,8 @@ function renderRows() {
       "<td><span class=\"cat-label\">" + r.cat + "</span>" + kwHtml(r) + "</td>" +
       "<td class=\"col-content\">" + r.content + "</td>" +
       "<td class=\"col-date\">없음</td>" +
-      "<td class=\"col-date\">" + formatDate(r.date) + "</td>" +
-      "<td class=\"col-date\">" + formatDate(r.date) + "</td>" +
+      "<td class=\"col-date\">" + formatVocDate(r.date) + "</td>" +
+      "<td class=\"col-date\">" + formatVocDate(r.date) + "</td>" +
       "</tr>";
   }).join("");
   document.getElementById("resultCount").textContent = "조회 " + sorted.length + "건";
@@ -2945,7 +2945,7 @@ function toggleAnon() {
 
 function updateDatetimeDisplay() {
   var v = document.getElementById("fDatetime").value;
-  document.getElementById("fDatetimeDisplay").textContent = "선택된 접수일시: " + (v ? formatDate(v) : "-");
+  document.getElementById("fDatetimeDisplay").textContent = "선택된 접수일시: " + (v ? formatVocDate(v) : "-");
 }
 
 function submitManual() {
@@ -2979,7 +2979,7 @@ function submitManual() {
 function simulateUpload() {
   document.getElementById("uploadFileName").textContent = "voc_upload_0723.xlsx";
   document.getElementById("uploadHistoryRows").innerHTML =
-    "<tr><td>voc_upload_0723.xlsx</td><td>" + formatDate("2026-07-23 11:32") + "</td><td>18건 (12/4/2)</td><td><span class=\"chip\" style=\"background:var(--bg-success);color:var(--text-success)\">완료</span></td></tr>";
+    "<tr><td>voc_upload_0723.xlsx</td><td>" + formatVocDate("2026-07-23 11:32") + "</td><td>18건 (12/4/2)</td><td><span class=\"chip\" style=\"background:var(--bg-success);color:var(--text-success)\">완료</span></td></tr>";
 }
 
 /* ---------- 채널 설정 (pix_voc_channels_v1) ---------- */
