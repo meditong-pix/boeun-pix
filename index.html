@@ -2844,6 +2844,9 @@ renderKeywordGrid();
     width: 100%; font-size: 12px; padding: 8px 10px; border-radius: 8px; border: 0.5px solid var(--border-strong);
     background: var(--surface-2); color: var(--text-primary);
   }
+  .modal-card input[readonly], .modal-card textarea[readonly], .modal-card select:disabled {
+    background: var(--surface-1); color: var(--text-secondary); cursor: default; opacity: 0.95;
+  }
   .patient-box { border: 0.5px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-top: 6px; }
   .patient-box-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .anon-check { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
@@ -2876,7 +2879,8 @@ renderKeywordGrid();
 
     <div id="pane-list">
       <div class="filter-row">
-        <select><option>전체 유형</option><option>긍정</option><option>부정</option><option>미분류</option></select>
+        <select id="filterType" onchange="renderRows()"><option value="">전체 유형</option><option value="긍정">긍정</option><option value="부정">부정</option><option value="미분류">미분류</option></select>
+        <select id="filterPraise" onchange="renderRows()"><option value="">전체 칭찬 대상</option><option value="부서칭찬">부서칭찬</option><option value="직원칭찬">직원칭찬</option></select>
         <select id="filterChannel"><option>전체 채널</option><option>메디통 픽스(앱)</option><option>고객의견카드</option><option>직접 전화</option><option>카카오톡·채널톡</option><option>홈페이지</option><option>현장 상담</option></select>
         <select><option>전체 병동</option><option>51병동</option><option>52병동</option><option>6A병동</option><option>7A병동</option><option>5C병동</option><option>5병동</option></select>
         <select><option>전체 진료과</option><option>내과</option><option>외과</option><option>정형외과</option><option>신경과</option></select>
@@ -2898,8 +2902,8 @@ renderKeywordGrid();
         <thead>
           <tr>
             <td>번호</td><td>환자</td><td>병동</td><td>진료과/담당의사</td><td>유입채널</td>
-            <td>VOC 유형(AI 분석)</td><td>카테고리/키워드(AI 분석)</td><td>접수 내용</td><td>첨부</td>
-            <td>접수일시</td><td>등록일시</td><td>수정</td><td>삭제</td>
+            <td>VOC 유형(AI 분석)</td><td>카테고리/키워드(AI 분석)</td><td>칭찬 대상(부서·직원)</td><td>접수 내용</td><td>첨부</td>
+            <td>접수일시</td><td>수정</td><td>삭제</td>
           </tr>
         </thead>
         <tbody id="vocRows"></tbody>
@@ -3039,28 +3043,28 @@ renderKeywordGrid();
     <div class="field-row" style="margin-top:4px">
       <div>
         <div class="field-label" style="margin-top:10px">환자</div>
-        <input type="text" id="ePatient">
+        <input type="text" id="ePatient" readonly>
       </div>
       <div>
         <div class="field-label" style="margin-top:10px">병동</div>
-        <input type="text" id="eWard">
+        <input type="text" id="eWard" readonly>
       </div>
     </div>
 
     <div class="field-label">진료과/담당의사</div>
-    <input type="text" id="eDeptDoc" placeholder="예: 내과/김의사">
+    <input type="text" id="eDeptDoc" placeholder="예: 내과/김의사" readonly>
 
     <div class="field-label">카테고리</div>
-    <select id="eCat">
+    <select id="eCat" disabled>
       <option>진료/치료</option><option>간호/처치</option><option>시설/환경</option>
       <option>행정/절차</option><option>직원응대</option><option>기타</option><option>AI 분류 대기</option>
     </select>
 
     <div class="field-label">키워드 <span style="font-weight:500;color:var(--text-muted)">(쉼표로 구분)</span></div>
-    <input type="text" id="eKws" placeholder="예: 회진, 설명">
+    <input type="text" id="eKws" placeholder="예: 회진, 설명" readonly>
 
     <div class="field-label">접수 내용</div>
-    <textarea id="eContent"></textarea>
+    <textarea id="eContent" readonly></textarea>
 
     <div class="field-label">특별 유형 플래그</div>
     <select id="eFlag">
@@ -3090,17 +3094,22 @@ function kwHtml(r) {
 function channelBadge(c) {
   return '<span class="chip" style="background:var(--bg-accent);color:var(--text-accent)">' + c + '</span>';
 }
+function praiseCellHtml(r) {
+  if (!r.praise) return '<span style="font-size:11px;color:var(--text-muted)">-</span>';
+  return '<span class="chip" style="background:var(--bg-success);color:var(--text-success)">' + r.praise.kind + '</span> ' +
+    '<span style="font-size:11px;color:var(--text-secondary)">' + r.praise.name + '</span>';
+}
 
 var vocData = [
-  { no: 265007, patient: "박OO", ward: "6A병동", deptDoc: "정형외과/박의사", channel: "직접 전화", type: "긍정", cat: "기타", kws: [], content: "간호 응대가 세심했습니다.", date: "2026-07-01 10:25", flag: null },
-  { no: 265006, patient: "김OO", ward: "51병동", deptDoc: "내과/김의사", channel: "메디통 픽스(앱)", type: "긍정", cat: "진료/치료", kws: ["회진", "설명"], content: "회진 설명이 친절했습니다.", date: "2026-07-01 09:12", flag: null },
-  { no: 265005, patient: "정OO", ward: "7A병동", deptDoc: "신경과/정의사", channel: "카카오톡·채널톡", type: "부정", cat: "시설/환경", kws: ["소음"], content: "병실 소음이 큽니다.", date: "2026-07-01 11:44", flag: null },
-  { no: 265004, patient: "이OO", ward: "52병동", deptDoc: "외과/이의사", channel: "고객의견카드", type: "부정", cat: "행정/절차", kws: ["안내"], content: "대기 안내가 부족했습니다.", date: "2026-07-01 10:01", flag: null },
-  { no: 265003, patient: "최OO", ward: "5C병동", deptDoc: "내과/최의사", channel: "홈페이지", type: "부정", cat: "행정/절차", kws: ["수납", "안내"], content: "앱 안내는 좋았지만 수납 대기가 길었습니다.", date: "2026-07-01 12:20", flag: null },
-  { no: 265002, patient: "익명", ward: "5병동", deptDoc: "내과/김의사", channel: "고객의견카드", type: "미분류", cat: "간호/처치", kws: ["간호사 응대", "응답 속도"], content: "간호사 응대도 친절하고 병실 환경도 쾌적한데 응답 속도가 너무 느려요", date: "2026-07-01 14:25", flag: null },
-  { no: 265001, patient: "익명", ward: "51병동", deptDoc: "내과/김의사", channel: "직접 전화", type: "미분류", cat: "기타", kws: [], content: "그냥 그랬어요", date: "2026-07-01 13:08", flag: null },
-  { no: 265000, patient: "윤OO", ward: "3병동", deptDoc: "정형외과/박의사", channel: "직접 전화", type: "부정", cat: "간호/처치", kws: ["낙상 위험"], content: "환자가 침대에서 낙상할 뻔했습니다. 안전바가 없었어요.", date: "2026-06-30 16:20", flag: "환자안전" },
-  { no: 264999, patient: "장OO", ward: "7병동", deptDoc: "내과/최의사", channel: "고객의견카드", type: "부정", cat: "시설/환경", kws: ["손 소독"], content: "손 소독제가 비치되어 있지 않았습니다.", date: "2026-06-30 15:02", flag: "감염관리" }
+  { no: 265007, patient: "박OO", ward: "6A병동", deptDoc: "정형외과/박의사", channel: "직접 전화", type: "긍정", cat: "기타", kws: [], content: "간호 응대가 세심했습니다.", date: "2026-07-01 10:25", flag: null, praise: { kind: "부서칭찬", name: "간호부" } },
+  { no: 265006, patient: "김OO", ward: "51병동", deptDoc: "내과/김의사", channel: "메디통 픽스(앱)", type: "긍정", cat: "진료/치료", kws: ["회진", "설명"], content: "회진 설명이 친절했습니다.", date: "2026-07-01 09:12", flag: null, praise: { kind: "직원칭찬", name: "김의사" } },
+  { no: 265005, patient: "정OO", ward: "7A병동", deptDoc: "신경과/정의사", channel: "카카오톡·채널톡", type: "부정", cat: "시설/환경", kws: ["소음"], content: "병실 소음이 큽니다.", date: "2026-07-01 11:44", flag: null, praise: null },
+  { no: 265004, patient: "이OO", ward: "52병동", deptDoc: "외과/이의사", channel: "고객의견카드", type: "부정", cat: "행정/절차", kws: ["안내"], content: "대기 안내가 부족했습니다.", date: "2026-07-01 10:01", flag: null, praise: null },
+  { no: 265003, patient: "최OO", ward: "5C병동", deptDoc: "내과/최의사", channel: "홈페이지", type: "부정", cat: "행정/절차", kws: ["수납", "안내"], content: "앱 안내는 좋았지만 수납 대기가 길었습니다.", date: "2026-07-01 12:20", flag: null, praise: null },
+  { no: 265002, patient: "익명", ward: "5병동", deptDoc: "내과/김의사", channel: "고객의견카드", type: "미분류", cat: "간호/처치", kws: ["간호사 응대", "응답 속도"], content: "간호사 응대도 친절하고 병실 환경도 쾌적한데 응답 속도가 너무 느려요", date: "2026-07-01 14:25", flag: null, praise: { kind: "부서칭찬", name: "간호부" } },
+  { no: 265001, patient: "익명", ward: "51병동", deptDoc: "내과/김의사", channel: "직접 전화", type: "미분류", cat: "기타", kws: [], content: "그냥 그랬어요", date: "2026-07-01 13:08", flag: null, praise: null },
+  { no: 265000, patient: "윤OO", ward: "3병동", deptDoc: "정형외과/박의사", channel: "직접 전화", type: "부정", cat: "간호/처치", kws: ["낙상 위험"], content: "환자가 침대에서 낙상할 뻔했습니다. 안전바가 없었어요.", date: "2026-06-30 16:20", flag: "환자안전", praise: null },
+  { no: 264999, patient: "장OO", ward: "7병동", deptDoc: "내과/최의사", channel: "고객의견카드", type: "부정", cat: "시설/환경", kws: ["손 소독"], content: "손 소독제가 비치되어 있지 않았습니다.", date: "2026-06-30 15:02", flag: "감염관리", praise: null }
 ];
 
 var activeFlagFilters = { "환자안전": false, "감염관리": false };
@@ -3123,9 +3132,16 @@ function formatVocDate(str) {
 
 function renderRows() {
   var anyOn = activeFlagFilters["환자안전"] || activeFlagFilters["감염관리"];
-  var filtered = anyOn
-    ? vocData.filter(function (r) { return r.flag && activeFlagFilters[r.flag]; })
-    : vocData;
+  var typeFilter = (document.getElementById("filterType") || {}).value || "";
+  var praiseFilter = (document.getElementById("filterPraise") || {}).value || "";
+  var filtered = vocData.filter(function (r) {
+    if (anyOn && !(r.flag && activeFlagFilters[r.flag])) return false;
+    if (typeFilter && r.type !== typeFilter) return false;
+    if (praiseFilter) {
+      if (!r.praise || r.praise.kind !== praiseFilter) return false;
+    }
+    return true;
+  });
   var sorted = filtered.slice().sort(function (a, b) { return b.no - a.no; });
   document.getElementById("vocRows").innerHTML = sorted.map(function (r) {
     var flagHtml = r.flag ? '<div class="flag-sub">' + flagBadgeHtml(r.flag) + "</div>" : "";
@@ -3137,9 +3153,9 @@ function renderRows() {
       "<td>" + channelBadge(r.channel) + "</td>" +
       "<td><div class=\"type-cell\">" + typeBadge(r.type) + flagHtml + "</div></td>" +
       "<td><span class=\"cat-label\">" + r.cat + "</span>" + kwHtml(r) + "</td>" +
+      "<td>" + praiseCellHtml(r) + "</td>" +
       "<td class=\"col-content\">" + r.content + "</td>" +
       "<td class=\"col-date\">없음</td>" +
-      "<td class=\"col-date\">" + formatVocDate(r.date) + "</td>" +
       "<td class=\"col-date\">" + formatVocDate(r.date) + "</td>" +
       "<td class=\"col-actions\"><button type=\"button\" class=\"btn-row\" onclick=\"openEditModal(" + r.no + ")\">수정</button></td>" +
       "<td class=\"col-actions\"><button type=\"button\" class=\"btn-row danger\" onclick=\"deleteVoc(" + r.no + ")\">삭제</button></td>" +
@@ -3193,16 +3209,8 @@ function saveEditVoc() {
   var no = parseInt(document.getElementById("eNo").value, 10);
   var row = vocData.find(function (r) { return r.no === no; });
   if (!row) return;
-  var content = document.getElementById("eContent").value.trim();
-  if (!content) { alert("접수 내용을 입력해 주세요."); return; }
   row.type = document.getElementById("eType").value;
   row.channel = document.getElementById("eChannel").value;
-  row.patient = document.getElementById("ePatient").value.trim() || "익명";
-  row.ward = document.getElementById("eWard").value.trim();
-  row.deptDoc = document.getElementById("eDeptDoc").value.trim();
-  row.cat = document.getElementById("eCat").value;
-  row.kws = document.getElementById("eKws").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
-  row.content = content;
   row.flag = document.getElementById("eFlag").value || null;
   renderRows();
   closeEditModal();
@@ -3268,7 +3276,7 @@ function submitManual() {
 
   vocData.push({
     no: nextNo, patient: name, ward: ward, deptDoc: dept + "/" + doctor, channel: channel,
-    type: "미분류", cat: "AI 분류 대기", kws: [], content: content, date: dateStr, flag: null
+    type: "미분류", cat: "AI 분류 대기", kws: [], content: content, date: dateStr, flag: null, praise: null
   });
 
   renderRows();
