@@ -14,6 +14,7 @@
     --border: #e1e0d9;
     --border-strong: #cfcdc5;
     --bg-accent: #E6F1FB; --text-accent: #0C447C;
+    --bg-danger: #FCEBEB; --text-danger: #791F1F;
     --fill-accent: #2f6fb3; --on-accent: #ffffff;
   }
   * { box-sizing: border-box; }
@@ -56,6 +57,15 @@
   .use-toggle.disabled { opacity: 0.5; cursor: default; }
   .use-toggle .on { color: var(--fill-accent); }
   .use-toggle .off { color: var(--text-muted); }
+  .channel-actions { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .btn-row {
+    font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 8px;
+    border: 0.5px solid var(--border-strong); background: var(--surface-2); color: var(--text-secondary); cursor: pointer;
+  }
+  .btn-row:hover { background: var(--surface-1); color: var(--text-primary); }
+  .btn-row.danger { color: #791F1F; border-color: #F2B8B5; background: #FCEBEB; }
+  .btn-row.danger:hover { background: #f8d7d7; }
+  .btn-row:disabled { opacity: 0.45; cursor: default; }
   .channel-footer { font-size: 12px; color: var(--text-muted); margin-top: 10px; padding: 0 6px; }
 
   /* 키워드 설정 */
@@ -78,6 +88,20 @@
   }
 
   .kw-section-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin: 4px 0 10px; }
+  .kw-section-label .count {
+    font-weight: 600; color: var(--text-accent); background: var(--bg-accent);
+    border-radius: 999px; padding: 1px 8px; margin-left: 6px; font-size: 11px;
+  }
+  .kw-section-note {
+    font-weight: 500; color: var(--text-muted); margin-left: 8px; font-size: 11px;
+  }
+  .kw-added-empty {
+    grid-column: 1 / -1; color: var(--text-muted); font-size: 13px; padding: 16px 0; margin: 0;
+  }
+  .kw-card-actions {
+    display: inline-flex; gap: 6px; flex-shrink: 0; margin-left: 8px;
+  }
+  .kw-card-actions .btn-row { flex-shrink: 0; }
   .kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
   .kw-card {
     display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 10px;
@@ -130,8 +154,8 @@
     <div class="channel-add-row"><button class="btn-primary" onclick="toggleAddChannelForm()">+ 채널 추가</button></div>
     <div class="add-kw-form" id="addChannelForm">
       <div class="add-kw-row" style="grid-template-columns:1fr auto">
-        <div class="add-kw-field"><label>채널명</label><input type="text" id="newChannelName" placeholder="예: 문자 상담"></div>
-        <button class="btn-primary" onclick="addChannel()">저장</button>
+        <div class="add-kw-field"><label id="channelFormLabel">채널명</label><input type="text" id="newChannelName" placeholder="예: 문자 상담"></div>
+        <button class="btn-primary" id="channelFormSaveBtn" onclick="submitChannelForm()">저장</button>
       </div>
     </div>
     <div class="channel-list" id="channelList"></div>
@@ -155,14 +179,17 @@
 
     <div class="add-kw-form" id="addKwForm">
       <div class="add-kw-row">
-        <div class="add-kw-field"><label>키워드명</label><input type="text" id="newKwName" placeholder="예: 주차 안내"></div>
+        <div class="add-kw-field"><label id="kwFormNameLabel">키워드명</label><input type="text" id="newKwName" placeholder="예: 주차 안내"></div>
         <div class="add-kw-field"><label>좋아요 문구</label><input type="text" id="newKwPos" placeholder="예: 주차 안내가 친절했어요"></div>
         <div class="add-kw-field"><label>불편 문구</label><input type="text" id="newKwNeg" placeholder="예: 주차 안내가 부족했어요"></div>
-        <button class="btn-primary" onclick="addHospitalKeyword()">저장</button>
+        <button class="btn-primary" id="kwFormSaveBtn" onclick="submitHospitalKeywordForm()">저장</button>
       </div>
     </div>
 
-    <p class="kw-section-label">메디통 기본 키워드</p>
+    <p class="kw-section-label">추가된 키워드 <span class="count" id="addedKwCount">0</span></p>
+    <div class="kw-grid" id="kwAddedGrid"></div>
+
+    <p class="kw-section-label">메디통 기본 키워드<span class="kw-section-note">수정·삭제가 불가합니다</span></p>
     <div class="kw-grid" id="kwGrid"></div>
   </div>
 
@@ -607,11 +634,14 @@ function toggleChannel(i) {
   renderChannels();
 }
 
+var editingChannelIndex = null;
+
 function renderChannels() {
   document.getElementById("channelList").innerHTML = channels.map(function (c, i) {
     var toggleCls = c.locked ? "use-toggle disabled" : "use-toggle";
     var label = c.on ? '<span class="on">✓ 사용</span>' : '<span class="off">미사용</span>';
     var badge = c.locked ? '<span class="always-badge">항상 사용</span>' : (c.custom ? '<span class="always-badge">병원 추가</span>' : "");
+    var deleteDisabled = c.locked ? " disabled" : "";
     return '<div class="channel-row">' +
       '<div class="channel-icon"></div>' +
       '<div class="channel-info">' +
@@ -621,6 +651,10 @@ function renderChannels() {
       '<input type="checkbox" ' + (c.on ? "checked" : "") + (c.locked ? " disabled" : "") + ' onclick="event.preventDefault()">' +
       label +
       '</label>' +
+      '<div class="channel-actions">' +
+      '<button type="button" class="btn-row" onclick="event.stopPropagation(); editChannel(' + i + ')">수정</button>' +
+      '<button type="button" class="btn-row danger" onclick="event.stopPropagation(); deleteChannel(' + i + ')"' + deleteDisabled + '>삭제</button>' +
+      '</div>' +
       '</div>';
   }).join("");
 
@@ -628,13 +662,57 @@ function renderChannels() {
   document.getElementById("channelFooter").textContent = "사용 중 " + used + "개 · 미사용 " + (channels.length - used) + "개";
 }
 
-function toggleAddChannelForm() {
-  document.getElementById("addChannelForm").classList.toggle("open");
+function resetChannelForm() {
+  editingChannelIndex = null;
+  document.getElementById("newChannelName").value = "";
+  document.getElementById("channelFormLabel").textContent = "채널명";
+  document.getElementById("channelFormSaveBtn").textContent = "저장";
 }
 
-function addChannel() {
+function toggleAddChannelForm() {
+  var form = document.getElementById("addChannelForm");
+  var willOpen = !form.classList.contains("open");
+  if (willOpen) resetChannelForm();
+  form.classList.toggle("open", willOpen);
+}
+
+function editChannel(i) {
+  var c = channels[i];
+  if (!c) return;
+  editingChannelIndex = i;
+  document.getElementById("newChannelName").value = c.name;
+  document.getElementById("channelFormLabel").textContent = "채널명 수정";
+  document.getElementById("channelFormSaveBtn").textContent = "수정 저장";
+  document.getElementById("addChannelForm").classList.add("open");
+  document.getElementById("newChannelName").focus();
+}
+
+function deleteChannel(i) {
+  var c = channels[i];
+  if (!c) return;
+  if (c.locked) {
+    alert("항상 사용 채널은 삭제할 수 없습니다.");
+    return;
+  }
+  if (!confirm("'" + c.name + "' 채널을 삭제할까요?")) return;
+  channels.splice(i, 1);
+  if (editingChannelIndex === i) resetChannelForm();
+  else if (editingChannelIndex != null && editingChannelIndex > i) editingChannelIndex -= 1;
+  saveChannels();
+  renderChannels();
+}
+
+function submitChannelForm() {
   var name = document.getElementById("newChannelName").value.trim();
   if (!name) { alert("채널명을 입력해 주세요."); return; }
+  if (editingChannelIndex != null) {
+    channels[editingChannelIndex].name = name;
+    document.getElementById("addChannelForm").classList.remove("open");
+    resetChannelForm();
+    saveChannels();
+    renderChannels();
+    return;
+  }
   channels.push({
     id: "custom_" + Date.now(),
     name: name,
@@ -644,10 +722,14 @@ function addChannel() {
     locked: false,
     custom: true
   });
-  document.getElementById("newChannelName").value = "";
   document.getElementById("addChannelForm").classList.remove("open");
+  resetChannelForm();
   saveChannels();
   renderChannels();
+}
+
+function addChannel() {
+  submitChannelForm();
 }
 
 /* ---------- 상단 탭 ---------- */
@@ -724,8 +806,56 @@ function toggleKw(cat, name) {
   renderKeywordGrid();
 }
 
+var editingHospitalKwIndex = null;
+
+function resetHospitalKwForm() {
+  editingHospitalKwIndex = null;
+  document.getElementById("newKwName").value = "";
+  document.getElementById("newKwPos").value = "";
+  document.getElementById("newKwNeg").value = "";
+  document.getElementById("kwFormNameLabel").textContent = "키워드명";
+  document.getElementById("kwFormSaveBtn").textContent = "저장";
+}
+
 function toggleAddForm() {
-  document.getElementById("addKwForm").classList.toggle("open");
+  var form = document.getElementById("addKwForm");
+  var willOpen = !form.classList.contains("open");
+  if (willOpen) resetHospitalKwForm();
+  form.classList.toggle("open", willOpen);
+}
+
+function editHospitalKeyword(index) {
+  var list = hospitalKw[currentCat] || [];
+  var k = list[index];
+  if (!k) return;
+  editingHospitalKwIndex = index;
+  document.getElementById("newKwName").value = k[0] || "";
+  document.getElementById("newKwPos").value = k[1] || "";
+  document.getElementById("newKwNeg").value = k[2] || "";
+  document.getElementById("kwFormNameLabel").textContent = "키워드명 수정";
+  document.getElementById("kwFormSaveBtn").textContent = "수정 저장";
+  document.getElementById("addKwForm").classList.add("open");
+  document.getElementById("newKwName").focus();
+}
+
+function deleteHospitalKeyword(index) {
+  var list = hospitalKw[currentCat] || [];
+  var k = list[index];
+  if (!k) return;
+  if (!confirm("'" + k[0] + "' 키워드를 삭제할까요?")) return;
+  var oldKey = currentCat + "||" + k[0];
+  list.splice(index, 1);
+  hospitalKw[currentCat] = list;
+  delete selectedKw[oldKey];
+  if (editingHospitalKwIndex === index) {
+    document.getElementById("addKwForm").classList.remove("open");
+    resetHospitalKwForm();
+  } else if (editingHospitalKwIndex != null && editingHospitalKwIndex > index) {
+    editingHospitalKwIndex -= 1;
+  }
+  persistKeywordState();
+  renderCatTabs();
+  renderKeywordGrid();
 }
 
 function normalizeKeywordText(value) {
@@ -800,10 +930,8 @@ function useExistingStandardKeyword() {
     persistKeywordState();
     renderKeywordGrid();
   }
-  document.getElementById("newKwName").value = "";
-  document.getElementById("newKwPos").value = "";
-  document.getElementById("newKwNeg").value = "";
   document.getElementById("addKwForm").classList.remove("open");
+  resetHospitalKwForm();
   closeSimilarKwModal();
 }
 
@@ -812,7 +940,48 @@ function confirmAddDespiteSimilar() {
   addHospitalKeyword(true);
 }
 
+function submitHospitalKeywordForm() {
+  if (editingHospitalKwIndex != null) {
+    saveEditedHospitalKeyword();
+    return;
+  }
+  addHospitalKeyword(false);
+}
+
+function saveEditedHospitalKeyword() {
+  var list = hospitalKw[currentCat] || [];
+  var idx = editingHospitalKwIndex;
+  var prev = list[idx];
+  if (!prev) return;
+  var name = document.getElementById("newKwName").value.trim();
+  var pos = document.getElementById("newKwPos").value.trim();
+  var neg = document.getElementById("newKwNeg").value.trim();
+  if (!name || !pos || !neg) { alert("키워드명, 좋아요 문구, 불편 문구를 모두 입력해 주세요."); return; }
+  var baseNames = (VOC_KEYWORD_DATA[currentCat] || []).map(function (k) { return k[0]; });
+  var exactMatch = baseNames.find(function (item) { return normalizeKeywordText(item) === normalizeKeywordText(name); });
+  if (exactMatch) {
+    alert("메디통 기본 키워드와 동일한 이름은 사용할 수 없습니다.");
+    return;
+  }
+  var dupHospital = list.some(function (k, i) {
+    return i !== idx && normalizeKeywordText(k[0]) === normalizeKeywordText(name);
+  });
+  if (dupHospital) { alert("이미 추가한 병원 키워드입니다."); return; }
+  var oldKey = currentCat + "||" + prev[0];
+  var wasSelected = !!selectedKw[oldKey];
+  list[idx] = [name, pos, neg];
+  hospitalKw[currentCat] = list;
+  delete selectedKw[oldKey];
+  if (wasSelected) selectedKw[currentCat + "||" + name] = true;
+  document.getElementById("addKwForm").classList.remove("open");
+  resetHospitalKwForm();
+  persistKeywordState();
+  renderCatTabs();
+  renderKeywordGrid();
+}
+
 function addHospitalKeyword(skipSimilarCheck) {
+  if (!hospitalKw[currentCat]) hospitalKw[currentCat] = [];
   var name = document.getElementById("newKwName").value.trim();
   var pos = document.getElementById("newKwPos").value.trim();
   var neg = document.getElementById("newKwNeg").value.trim();
@@ -834,41 +1003,62 @@ function addHospitalKeyword(skipSimilarCheck) {
   }
   hospitalKw[currentCat].push([name, pos, neg]);
   selectedKw[currentCat + "||" + name] = true;
-  document.getElementById("newKwName").value = "";
-  document.getElementById("newKwPos").value = "";
-  document.getElementById("newKwNeg").value = "";
   document.getElementById("addKwForm").classList.remove("open");
+  resetHospitalKwForm();
   persistKeywordState();
   renderCatTabs();
   renderKeywordGrid();
 }
 
 function renderKeywordGrid() {
+  if (!hospitalKw[currentCat]) hospitalKw[currentCat] = [];
   var q = document.getElementById("kwSearch").value.trim().toLowerCase();
-  var base = VOC_KEYWORD_DATA[currentCat];
-  var added = hospitalKw[currentCat];
+  var base = VOC_KEYWORD_DATA[currentCat] || [];
+  var added = hospitalKw[currentCat] || [];
   var selectedCount = base.concat(added).filter(function (k) { return selectedKw[currentCat + "||" + k[0]]; }).length;
 
   document.getElementById("kwHeadTitle").textContent = currentCat;
   document.getElementById("kwHeadSub").textContent =
     "기본 " + base.length + "개 · 선택 " + selectedCount + "개 · 병원 추가 " + added.length + "개";
+  document.getElementById("addedKwCount").textContent = String(added.length);
 
-  function cardHtml(k, isHospital) {
+  function escapeAttr(name) {
+    return String(name).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  }
+
+  function baseCardHtml(k) {
     if (q && k[0].toLowerCase().indexOf(q) === -1) return "";
     var key = currentCat + "||" + k[0];
     var isSel = !!selectedKw[key];
-    return '<div class="kw-card' + (isSel ? " selected" : "") + (isHospital ? " hospital-added" : "") + '" onclick="toggleKw(\'' + currentCat + '\',\'' + k[0].replace(/'/g, "\\'") + '\')">' +
+    return '<div class="kw-card' + (isSel ? " selected" : "") + '" onclick="toggleKw(\'' + currentCat + '\',\'' + escapeAttr(k[0]) + '\')">' +
       '<span class="kw-circle"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
-      '<div class="kw-card-body"><p class="kw-card-name">' + k[0] + '</p><p class="kw-card-cat">' + currentCat + (isHospital ? " · 병원 추가" : "") + '</p></div>' +
+      '<div class="kw-card-body"><p class="kw-card-name">' + k[0] + '</p><p class="kw-card-cat">' + currentCat + '</p></div>' +
       '<span class="kw-card-state">' + (isSel ? "선택됨" : "선택") + '</span>' +
       '</div>';
   }
 
-  var html = base.map(function (k) { return cardHtml(k, false); }).join("");
-  if (added.length) {
-    html += added.map(function (k) { return cardHtml(k, true); }).join("");
+  function addedCardHtml(k, index) {
+    if (q && k[0].toLowerCase().indexOf(q) === -1) return "";
+    var key = currentCat + "||" + k[0];
+    var isSel = !!selectedKw[key];
+    return '<div class="kw-card hospital-added' + (isSel ? " selected" : "") + '">' +
+      '<span class="kw-circle" onclick="toggleKw(\'' + currentCat + '\',\'' + escapeAttr(k[0]) + '\')"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+      '<div class="kw-card-body" onclick="toggleKw(\'' + currentCat + '\',\'' + escapeAttr(k[0]) + '\')"><p class="kw-card-name">' + k[0] + '</p><p class="kw-card-cat">' + currentCat + ' · 병원 추가</p></div>' +
+      '<span class="kw-card-state" onclick="toggleKw(\'' + currentCat + '\',\'' + escapeAttr(k[0]) + '\')">' + (isSel ? "선택됨" : "선택") + '</span>' +
+      '<div class="kw-card-actions">' +
+      '<button type="button" class="btn-row" onclick="event.stopPropagation(); editHospitalKeyword(' + index + ')">수정</button>' +
+      '<button type="button" class="btn-row danger" onclick="event.stopPropagation(); deleteHospitalKeyword(' + index + ')">삭제</button>' +
+      '</div>' +
+      '</div>';
   }
-  document.getElementById("kwGrid").innerHTML = html || '<p style="grid-column:1/-1;color:var(--text-muted);font-size:13px;padding:20px 0">검색 결과가 없습니다.</p>';
+
+  var addedHtml = added.map(function (k, i) { return addedCardHtml(k, i); }).join("");
+  document.getElementById("kwAddedGrid").innerHTML =
+    addedHtml || '<p class="kw-added-empty">추가된 키워드가 없습니다. [+ 키워드 추가]로 등록해 주세요.</p>';
+
+  var baseHtml = base.map(function (k) { return baseCardHtml(k); }).join("");
+  document.getElementById("kwGrid").innerHTML =
+    baseHtml || '<p style="grid-column:1/-1;color:var(--text-muted);font-size:13px;padding:20px 0">검색 결과가 없습니다.</p>';
 }
 
 renderChannels();

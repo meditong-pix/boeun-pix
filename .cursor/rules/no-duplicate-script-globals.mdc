@@ -1,0 +1,14 @@
+---
+description: Prevent duplicate globals and broken refs when editing index.html / VOC mocks
+globs: index.html,voc-*.html,sync-voc*.ps1,full-app/**/*.js
+alwaysApply: true
+---
+
+# No duplicate script globals / broken refs
+
+`index.html` merges React and VOC mock scripts in one document scope.
+
+- Never reintroduce a second top-level `formatDate` in VOC embeds; use `formatVocDate` (and keep call sites in sync).
+- Before finishing HTML/JS edits that touch shared names (`formatDate`, `renderRows`, `openModal`, etc.), search `index.html` for duplicate `function`/`const`/`let`/`var` declarations.
+- After `sync-voc-*.ps1`, re-check duplicates and that onclick/id references still resolve.
+- Prefer running `tests/index-script-declarations.test.mjs` when Node is available.
