@@ -338,6 +338,9 @@
     <div class="field-label">키워드 <span style="font-weight:500;color:var(--text-muted)">(쉼표로 구분)</span></div>
     <input type="text" id="eKws" placeholder="예: 회진, 설명" readonly>
 
+    <div class="field-label">칭찬 대상</div>
+    <input type="text" id="ePraise" readonly>
+
     <div class="field-label">접수 내용</div>
     <textarea id="eContent" readonly></textarea>
 
@@ -471,6 +474,9 @@ function openEditModal(no) {
   document.getElementById("eDeptDoc").value = row.deptDoc || "";
   setSelectValue("eCat", row.cat || "기타");
   document.getElementById("eKws").value = (row.kws || []).join(", ");
+  document.getElementById("ePraise").value = row.praise
+    ? (row.praise.kind + " · " + row.praise.name)
+    : "-";
   document.getElementById("eContent").value = row.content || "";
   setSelectValue("eFlag", row.flag || "");
   document.getElementById("editOverlay").style.display = "flex";
