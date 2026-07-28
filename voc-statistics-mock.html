@@ -55,6 +55,65 @@
   .panel-title { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
   .panel-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 4px; }
   .panel-sub2 { font-size: 11px; color: var(--text-muted); margin: 0 0 12px; }
+  .voc-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 14px 16px;
+    margin: 12px 0 14px;
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    background: #fbfbfc;
+  }
+  .voc-filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 92px; }
+  .voc-filter-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+  .voc-filter-select {
+    min-width: 78px;
+    height: 32px;
+    padding: 0 10px;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font: inherit;
+  }
+  .voc-filter-chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .voc-filter-chip {
+    height: 32px;
+    padding: 0 12px;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .voc-filter-chip.active {
+    border-color: #7c6cff;
+    background: #f3f0ff;
+    color: #5b46ff;
+  }
+  .voc-filter-action {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6d5dfc, #5b46ff);
+    color: #fff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(91, 70, 255, 0.22);
+  }
+  .voc-filter-panel { padding-top: 1rem; padding-bottom: 1rem; }
   .kpi5-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .kpi-card { background: var(--surface-1); border-radius: 10px; padding: 10px 14px; }
@@ -92,10 +151,37 @@
 <body>
 <div class="page" id="page">
 
+  <div class="panel voc-filter-panel">
+    <div class="voc-filter-bar">
+      <div class="voc-filter-group">
+        <span class="voc-filter-label">연도</span>
+        <select class="voc-filter-select" id="vocYearSelect">
+          <option>2026년</option>
+        </select>
+      </div>
+      <div class="voc-filter-group">
+        <span class="voc-filter-label">조회 기간</span>
+        <div class="voc-filter-chip-row" id="vocPeriodButtons">
+          <button type="button" class="voc-filter-chip active" data-period="month">월별</button>
+          <button type="button" class="voc-filter-chip" data-period="quarter">분기별</button>
+          <button type="button" class="voc-filter-chip" data-period="half">반기별</button>
+          <button type="button" class="voc-filter-chip" data-period="year">연도별</button>
+        </div>
+      </div>
+      <div class="voc-filter-group">
+        <span class="voc-filter-label" id="vocBucketLabel">월 선택</span>
+        <select class="voc-filter-select" id="vocBucketSelect">
+          <option>6월</option>
+        </select>
+      </div>
+      <button type="button" class="voc-filter-action">AI 분석하기</button>
+    </div>
+  </div>
+
   <div class="panel">
     <p class="panel-title">전체 VOC 현황</p>
     <p class="panel-sub">접수 규모, 칭찬/불편 흐름, 응답자 구성을 한 화면에서 확인합니다.</p>
-    <p class="panel-sub2" style="text-align:right">2026-07 기준 전월 대비</p>
+    <p class="panel-sub2" id="vocOverviewBasis" style="text-align:right">2026년 6월 기준 전월 대비</p>
     <div class="kpi5-grid">
       <div class="kpi-card"><p class="kpi-label">접수된 VOC 건수<span class="info-tip" data-tip="해당 기간 동안 실제 접수된 VOC 원문 건수입니다. VOC 1건은 1건으로 집계됩니다.">i</span></p><p class="kpi-value">8,323건 <span class="neutral" style="font-size:11px;font-weight:500">▲214건</span></p></div>
       <div class="kpi-card"><p class="kpi-label">언급된 VOC 건수<span class="info-tip" data-tip="VOC 내용에서 분리된 문장이 유형(카테고리)에 태깅된 총 횟수입니다. 하나의 VOC가 여러 유형에 해당하는 경우 각각 집계되므로, 접수된 VOC 건수보다 많을 수 있습니다.">i</span></p><p class="kpi-value">9,120건 <span class="neutral" style="font-size:11px;font-weight:500">▲340건</span></p></div>
@@ -1443,6 +1529,67 @@ var kpi = [
 ];
 
 var maxCnt = Math.max.apply(null, kpi.map(function (k) { return k.cnt; }));
+
+var vocFilterConfig = {
+  month: { label: "월 선택", basis: "기준 전월 대비", options: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"], selected: "6월" },
+  quarter: { label: "분기 선택", basis: "기준 전분기 대비", options: ["1분기", "2분기", "3분기", "4분기"], selected: "2분기" },
+  half: { label: "반기 선택", basis: "기준 전반기 대비", options: ["상반기", "하반기"], selected: "상반기" },
+  year: { label: "연도 선택", basis: "기준 전년도 대비", options: ["전체"], selected: "전체" }
+};
+var vocFilterState = { year: "2026년", period: "month", bucket: "6월" };
+
+function renderVocFilters() {
+  var config = vocFilterConfig[vocFilterState.period];
+  var labelEl = document.getElementById("vocBucketLabel");
+  var selectEl = document.getElementById("vocBucketSelect");
+  var basisEl = document.getElementById("vocOverviewBasis");
+  if (!labelEl || !selectEl || !basisEl) return;
+
+  labelEl.textContent = config.label;
+  selectEl.innerHTML = config.options.map(function (option) {
+    var selected = option === vocFilterState.bucket ? " selected" : "";
+    return "<option" + selected + ">" + option + "</option>";
+  }).join("");
+  selectEl.disabled = vocFilterState.period === "year";
+
+  basisEl.textContent = vocFilterState.year + " " + vocFilterState.bucket + " " + config.basis;
+
+  Array.prototype.forEach.call(document.querySelectorAll("#vocPeriodButtons .voc-filter-chip"), function (button) {
+    button.classList.toggle("active", button.getAttribute("data-period") === vocFilterState.period);
+  });
+}
+
+function bindVocFilters() {
+  var yearEl = document.getElementById("vocYearSelect");
+  var bucketEl = document.getElementById("vocBucketSelect");
+  var buttons = document.querySelectorAll("#vocPeriodButtons .voc-filter-chip");
+
+  if (yearEl) {
+    yearEl.addEventListener("change", function () {
+      vocFilterState.year = yearEl.value;
+      renderVocFilters();
+    });
+  }
+  if (bucketEl) {
+    bucketEl.addEventListener("change", function () {
+      vocFilterState.bucket = bucketEl.value;
+      renderVocFilters();
+    });
+  }
+  Array.prototype.forEach.call(buttons, function (button) {
+    button.addEventListener("click", function () {
+      var nextPeriod = button.getAttribute("data-period");
+      var config = vocFilterConfig[nextPeriod];
+      vocFilterState.period = nextPeriod;
+      vocFilterState.bucket = config.selected;
+      renderVocFilters();
+    });
+  });
+
+  renderVocFilters();
+}
+
+bindVocFilters();
 
 document.getElementById("typeGrid").innerHTML = kpi.map(function (k) {
   var isUp = k.change > 0, isFlat = k.change === 0;
