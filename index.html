@@ -3704,23 +3704,15 @@ renderRows();
     var useState = deps.useState || React.useState;
     var useRef = deps.useRef || React.useRef;
     var useEffect = deps.useEffect || React.useEffect;
+    var ReactDOM = deps.ReactDOM;
     var Base = createVocLightDomPage(deps, { title: "VOC \uD1B5\uACC4", templateKey: "statistics" });
     return function VocPixStatisticsWithAiModal() {
       var _open = useState(false);
       var open = _open[0];
       var setOpen = _open[1];
-      var _step = useState("pick");
-      var step = _step[0];
-      var setStep = _step[1];
-      var _level = useState("basic");
-      var level = _level[0];
-      var setLevel = _level[1];
-      var pickRef = useRef(null);
       var panelRef = useRef(null);
       useEffect(function () {
         window.openVocAiModal = function () {
-          setLevel("basic");
-          setStep("pick");
           setOpen(true);
         };
         function onClick(e) {
@@ -3729,8 +3721,6 @@ renderRows();
           var btn = t.closest(".voc-filter-action");
           if (!btn) return;
           e.preventDefault();
-          setLevel("basic");
-          setStep("pick");
           setOpen(true);
         }
         document.addEventListener("click", onClick, true);
@@ -3740,53 +3730,21 @@ renderRows();
         };
       }, []);
       useEffect(function () {
-        if (!open || step !== "pick" || !pickRef.current || typeof global.mountPxAiStrengthPicker !== "function") return undefined;
-        return global.mountPxAiStrengthPicker(pickRef.current, {
-          variant: "voc",
-          level: level,
-          onStart: function (lv) {
-            setLevel(lv);
-            setStep("result");
-          },
-          onClose: function () { setOpen(false); }
-        });
-      }, [open, step, level]);
-      useEffect(function () {
-        if (!open || step !== "result" || !panelRef.current || typeof global.mountPxAiAnalysisPanel !== "function") return undefined;
+        if (!open || !panelRef.current || typeof global.mountPxAiAnalysisPanel !== "function") return undefined;
         return global.mountPxAiAnalysisPanel(panelRef.current, {
           variant: "voc",
-          level: level,
+          level: "basic",
           hideLevelSlider: true,
           showLoading: true,
-          onClose: function () {
-            setOpen(false);
-            setStep("pick");
-          }
+          onClose: function () { setOpen(false); }
         });
-      }, [open, step, level]);
-      var pickModal = open && step === "pick"
-        ? React.createElement(
-            "div",
-            {
-              className: "fixed inset-0 z-[120] bg-black/55 flex items-center justify-center p-4 sm:p-6",
-              onClick: function () { setOpen(false); }
-            },
-            React.createElement(
-              "div",
-              {
-                className: "relative w-full max-w-[640px] rounded-[14px] bg-white p-7 sm:p-8 shadow-2xl",
-                onClick: function (e) { e.stopPropagation(); }
-              },
-              React.createElement("div", { ref: pickRef })
-            )
-          )
-        : null;
-      var resultModal = open && step === "result"
+      }, [open]);
+      var modal = open
         ? React.createElement(
             "div",
             {
               className: "fixed inset-0 z-[120] bg-black/55 flex items-center justify-center p-4 sm:p-6 overflow-y-auto",
-              onClick: function () { setOpen(false); setStep("pick"); }
+              onClick: function () { setOpen(false); }
             },
             React.createElement(
               "div",
@@ -3799,7 +3757,6 @@ renderRows();
             )
           )
         : null;
-      var modal = pickModal || resultModal;
       return React.createElement(
         React.Fragment,
         null,
