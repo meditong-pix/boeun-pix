@@ -213,6 +213,8 @@
     ".px-ai-voc-body{margin-top:14px;}",
     ".px-ai-voc-loading{color:#7a7887;font-size:13px;padding:30px 0;text-align:center;margin:0;}",
     ".px-ai-voc-grid{display:grid;gap:16px;}",
+    ".px-ai-voc-layout{display:flex;flex-direction:column;gap:14px;}",
+    ".px-ai-sum-card-top{margin-bottom:0;}",
     ".px-ai-root.px-ai-voc .px-ai-card{background:#201f27;border:1px solid #2d2c36;border-radius:10px;padding:14px 16px;margin-bottom:12px;}",
     ".px-ai-root.px-ai-voc .px-ai-card-hd{margin-bottom:10px;}",
     ".px-ai-root.px-ai-voc .px-ai-card-ttl{font-size:12px;font-weight:700;color:#cfcdda;}",
@@ -280,9 +282,17 @@
     ".px-ai-area-bar-track{height:6px;border-radius:3px;background:#2d2c36;overflow:hidden;}",
     ".px-ai-area-bar-fill{height:100%;}",
     ".px-ai-breadcrumb{font-size:12px;font-weight:700;color:#9b99a8;margin:4px 0 14px;}",
-    ".px-ai-inner-tabs{display:flex;gap:18px;border-bottom:1px solid #2d2c36;margin:0;}",
-    ".px-ai-inner-tab{border:none;background:transparent;font-size:13px;color:#7a7887;padding:8px 2px 9px;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;}",
+    ".px-ai-top-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}",
+    ".px-ai-report-head-btn{border:1px solid #8b5cf6;background:rgba(139,92,246,.12);color:#ddd6fe;font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap;}",
+    ".px-ai-report-head-btn:hover{background:rgba(139,92,246,.22);color:#fff;}",
+    ".px-ai-inner-tabs{display:flex;align-items:flex-end;gap:14px;border-bottom:1px solid #2d2c36;margin:0 0 12px;flex-wrap:wrap;}",
+    ".px-ai-inner-tab{border:none;background:transparent;font-size:13px;color:#7a7887;padding:8px 2px 9px;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap;}",
     ".px-ai-inner-tab.on{color:#fff;font-weight:700;border-bottom-color:#fff;}",
+    ".px-ai-inner-tab-report.on{color:#ddd6fe;border-bottom-color:#8b5cf6;}",
+    ".px-ai-saved-report-tabs{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}",
+    ".px-ai-saved-rpt-wrap{display:flex;flex-direction:column;gap:8px;height:100%;min-height:420px;}",
+    ".px-ai-saved-rpt-meta{font-size:11px;color:#9b99a8;font-weight:600;}",
+    ".px-ai-saved-rpt-frame{flex:1;width:100%;min-height:360px;border:1px solid #2d2c36;border-radius:10px;background:#fff;}",
     ".px-ai-setup-chip-base{font-size:12px;padding:8px 14px;border-radius:999px;border:1px solid #2d2c36;background:#201f27;color:#7a7887;}",
     ".px-ai-setup-chip{font-size:12px;padding:8px 14px;border-radius:999px;border:1px solid #2d2c36;background:#201f27;color:#cfcdda;cursor:pointer;}",
     ".px-ai-strength-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}",
@@ -415,7 +425,9 @@
     ".px-ai-rpt-sw-k{font-size:10px;font-weight:700;margin:0 0 4px;}",
     ".px-ai-rpt-sw-k.pos{color:#7ea6ff;}",
     ".px-ai-rpt-sw-k.neg{color:#f2949c;}",
-    "@media (max-width:900px){.px-ai-rpt-doc-wrap{max-height:none;}}"
+    "@media (max-width:900px){.px-ai-rpt-doc-wrap{max-height:none;}}",
+    ".px-ai-archive-embed{height:100%;min-height:100%;display:flex;flex-direction:column;box-sizing:border-box;}",
+    ".px-ai-archive-embed .px-ai-scroll{flex:1 1 auto;min-height:0;overflow:auto;padding:12px 14px 18px;}"
   ].join("");
 
   var STRENGTH_CSS = [
@@ -698,7 +710,7 @@
         matrix: "75점을 기준으로 절대 점수와 변화 방향을 함께 보면, 정서적 지지·전반적인 평가 2개 영역이 '긴급 대응' 구간에 속하고 나머지 5개 영역은 모두 '우수 사례' 구간에 속해, 이번 달은 중간 지대 없이 뚜렷하게 양극화된 모습을 보였습니다. 응답자 수가 9명으로 표본 규모가 작아 해석에 유의해야 합니다.",
         areas: "상승 영역은 입원 중 간호사(+12.67점)가 1위였고, 변화 문항은 문19 재문의(+20.0점)가 가장 큰 폭으로 상승했습니다.",
         issues: "상승 영역 5개와 하락 영역 5개를 함께 제시하며, 정서적 지지·6병동·심장혈관흉부외과는 심각도 '높음'으로 분류되어 우선 대응이 필요합니다.",
-        plan: "정서적 지지 강화, 6병동·심장혈관흉부외과 집중 관리를 1개월 내 착수할 최우선 과제로 제안합니다."
+        plan: "정서적 지지 강화, 6병동·심장혈관흉부외과 집중 관리를 1개월 내 착수할 최우선 과제로 건의함."
       },
       actionPlanRows: [
         ["높음", "정서적 지지 강화", "1개월 내"],
@@ -970,9 +982,9 @@
         title: "2026년 6월 VOC 분석보고서",
         author: "",
         docInfo: {
-          dept: "의료기획팀 · 환자경험관리파트",
+          author: "진보은 주임",
           date: "2026. 07. 03.",
-          audience: "병원장 · 진료부원장",
+          period: "2026년 6월",
           subject: "2026년 6월 접수 VOC (8,323건)"
         },
         footerNote: "메디통 픽스 AI · 내부 보고 문서 (VOC 통계 목업 기준)"
@@ -1059,11 +1071,11 @@
           { id: "B", content: "시스템 및 서비스 · 환경관련 유형 원인 점검 (관련 부서 합동)", duration: "2주", priority: "중간", priorityCls: "", recommend: false },
           { id: "C", content: "7병동 · 내과 중환자실 · 내과 대상 부정률 악화 원인 모니터링 강화", duration: "2~3주", priority: "중간", priorityCls: "", recommend: false }
         ],
-        recommendationHtml: "결정은 경영진의 몫이나, 실무팀은 환자안전과 직결된 <b>옵션 A</b>를 최우선 권고합니다.",
+        recommendationHtml: "환자안전과 직결된 <b>옵션 A</b>를 최우선 과제로 추진할 것을 건의함.",
         monitorRows: [
           { week: "7월 1주차", content: "환자안전 플래그 12건 재발방지 조치 이행 여부 확인" },
           { week: "7월 2주차", content: "시스템·환경관련 유형 부정률 재점검" },
-          { week: "7월 말", content: "7병동 · 내과 중환자실 · 내과 부정률 재평가 후 다음 임원 보고에 반영" }
+          { week: "7월 말", content: "7병동 · 내과 중환자실 · 내과 부정률 재평가" }
         ]
       },
       reportOverview: {
@@ -1076,7 +1088,7 @@
         status: "8개 유형 가운데 6종은 전월 대비 부정률이 개선되었고, 진료 및 치료·검사관련(▼1.2%p)·인적응대관련(▼0.9%p)에서 두드러집니다. 반면 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p)·비용관련(▲0.6%p)은 악화 추세입니다. 긍정 키워드는 '친절함'·'세심함'이, 부정 키워드는 '비용 부담'·'예약 절차 복잡'이 상위를 차지했습니다.",
         analysisOrg: "병동·진료과·의사 그룹별 부정률 변화(전월 대비)를 확인한 결과, 정형외과와 정형외과 원장의 개선폭이 가장 크고, 7병동·내과 중환자실·내과·내과 김의사는 부정률이 악화되었습니다.",
         issuesEval: "실제 접수된 VOC 원문 중 이번 달 흐름을 보여주는 사례입니다.\n\n리스크는 다음과 같이 진단됩니다. 현재는 7병동·내과 중환자실 등 일부 그룹에 한정된 부정률 악화이며, 시스템·환경관련 유형 부정률 상승이 이어지면 확산 우려가 있습니다. 환자안전 플래그 증가는 환자경험평가·수가 가감산에 부정적 영향을 줄 수 있습니다.",
-        conclusionOpts: "아래 세 가지 대응 옵션 중 경영진의 결정이 필요합니다. 실무팀은 환자안전과 직결된 옵션 A를 최우선 권고합니다.",
+        conclusionOpts: "아래 세 가지 대응 옵션 중 환자안전과 직결된 옵션 A를 최우선 과제로 추진할 것을 건의함.",
         kpi: "주요 지표는 전월 대비 다음과 같이 변화했습니다.",
         statusNarrative: "개선은 인적응대관련 유형에서 뚜렷하게 나타났으며, 3병동·5병동 두 곳이 전체 개선분의 과반을 차지합니다. 반면 7병동은 부정률이 전월 대비 3.2%p 상승해 유일하게 악화된 병동입니다.",
         analysis: "",
@@ -1088,9 +1100,9 @@
         quotes: "환자 VOC 원문 중 이번 달 흐름을 가장 잘 보여주는 표현입니다.",
         riskScenarios: "리스크 시나리오는 다음과 같이 진단됩니다.",
         options: "아래 세 가지 대응 옵션 중 하나를 선택해 주시기 바랍니다.",
-        recommendation: "결정은 경영진의 몫이나, 실무팀은 옵션 A(합동 점검)를 우선 권고합니다.",
-        monitorPlan: "• 7월 1주차: 환자안전 플래그 12건 재발방지 조치 이행 여부 확인\n• 7월 2주차: 시스템·환경관련 유형 부정률 재점검\n• 7월 말: 7병동 · 내과 중환자실 · 내과 부정률 재평가 후 다음 임원 보고에 반영",
-        monitor: "8월 1주차 시스템 및 서비스 VOC 중간 점검, 8월 3주차 12병동 재평가, 8월 말 전체 지표 재집계 후 다음 임원 보고에 반영합니다."
+        recommendation: "환자안전과 직결된 옵션 A(전수 검토 및 재발방지 대책 수립)를 최우선 과제로 추진할 것을 건의함. 옵션 B·C는 옵션 A 시행 이후 순차 추진을 검토하되, 필요 시 병행 추진도 가능할 것으로 판단됨.",
+        monitorPlan: "• 7월 1주차: 환자안전 플래그 12건 재발방지 조치 이행 여부 확인\n• 7월 2주차: 시스템·환경관련 유형 부정률 재점검\n• 7월 말: 7병동 · 내과 중환자실 · 내과 부정률 재평가",
+        monitor: "8월 1주차 시스템 및 서비스 VOC 중간 점검, 8월 3주차 12병동 재평가, 8월 말 전체 지표 재집계."
       },
       typeSentiment: [
         { type: "시스템 및 서비스", cnt: 780, negChange: 4.2, pos: 38, neg: 62, org: "IT팀 · 예약센터", topKw: "예약 절차 복잡", kwShare: 43 },
@@ -1209,6 +1221,8 @@
     var sx = 0;
     var si = 0;
     var disposed = false;
+    var savedReportEntry = null;
+    var mainViewTab = "analysis";
     host.innerHTML = "";
     var root = document.createElement("div");
     var useDarkModal = variant === "voc" || variant === "survey";
@@ -1228,16 +1242,20 @@
           '<div class="px-ai-top">' +
             '<div><div class="px-ai-voc-title">' + esc(data.title || (variant === "voc" ? "VOC AI 상세 분석" : "환자경험평가 AI 상세 분석")) + '</div>' +
             '<div class="px-ai-voc-sub" data-role="period"></div></div>' +
-            '<button type="button" class="px-ai-close" data-role="close" aria-label="닫기">✕</button>' +
+            '<div class="px-ai-top-actions">' +
+              '<button type="button" class="px-ai-report-head-btn" data-role="report-btn" style="display:none">보고서 작성 ↗</button>' +
+              '<button type="button" class="px-ai-close" data-role="close" aria-label="닫기">✕</button>' +
+            '</div>' +
           '</div>' +
         '</div>' +
         '<p class="px-ai-breadcrumb" data-role="breadcrumb"></p>' +
-        '<div class="px-ai-inner-tabs" data-role="inner-tabs" style="display:none">' +
-          '<button type="button" class="px-ai-inner-tab on" data-tab="analysis" data-role="analysis-tab">분석</button>' +
-          '<button type="button" class="px-ai-inner-tab" data-tab="report">보고서 작성</button>' +
+        '<div class="px-ai-inner-tabs" data-role="inner-tabs">' +
+          '<button type="button" class="px-ai-inner-tab on" data-tab="analysis" data-role="analysis-tab">AI 분석</button>' +
+          '<div class="px-ai-saved-report-tabs" data-role="saved-report-tabs"></div>' +
         '</div>' +
         '<div class="px-ai-scroll" data-role="scroll">' +
           '<div data-pane="analysis">' + analysisBodyHtml + '</div>' +
+          '<div data-role="saved-report-pane" style="display:none"></div>' +
           '<div data-pane="report" style="display:none">' +
             '<div class="px-ai-rpt-doc-wrap" data-role="report-doc"></div>' +
             '<div data-role="report-out" style="display:none"></div></div>' +
@@ -1308,8 +1326,26 @@
       labels: root.querySelectorAll(".px-ai-hlbl"),
       tabs: root.querySelectorAll(".px-ai-tab"),
       innerTabBtns: root.querySelectorAll(".px-ai-inner-tab"),
+      reportBtn: root.querySelector('[data-role="report-btn"]'),
+      savedReportTabs: root.querySelector('[data-role="saved-report-tabs"]'),
+      savedReportPane: root.querySelector('[data-role="saved-report-pane"]'),
       close: root.querySelector('[data-role="close"]')
     };
+
+    if (options.embedInArchive) {
+      var archiveHead = root.querySelector(".px-ai-head");
+      if (archiveHead) archiveHead.style.display = "none";
+      if (els.innerTabs) els.innerTabs.style.display = "none";
+      if (els.breadcrumb) els.breadcrumb.style.display = "none";
+      if (els.close) els.close.style.display = "none";
+      if (els.reportBtn) els.reportBtn.style.display = "none";
+      root.classList.add("px-ai-archive-embed");
+      var archiveScroll = root.querySelector('[data-role="scroll"]');
+      if (archiveScroll) {
+        archiveScroll.style.maxHeight = "none";
+        archiveScroll.style.height = "100%";
+      }
+    }
 
     function pill(c, l) { return '<span class="px-ai-pill ' + c + '">' + esc(l) + "</span>"; }
     function sec(lbl, ct, inner) {
@@ -1760,12 +1796,12 @@
         if (optional.indexOf("monitor") > -1) rightHtml += renderMonitorCard();
       }
       els.body.innerHTML =
-        '<div class="px-ai-voc-grid" style="grid-template-columns:1fr 1.3fr">' +
-          '<div class="px-ai-card px-ai-sum-card"><div class="px-ai-card-hd">' +
+        '<div class="px-ai-voc-layout">' +
+          '<div class="px-ai-card px-ai-sum-card px-ai-sum-card-top"><div class="px-ai-card-hd">' +
           '<span class="px-ai-card-ttl">🩺 AI 요약</span><span class="px-ai-card-sub">' + periodSub +
           ' · <span class="px-ai-level-tag">' + esc(LV_NAMES[curLv]) + "</span></span></div>" +
           '<p class="px-ai-voc-sum">' + esc(sumText) + "</p></div>" +
-          "<div>" + rightHtml + "</div>" +
+          '<div class="px-ai-voc-grid-body">' + rightHtml + "</div>" +
         "</div>";
     }
     function renderAnalysis() {
@@ -1865,22 +1901,120 @@
       return '<div class="px-ai-card"><div class="px-ai-card-hd"><span class="px-ai-card-ttl">유형별 분포</span></div>' +
         reportTypeDistHtml() + "</div>";
     }
+    function formatSavedReportTime(iso) {
+      if (!iso) return "";
+      try {
+        var d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return "";
+        var p = function (n) { return String(n).padStart(2, "0"); };
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+      } catch (_e) {
+        return "";
+      }
+    }
+    function savedReportTabLabel(status) {
+      return status === "draft" ? "보고서 · 임시저장" : "보고서 · 저장됨";
+    }
+    function loadSavedReportFromStorage() {
+      savedReportEntry = null;
+      if (!options.reportStorageKey) return;
+      try {
+        var raw = global.localStorage && global.localStorage.getItem(options.reportStorageKey);
+        if (!raw) return;
+        var parsed = JSON.parse(raw);
+        if (!parsed || !parsed.html) return;
+        savedReportEntry = {
+          storageKey: options.reportStorageKey,
+          status: parsed.status === "draft" ? "draft" : "saved",
+          savedAt: parsed.savedAt || "",
+          html: parsed.html
+        };
+      } catch (_e) {}
+    }
+    function applySavedReportEntry(entry) {
+      if (!entry || !entry.html) return;
+      savedReportEntry = {
+        storageKey: entry.storageKey || options.reportStorageKey,
+        status: entry.status === "draft" ? "draft" : "saved",
+        savedAt: entry.savedAt || new Date().toISOString(),
+        html: entry.html
+      };
+      renderSavedReportTabs();
+    }
+    function renderSavedReportTabs() {
+      if (!useDarkModal || !els.savedReportTabs) return;
+      if (!savedReportEntry) {
+        els.savedReportTabs.innerHTML = "";
+        if (mainViewTab === "saved") switchMainViewTab("analysis");
+        return;
+      }
+      var on = mainViewTab === "saved";
+      els.savedReportTabs.innerHTML =
+        '<button type="button" class="px-ai-inner-tab px-ai-inner-tab-report' + (on ? " on" : "") + '" data-tab="saved">' +
+          esc(savedReportTabLabel(savedReportEntry.status)) +
+        "</button>";
+      var btn = els.savedReportTabs.querySelector("[data-tab=\"saved\"]");
+      if (btn) {
+        btn.addEventListener("click", function () {
+          switchMainViewTab("saved");
+        });
+      }
+    }
+    function renderSavedReportPane() {
+      if (!els.savedReportPane || !savedReportEntry) return;
+      var statusLabel = savedReportEntry.status === "draft" ? "임시저장" : "저장됨";
+      var when = formatSavedReportTime(savedReportEntry.savedAt);
+      els.savedReportPane.innerHTML =
+        '<div class="px-ai-saved-rpt-wrap">' +
+          '<div class="px-ai-saved-rpt-meta">' + esc(statusLabel) + (when ? " · " + esc(when) : "") + "</div>" +
+          '<iframe class="px-ai-saved-rpt-frame" title="저장된 보고서 미리보기" sandbox="allow-same-origin"></iframe>' +
+        "</div>";
+      var frame = els.savedReportPane.querySelector("iframe");
+      if (frame) frame.srcdoc = sanitizeSavedReportHtml(savedReportEntry.html);
+    }
+    function switchMainViewTab(tab) {
+      if (!useDarkModal) return;
+      mainViewTab = tab === "saved" && savedReportEntry ? "saved" : "analysis";
+      if (els.analysisTabBtn) els.analysisTabBtn.classList.toggle("on", mainViewTab === "analysis");
+      if (els.analysisPane) els.analysisPane.style.display = mainViewTab === "analysis" ? "" : "none";
+      if (els.savedReportPane) {
+        els.savedReportPane.style.display = mainViewTab === "saved" ? "" : "none";
+        if (mainViewTab === "saved") renderSavedReportPane();
+      }
+      renderSavedReportTabs();
+    }
+    function onReportPersisted(ev) {
+      if (disposed || !useDarkModal) return;
+      var detail = ev && ev.detail;
+      if (!detail || !detail.html) return;
+      if (options.reportStorageKey && detail.storageKey !== options.reportStorageKey) return;
+      applySavedReportEntry(detail);
+      switchMainViewTab("saved");
+    }
     function updateBreadcrumb() {
       if (!els.breadcrumb) return;
-      els.breadcrumb.textContent = analysisPhase === "strength"
-        ? "1. 분석 강도 → 2. AI 분석 결과"
-        : "1. 분석 강도 → 2. AI 분석 결과";
+      els.breadcrumb.textContent = "AI 분석 후 보고서를 작성할 수 있습니다.";
+    }
+    function updateReportButton(show) {
+      if (!els.reportBtn) return;
+      els.reportBtn.style.display = show ? "" : "none";
+    }
+    function openExternalReportDrawer() {
+      if (typeof options.onOpenReport === "function") {
+        options.onOpenReport();
+        return;
+      }
+      if (variant === "voc" && typeof window.openVocAiReportModal === "function") {
+        window.openVocAiReportModal();
+      } else if (variant === "survey" && typeof window.openPxSurveyAiReportModal === "function") {
+        window.openPxSurveyAiReportModal();
+      }
     }
     function syncInnerTabVisibility() {
-      if (els.analysisTabBtn) {
-        els.analysisTabBtn.style.display = panelOpenMode === "reportDirect" ? "none" : "";
-      }
+      updateReportButton(analysisPhase === "ready");
     }
     function updateInnerTabs(show) {
-      if (els.innerTabs) {
-        els.innerTabs.style.display = show ? "flex" : "none";
-        if (show) syncInnerTabVisibility();
-      }
+      updateReportButton(show);
     }
     function renderStep2Strength() {
       if (!els.body || !useDarkModal) return;
@@ -1918,7 +2052,7 @@
       importedItems = {};
       analysisPhase = "loading";
       updateBreadcrumb();
-      updateInnerTabs(true);
+      updateReportButton(false);
       switchToTab("analysis");
       var loadingText = variant === "voc"
         ? "VOC 데이터를 분석하고 있습니다…"
@@ -1929,6 +2063,7 @@
         analysisPhase = "ready";
         renderChipBasedAnalysis();
         renderReportPane();
+        updateReportButton(true);
         switchToTab("analysis");
       }, 700);
     }
@@ -2328,9 +2463,9 @@
       var info = (data.reportMeta || {}).docInfo;
       if (!info) return "";
       return '<table class="px-ai-rpt-doc-info"><tr>' +
-        '<td class="lbl">작성부서</td><td>' + esc(info.dept) + '</td>' +
-        '<td class="lbl">작성일자</td><td style="border-right:none">' + esc(info.date) + "</td></tr><tr>" +
-        '<td class="lbl">보고대상</td><td>' + esc(info.audience) + '</td>' +
+        '<td class="lbl">작성자</td><td>' + esc(info.author || "") + '</td>' +
+        '<td class="lbl">작성일</td><td style="border-right:none">' + esc(info.date) + "</td></tr><tr>" +
+        '<td class="lbl">분석 기간</td><td>' + esc(info.period || "") + '</td>' +
         '<td class="lbl">분석대상</td><td style="border-right:none">' + esc(info.subject) + "</td></tr></table>";
     }
     function renderOverviewSectionHtml() {
@@ -2496,8 +2631,8 @@
         '<button type="button" class="px-ai-rpt-remove" data-remove-block="' + esc(key) + '">✕ 빼기</button></div>' +
         (draft ? '<span class="px-ai-rpt-draft-tag">✎ 초안 · 클릭해서 수정</span>' : "");
       return '<div class="px-ai-rpt-sec" data-rpt-block="' + esc(key) + '">' + head +
-        (draft ? '<div contenteditable="true" class="px-ai-editable-block">' + draft + "</div>" : "") +
         (embed || "") +
+        (draft ? '<div contenteditable="true" class="px-ai-editable-block">' + draft + "</div>" : "") +
         "</div>";
     }
     function bindReportDocActions() {
@@ -2822,29 +2957,15 @@
     }
     function switchToTab(tab) {
       if (useDarkModal) {
-        if (analysisPhase === "strength") {
-          curTab = "analysis";
-          if (els.innerTabs) els.innerTabs.style.display = "none";
-          if (els.analysisPane) els.analysisPane.style.display = "";
-          if (els.reportPane) els.reportPane.style.display = "none";
+        if (tab === "saved") {
+          switchMainViewTab("saved");
           return;
         }
-        if (panelOpenMode === "reportDirect") tab = "report";
-        else if (tab === "report" && analysisPhase !== "ready") tab = "analysis";
-        curTab = tab;
-        if (els.innerTabs) {
-          els.innerTabs.style.display = "flex";
-          syncInnerTabVisibility();
+        if (tab === "report" && analysisPhase === "ready") {
+          openExternalReportDrawer();
+          return;
         }
-        if (els.innerTabBtns) {
-          Array.prototype.forEach.call(els.innerTabBtns, function (btn) {
-            if (btn.getAttribute("data-role") === "analysis-tab" && panelOpenMode === "reportDirect") return;
-            btn.classList.toggle("on", btn.getAttribute("data-tab") === curTab);
-          });
-        }
-        if (els.analysisPane) els.analysisPane.style.display = curTab === "analysis" ? "" : "none";
-        if (els.reportPane) els.reportPane.style.display = curTab === "report" ? "" : "none";
-        if (curTab === "report") renderReportPane();
+        switchMainViewTab("analysis");
         return;
       }
       curTab = tab;
@@ -3107,9 +3228,9 @@
         removedReportBlocks = {};
         if (els.period) els.period.textContent = data.periodText;
         if (els.breadcrumb) els.breadcrumb.style.display = "none";
-        updateInnerTabs(true);
+        updateReportButton(false);
         analysisPhase = "loading";
-        switchToTab("report");
+        switchToTab("analysis");
         var directLoadingText = variant === "voc"
           ? "VOC 데이터를 분석하고 있습니다…"
           : "환자경험평가 데이터를 분석하고 있습니다…";
@@ -3120,7 +3241,8 @@
           analysisPhase = "ready";
           renderChipBasedAnalysis();
           renderReportPane();
-          switchToTab("report");
+          updateReportButton(true);
+          switchToTab("analysis");
         }, 700);
         return;
       }
@@ -3140,7 +3262,7 @@
         if (els.period) els.period.textContent = data.periodText;
         renderStep2Strength();
         if (els.reportDoc) renderReportPane();
-        updateInnerTabs(false);
+        updateReportButton(false);
         switchToTab("analysis");
         return;
       }
@@ -3160,11 +3282,9 @@
       if (els.reportSetup) renderReportPane();
     }
 
-    if (useDarkModal && els.innerTabBtns) {
-      Array.prototype.forEach.call(els.innerTabBtns, function (tab) {
-        tab.addEventListener("click", function () {
-          switchToTab(tab.getAttribute("data-tab"));
-        });
+    if (useDarkModal && els.analysisTabBtn) {
+      els.analysisTabBtn.addEventListener("click", function () {
+        switchMainViewTab("analysis");
       });
     } else if (!useDarkModal) {
       Array.prototype.forEach.call(els.tabs, function (tab) {
@@ -3176,6 +3296,13 @@
           els.analysisPane.style.display = curTab === "analysis" ? "" : "none";
           els.reportPane.style.display = curTab === "report" ? "" : "none";
         });
+      });
+    }
+    if (els.reportBtn) {
+      els.reportBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (analysisPhase !== "ready") return;
+        openExternalReportDrawer();
       });
     }
     if (els.close) {
@@ -3269,8 +3396,39 @@
       renderAnalysis();
     }
     global.addEventListener("px-ai-panel-data", onData);
+    loadSavedReportFromStorage();
+    renderSavedReportTabs();
+    global.addEventListener("pix-report-persisted", onReportPersisted);
+
+    function beginCompletedAnalysisView(levelKey) {
+      var idx = LV_KEYS.indexOf(levelKey || options.level || "deep");
+      if (idx < 0) idx = 2;
+      curLv = idx;
+      global.__pxAiAnalysisLevel = LV_KEYS[curLv];
+      analysisPhase = "ready";
+      appliedAnalysisBlocks = blocksForLevel(LV_KEYS[curLv]);
+      activeAnalysisBlocks = appliedAnalysisBlocks ? appliedAnalysisBlocks.slice() : null;
+      if (els.breadcrumb) els.breadcrumb.style.display = "none";
+      if (els.period) els.period.textContent = data.periodText;
+      renderChipBasedAnalysis();
+      if (els.reportDoc) renderReportPane();
+      updateReportButton(true);
+      switchToTab("analysis");
+    }
+
+    if (options.embedInArchive && options.replaySnapshot && options.replaySnapshot.html) {
+      host.innerHTML = options.replaySnapshot.html;
+      return function dispose() {
+        disposed = true;
+        host.innerHTML = "";
+      };
+    }
 
     requestAnimationFrame(function () {
+      if (options.embedInArchive && options.showCompletedAnalysis) {
+        beginCompletedAnalysisView(options.level || (options.replaySnapshot && options.replaySnapshot.level));
+        return;
+      }
       if (hideSlider) {
         if (options.openMode === "reportDirect") beginReportDirect();
         else beginAnalysis();
@@ -3282,13 +3440,44 @@
       }
     });
 
+    function captureAnalysisSnapshot() {
+      if (analysisPhase !== "ready") return null;
+      var clone = root.cloneNode(true);
+      clone.querySelectorAll("script").forEach(function (s) { s.remove(); });
+      clone.querySelectorAll('[data-role="close"]').forEach(function (el) { el.remove(); });
+      clone.querySelectorAll(".px-ai-report-head-btn").forEach(function (el) { el.remove(); });
+      return {
+        variant: variant,
+        level: LV_KEYS[curLv],
+        levelLabel: LV_NAMES[curLv],
+        periodText: data.periodText || "",
+        title: data.title || "",
+        capturedAt: new Date().toISOString(),
+        html: clone.outerHTML
+      };
+    }
+
+    var captureKeys = [];
+    if (options.reportStorageKey) captureKeys.push(options.reportStorageKey);
+    captureKeys.push("variant:" + variant);
+    global.__pixAnalysisPanelCaptures = global.__pixAnalysisPanelCaptures || {};
+    captureKeys.forEach(function (key) {
+      global.__pixAnalysisPanelCaptures[key] = captureAnalysisSnapshot;
+    });
+
     return function dispose() {
       disposed = true;
+      captureKeys.forEach(function (key) {
+        if (global.__pixAnalysisPanelCaptures && global.__pixAnalysisPanelCaptures[key] === captureAnalysisSnapshot) {
+          delete global.__pixAnalysisPanelCaptures[key];
+        }
+      });
       if (els.track) {
         global.removeEventListener("pointermove", onMove);
         global.removeEventListener("pointerup", onUp);
       }
       global.removeEventListener("px-ai-panel-data", onData);
+      global.removeEventListener("pix-report-persisted", onReportPersisted);
       host.innerHTML = "";
     };
   }
@@ -3319,102 +3508,16 @@
   }
 
   function registerPxSurveyAnalyticsSection(deps) {
-    var React = deps.React;
-    var useState = deps.useState || React.useState;
-    var useRef = deps.useRef || React.useRef;
-    var useEffect = deps.useEffect || React.useEffect;
-    var ReactDOM = deps.ReactDOM;
-    var SURVEY_REPORT_URL = "px-survey-analysis-report.html";
-    var SURVEY_REPORT_STORAGE_KEY = "pix_survey_report_2026_06";
-    return function PxSurveyAnalyticsWithAiModal(props) {
-      var _open = useState(false);
-      var open = _open[0];
-      var setOpen = _open[1];
-      var _reportOpen = useState(false);
-      var reportOpen = _reportOpen[0];
-      var setReportOpen = _reportOpen[1];
-      var panelRef = useRef(null);
-      var reportFrameRef = useRef(null);
-      var openModeRef = useRef("analysis");
-      useEffect(function () {
-        window.openPxSurveyAiModal = function () {
-          openModeRef.current = "analysis";
-          setReportOpen(false);
-          setOpen(true);
-        };
-        window.openPxSurveyAiReportModal = function () {
-          setOpen(false);
-          setReportOpen(true);
-        };
-        return function () {
-          try { if (window.openPxSurveyAiModal) delete window.openPxSurveyAiModal; } catch (_e) {}
-          try { if (window.openPxSurveyAiReportModal) delete window.openPxSurveyAiReportModal; } catch (_e) {}
-        };
-      }, []);
-      useEffect(function () {
-        if (!open || !panelRef.current || typeof global.mountPxAiAnalysisPanel !== "function") return undefined;
-        return global.mountPxAiAnalysisPanel(panelRef.current, {
-          variant: "survey",
-          level: "basic",
-          hideLevelSlider: true,
-          showLoading: true,
-          openMode: openModeRef.current,
-          showToast: props.showToast,
-          onClose: function () { setOpen(false); }
-        });
-      }, [open, props.showToast]);
-      var actions = global.pixReportDocActions || {};
-      var reportFooter = typeof global.createPixReportModalFooter === "function"
-        ? global.createPixReportModalFooter(React, {
-          onDraft: function () { actions.draft && actions.draft(SURVEY_REPORT_STORAGE_KEY, reportFrameRef.current, "환자경험평가 보고서", props.showToast); },
-          onSave: function () { actions.save && actions.save(SURVEY_REPORT_STORAGE_KEY, reportFrameRef.current, "환자경험평가 보고서", props.showToast); },
-          onWord: function () { actions.word && actions.word("환자경험평가_분석보고서_2026-06.doc", reportFrameRef.current, props.showToast); },
-          onPdf: function () { actions.pdf && actions.pdf(reportFrameRef.current, props.showToast); },
-          onPrint: function () { actions.print && actions.print(reportFrameRef.current, props.showToast); }
-        })
-        : null;
-      var modal = open
-        ? React.createElement(
-            "div",
-            {
-              className: "fixed inset-0 z-[120] bg-black/55 flex items-center justify-center p-4 sm:p-6 overflow-y-auto",
-              onClick: function () { setOpen(false); }
-            },
-            React.createElement(
-              "div",
-              {
-                className: "relative w-full max-w-[1200px] max-h-[90vh] overflow-y-auto rounded-[14px] shadow-2xl",
-                style: { background: "#17171c", color: "#e7e6ee", padding: "22px 26px", boxSizing: "border-box" },
-                onClick: function (e) { e.stopPropagation(); }
-              },
-              React.createElement("div", { ref: panelRef, style: { width: "100%" } })
-            )
-          )
-        : null;
-      var reportDrawer = createPixReportIframeDrawer(React, {
-        open: reportOpen,
-        onClose: function () { setReportOpen(false); },
-        title: "2026\uB144 6\uC6D4 \uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
-        subtitle: "\uB0B4\uBD80 \uBCF4\uACE0 \u00B7 \uC784\uC6D0 \uBCF4\uACE0\uC6A9 \u00B7 PIX AI \uD658\uC790\uACBD\uD5D8\uAD00\uB9AC",
-        reportUrl: SURVEY_REPORT_URL,
-        iframeTitle: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
-        iframeRef: reportFrameRef,
-        footer: reportFooter
-      });
-      function portalize(node) {
-        if (!node) return null;
-        return typeof ReactDOM !== "undefined" && ReactDOM.createPortal
-          ? ReactDOM.createPortal(node, document.body)
-          : node;
-      }
-      return React.createElement(
-        React.Fragment,
-        null,
-        props.children,
-        portalize(modal),
-        portalize(reportDrawer)
-      );
-    };
+    return registerPixAiStatisticsShell(deps, {
+      variant: "survey",
+      storageKey: "pix_survey_report_2026_06",
+      reportUrl: "px-survey-analysis-report.html",
+      reportTitle: "2026\uB144 6\uC6D4 \uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
+      reportSubtitle: "\uB0B4\uBD80 \uBCF4\uACE0 \u00B7 \uC784\uC6D0 \uBCF4\uACE0\uC6A9 \u00B7 PIX AI \uD658\uC790\uACBD\uD5D8\uAD00\uB9AC",
+      iframeTitle: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
+      reportLabel: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBCF4\uACE0\uC11C",
+      wordFilename: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00_\uBD84\uC11D\uBCF4\uACE0\uC11C_2026-06.doc"
+    });
   }
 
   function collectReportIframeHtml(iframe) {
@@ -3434,17 +3537,26 @@
       var clone = doc.documentElement.cloneNode(true);
       var removeSelectors = [
         ".rpt-block-toolbar", ".rpt-sec-delete", ".rpt-sec-add-row",
-        ".rpt-sec-add-row", "[data-rpt-add-menu]", ".rpt-stats-dialog-backdrop"
+        "[data-rpt-stats-toolbar]", "[data-rpt-add-menu]", ".rpt-stats-dialog-backdrop",
+        ".rpt-stat-remove", ".rpt-wysiwyg-mock", "[data-rpt-wysiwyg-mock]",
+        ".rpt-wysiwyg-toolbar", ".rpt-wysiwyg-tabs"
       ];
       removeSelectors.forEach(function (sel) {
         Array.prototype.forEach.call(clone.querySelectorAll(sel), function (el) {
           if (el.parentNode) el.parentNode.removeChild(el);
         });
       });
-      Array.prototype.forEach.call(clone.querySelectorAll(".rpt-layout-block"), function (wrap) {
+      Array.prototype.forEach.call(clone.querySelectorAll(".rpt-layout-block, [data-rpt-stat-block]"), function (wrap) {
         var parent = wrap.parentNode;
         if (!parent) return;
-        while (wrap.firstChild) parent.insertBefore(wrap.firstChild, wrap);
+        while (wrap.firstChild) {
+          var child = wrap.firstChild;
+          if (child.nodeType === 1 && child.classList && child.classList.contains("rpt-stat-remove")) {
+            wrap.removeChild(child);
+            continue;
+          }
+          parent.insertBefore(child, wrap);
+        }
         parent.removeChild(wrap);
       });
       Array.prototype.forEach.call(clone.querySelectorAll("[contenteditable]"), function (el) {
@@ -3455,6 +3567,9 @@
         if (!String(el.textContent || "").trim()) {
           if (el.parentNode) el.parentNode.removeChild(el);
         }
+      });
+      Array.prototype.forEach.call(clone.querySelectorAll("script"), function (el) {
+        if (el.parentNode) el.parentNode.removeChild(el);
       });
       return "<!DOCTYPE html>\n" + clone.outerHTML;
     } catch (_error) {
@@ -3503,22 +3618,177 @@
     }, 0);
   }
 
+  function notifyReportPersisted(detail) {
+    try {
+      global.dispatchEvent(new CustomEvent("pix-report-persisted", { detail: detail }));
+    } catch (_e) {}
+  }
+
+  function replaceCanvasesWithImages(root) {
+    if (!root) return;
+    root.querySelectorAll("canvas").forEach(function (canvas) {
+      try {
+        var img = document.createElement("img");
+        img.src = canvas.toDataURL("image/png");
+        img.alt = canvas.getAttribute("aria-label") || "chart";
+        img.className = canvas.className || "";
+        img.style.cssText = canvas.style.cssText || "max-width:100%;height:auto;display:block;";
+        if (canvas.parentNode) canvas.parentNode.replaceChild(img, canvas);
+      } catch (_e) {}
+    });
+  }
+
+  function captureVocStatsSnapshot() {
+    var host = document.querySelector(".voc-embed-root");
+    if (!host || !host.innerHTML.trim()) return null;
+    var yearEl = host.querySelector("#vocYearSelect");
+    var bucketEl = host.querySelector("#vocBucketSelect");
+    var basisEl = host.querySelector("#vocOverviewBasis");
+    var periodBtn = host.querySelector(".voc-filter-chip.active[data-period]");
+    var clone = host.cloneNode(true);
+    clone.querySelectorAll("script").forEach(function (s) { s.remove(); });
+    clone.querySelectorAll(".voc-filter-panel").forEach(function (el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+    replaceCanvasesWithImages(clone);
+    return {
+      variant: "voc",
+      meta: {
+        year: yearEl ? yearEl.value : "",
+        bucket: bucketEl ? bucketEl.value : "",
+        period: periodBtn ? periodBtn.getAttribute("data-period") : "",
+        basis: basisEl ? String(basisEl.textContent || "").trim() : ""
+      },
+      styles: "",
+      html: clone.outerHTML,
+      capturedAt: new Date().toISOString()
+    };
+  }
+
+  function captureSurveyStatsSnapshot() {
+    var host = document.querySelector("[data-pix-survey-stats-root]");
+    if (!host || !host.innerHTML.trim()) return null;
+    var clone = host.cloneNode(true);
+    clone.querySelectorAll("script").forEach(function (s) { s.remove(); });
+    replaceCanvasesWithImages(clone);
+    return {
+      variant: "survey",
+      meta: {},
+      html: clone.innerHTML,
+      capturedAt: new Date().toISOString()
+    };
+  }
+
+  global.__pixCaptureReportStatsSnapshot = function (variant) {
+    if (variant === "voc") return captureVocStatsSnapshot();
+    if (variant === "survey") return captureSurveyStatsSnapshot();
+    return null;
+  };
+
+  global.__pixCaptureReportAnalysisSnapshot = function (storageKey, variant) {
+    var caps = global.__pixAnalysisPanelCaptures || {};
+    var fn = (storageKey && caps[storageKey]) || (variant && caps["variant:" + variant]);
+    if (typeof fn === "function") return fn();
+    return null;
+  };
+
+  global.__pixBuildArchiveSnapshotDoc = function (snapshot, kind) {
+    if (!snapshot || !snapshot.html) return "";
+    if (kind === "analysis") {
+      return "<!DOCTYPE html><html lang=\"ko\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>" +
+        "<style>html,body{margin:0;padding:0;min-height:100%;background:#17171c;overflow:auto;}</style></head><body>" +
+        snapshot.html + "</body></html>";
+    }
+    var styles = snapshot.styles || "";
+    if (snapshot.variant === "survey") {
+      return "<!DOCTYPE html><html lang=\"ko\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>" +
+        "<script src=\"https://cdn.tailwindcss.com\"></script>" +
+        "<style>html,body{margin:0;padding:0;background:#f8fafc;}</style></head><body>" +
+        snapshot.html + "</body></html>";
+    }
+    if (snapshot.html.indexOf("<style") >= 0) {
+      return "<!DOCTYPE html><html lang=\"ko\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>" +
+        "<style>html,body{margin:0;padding:0;background:#f8fafc;} .voc-filter-panel{display:none!important;}</style></head><body>" +
+        snapshot.html + "</body></html>";
+    }
+    return "<!DOCTYPE html><html lang=\"ko\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>" +
+      "<style>html,body{margin:0;padding:0;background:#f8fafc;} .voc-archive-snapshot-root{padding:8px 12px 24px;} .voc-filter-panel{display:none!important;}</style></head><body>" +
+      "<div class=\"voc-archive-snapshot-root voc-embed-root\">" + snapshot.html + "</div></body></html>";
+  };
+
+  var SAVED_REPORT_HIDE_CSS =
+    ".rpt-wysiwyg-mock,[data-rpt-wysiwyg-mock],.rpt-wysiwyg-toolbar,.rpt-wysiwyg-tabs{display:none!important;}";
+
+  function sanitizeSavedReportHtml(html) {
+    if (!html) return html;
+    try {
+      var doc = new DOMParser().parseFromString(html, "text/html");
+      var removeSelectors = [
+        ".rpt-wysiwyg-mock", "[data-rpt-wysiwyg-mock]",
+        ".rpt-wysiwyg-toolbar", ".rpt-wysiwyg-tabs",
+        ".rpt-block-toolbar", ".rpt-sec-delete", ".rpt-sec-add-row",
+        "[data-rpt-stats-toolbar]", "[data-rpt-add-menu]", ".rpt-stats-dialog-backdrop",
+        ".rpt-stat-remove", "script"
+      ];
+      removeSelectors.forEach(function (sel) {
+        Array.prototype.forEach.call(doc.querySelectorAll(sel), function (el) {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        });
+      });
+      Array.prototype.forEach.call(doc.querySelectorAll("[contenteditable]"), function (el) {
+        el.removeAttribute("contenteditable");
+        el.removeAttribute("spellcheck");
+      });
+      var hideStyle = doc.createElement("style");
+      hideStyle.setAttribute("data-pix-saved-report-hide", "1");
+      hideStyle.textContent = SAVED_REPORT_HIDE_CSS;
+      if (doc.head) doc.head.appendChild(hideStyle);
+      return "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+    } catch (_e) {
+      return html;
+    }
+  }
+
+  function buildPersistedReportBundle(storageKey, iframe, status) {
+    var html = collectReportExportHtml(iframe);
+    if (!html) return null;
+    var variant = storageKey.indexOf("pix_voc_") === 0 ? "voc" : "survey";
+    var statsSnapshot = typeof global.__pixCaptureReportStatsSnapshot === "function"
+      ? global.__pixCaptureReportStatsSnapshot(variant)
+      : null;
+    var analysisSnapshot = typeof global.__pixCaptureReportAnalysisSnapshot === "function"
+      ? global.__pixCaptureReportAnalysisSnapshot(storageKey, variant)
+      : null;
+    return {
+      savedAt: new Date().toISOString(),
+      status: status,
+      html: html,
+      statsSnapshot: statsSnapshot,
+      analysisSnapshot: analysisSnapshot
+    };
+  }
+
   global.pixReportDocActions = {
     collectHtml: collectReportIframeHtml,
     collectExportHtml: collectReportExportHtml,
     save: function (storageKey, iframe, label, showToast) {
-      var html = collectReportIframeHtml(iframe);
-      if (!html) {
+      var bundle = buildPersistedReportBundle(storageKey, iframe, "saved");
+      if (!bundle) {
         notifyReportAction("보고서 내용을 불러오지 못했습니다.", showToast);
         return false;
       }
       try {
-        localStorage.setItem(storageKey, JSON.stringify({
-          savedAt: new Date().toISOString(),
-          status: "saved",
-          html: html
-        }));
+        localStorage.setItem(storageKey, JSON.stringify(bundle));
         notifyReportAction((label || "보고서") + "를 저장했습니다.", showToast);
+        notifyReportPersisted({
+          storageKey: storageKey,
+          status: "saved",
+          savedAt: bundle.savedAt,
+          label: label,
+          html: bundle.html,
+          statsSnapshot: bundle.statsSnapshot,
+          analysisSnapshot: bundle.analysisSnapshot
+        });
         return true;
       } catch (_error) {
         notifyReportAction("저장에 실패했습니다.", showToast);
@@ -3526,18 +3796,23 @@
       }
     },
     draft: function (storageKey, iframe, label, showToast) {
-      var html = collectReportIframeHtml(iframe);
-      if (!html) {
+      var bundle = buildPersistedReportBundle(storageKey, iframe, "draft");
+      if (!bundle) {
         notifyReportAction("보고서 내용을 불러오지 못했습니다.", showToast);
         return false;
       }
       try {
-        localStorage.setItem(storageKey, JSON.stringify({
-          savedAt: new Date().toISOString(),
-          status: "draft",
-          html: html
-        }));
+        localStorage.setItem(storageKey, JSON.stringify(bundle));
         notifyReportAction((label || "보고서") + "를 임시저장했습니다.", showToast);
+        notifyReportPersisted({
+          storageKey: storageKey,
+          status: "draft",
+          savedAt: bundle.savedAt,
+          label: label,
+          html: bundle.html,
+          statsSnapshot: bundle.statsSnapshot,
+          analysisSnapshot: bundle.analysisSnapshot
+        });
         return true;
       } catch (_error) {
         notifyReportAction("임시저장에 실패했습니다.", showToast);
@@ -3662,26 +3937,29 @@
     };
 
     var showSplash = phase === "generating";
+    var isModal = opts.layout === "modal";
 
-    return React.createElement(
+    var panelNode = React.createElement(
       "div",
-      { className: "fixed inset-0 z-[120]" },
-      React.createElement("div", {
-        className: "absolute inset-0 bg-black/40",
-        onClick: opts.onClose
-      }),
-      React.createElement(
-        "div",
-        {
-          className: "absolute top-0 right-0 h-full w-full max-w-[900px] shadow-2xl animate-drawerSlideIn overflow-hidden border-l border-[#cfcdc5]",
-          style: {
+      {
+        className: isModal
+          ? "relative w-full max-w-[960px] h-[92vh] max-h-[92vh] overflow-hidden rounded-[14px] shadow-2xl border border-[#cfcdc5] flex flex-col"
+          : "absolute top-0 right-0 h-full w-full max-w-[900px] shadow-2xl animate-drawerSlideIn overflow-hidden border-l border-[#cfcdc5] pointer-events-auto",
+        style: isModal
+          ? {
+            background: "#eae8e2",
+            display: "flex",
+            flexDirection: "column",
+            boxSizing: "border-box"
+          }
+          : {
             background: "#eae8e2",
             display: "flex",
             flexDirection: "column",
             boxSizing: "border-box"
           },
-          onClick: function (e) { e.stopPropagation(); }
-        },
+        onClick: function (e) { e.stopPropagation(); }
+      },
         React.createElement(
           "div",
           {
@@ -3763,7 +4041,7 @@
             style: {
               position: "relative",
               flex: "1 1 auto",
-              minHeight: 0,
+              minHeight: isModal ? "480px" : 0,
               display: "flex",
               flexDirection: "column"
             }
@@ -3822,14 +4100,164 @@
             : null
         ),
         phase === "ready" ? opts.footer || null : null
-      )
+      );
+
+    return React.createElement(
+      "div",
+      {
+        className: "fixed inset-0 z-[130] " + (isModal ? "flex items-center justify-center p-2 sm:p-3" : "")
+      },
+      React.createElement("div", {
+        className: "absolute inset-0 bg-black/45",
+        onClick: opts.onClose
+      }),
+      panelNode
     );
   }
 
   function createPixReportIframeDrawer(React, opts) {
     if (!opts || !opts.open) return null;
     ensurePixReportDrawerCss();
-    return React.createElement(PixReportDrawerView, { React: React, opts: opts });
+    return React.createElement(PixReportDrawerView, { React: React, opts: Object.assign({ layout: "drawer" }, opts) });
+  }
+
+  function createPixReportIframeModal(React, opts) {
+    if (!opts || !opts.open) return null;
+    ensurePixReportDrawerCss();
+    return React.createElement(PixReportDrawerView, { React: React, opts: Object.assign({ layout: "modal" }, opts) });
+  }
+
+  function createPixAiAnalysisDrawer(React, opts) {
+    if (!opts || !opts.open) return null;
+    return React.createElement(
+      "div",
+      { className: "fixed inset-0 z-[120]" },
+      React.createElement("div", {
+        className: "absolute inset-0 bg-black/35",
+        onClick: opts.onClose
+      }),
+      React.createElement(
+        "div",
+        {
+          className: "absolute top-0 right-0 h-full w-full max-w-[640px] shadow-2xl overflow-hidden border-l border-[#2d2c36] flex flex-col",
+          style: { background: "#17171c", color: "#e7e6ee", boxSizing: "border-box" },
+          onClick: function (e) { e.stopPropagation(); }
+        },
+        React.createElement(
+          "div",
+          { style: { flex: "1 1 auto", minHeight: 0, overflow: "auto", padding: "22px 22px 18px" } },
+          opts.children
+        )
+      )
+    );
+  }
+
+  function registerPixAiStatisticsShell(deps, cfg) {
+    var React = deps.React;
+    var useState = deps.useState || React.useState;
+    var useRef = deps.useRef || React.useRef;
+    var useEffect = deps.useEffect || React.useEffect;
+    var ReactDOM = deps.ReactDOM;
+    cfg = cfg || {};
+    return function PixAiStatisticsShell(props) {
+      var _open = useState(false);
+      var open = _open[0];
+      var setOpen = _open[1];
+      var _reportOpen = useState(false);
+      var reportOpen = _reportOpen[0];
+      var setReportOpen = _reportOpen[1];
+      var panelRef = useRef(null);
+      var reportFrameRef = useRef(null);
+      var openModeRef = useRef("analysis");
+      var openGlobal = cfg.variant === "voc" ? "openVocAiModal" : "openPxSurveyAiModal";
+      var openReportGlobal = cfg.variant === "voc" ? "openVocAiReportModal" : "openPxSurveyAiReportModal";
+      useEffect(function () {
+        global[openGlobal] = function () {
+          openModeRef.current = "analysis";
+          setReportOpen(false);
+          setOpen(true);
+        };
+        global[openReportGlobal] = function () {
+          setReportOpen(true);
+        };
+        var removeDocClick = null;
+        if (cfg.variant === "voc") {
+          function onClick(e) {
+            var t = e.target;
+            if (!t || !t.closest) return;
+            var btn = t.closest(".voc-filter-action");
+            if (!btn) return;
+            e.preventDefault();
+            openModeRef.current = "analysis";
+            setReportOpen(false);
+            setOpen(true);
+          }
+          document.addEventListener("click", onClick, true);
+          removeDocClick = function () { document.removeEventListener("click", onClick, true); };
+        }
+        return function () {
+          if (removeDocClick) removeDocClick();
+          try { if (global[openGlobal]) delete global[openGlobal]; } catch (_e) {}
+          try { if (global[openReportGlobal]) delete global[openReportGlobal]; } catch (_e) {}
+        };
+      }, []);
+      useEffect(function () {
+        if (!open || !panelRef.current || typeof global.mountPxAiAnalysisPanel !== "function") return undefined;
+        return global.mountPxAiAnalysisPanel(panelRef.current, {
+          variant: cfg.variant,
+          level: "basic",
+          hideLevelSlider: true,
+          showLoading: true,
+          openMode: openModeRef.current,
+          showToast: props.showToast,
+          reportStorageKey: cfg.storageKey,
+          onClose: function () { setOpen(false); setReportOpen(false); },
+          onOpenReport: function () { setReportOpen(true); }
+        });
+      }, [open, props.showToast]);
+      var actions = global.pixReportDocActions || {};
+      var reportFooter = typeof global.createPixReportModalFooter === "function"
+        ? global.createPixReportModalFooter(React, {
+          onDraft: function () { actions.draft && actions.draft(cfg.storageKey, reportFrameRef.current, cfg.reportLabel, props.showToast); },
+          onSave: function () { actions.save && actions.save(cfg.storageKey, reportFrameRef.current, cfg.reportLabel, props.showToast); },
+          onWord: function () { actions.word && actions.word(cfg.wordFilename, reportFrameRef.current, props.showToast); },
+          onPdf: function () { actions.pdf && actions.pdf(reportFrameRef.current, props.showToast); },
+          onPrint: function () { actions.print && actions.print(reportFrameRef.current, props.showToast); }
+        })
+        : null;
+      var aiDrawer = typeof global.createPixAiAnalysisDrawer === "function"
+        ? global.createPixAiAnalysisDrawer(React, {
+          open: open,
+          onClose: function () { setOpen(false); setReportOpen(false); },
+          children: React.createElement("div", { ref: panelRef, style: { width: "100%" } })
+        })
+        : null;
+      var reportModal = typeof global.createPixReportIframeModal === "function"
+        ? global.createPixReportIframeModal(React, {
+          open: reportOpen,
+          onClose: function () { setReportOpen(false); },
+          title: cfg.reportTitle,
+          subtitle: cfg.reportSubtitle,
+          reportUrl: cfg.reportUrl,
+          iframeTitle: cfg.iframeTitle,
+          iframeRef: reportFrameRef,
+          footer: reportFooter
+        })
+        : null;
+      function portalize(node) {
+        if (!node) return null;
+        return typeof ReactDOM !== "undefined" && ReactDOM.createPortal
+          ? ReactDOM.createPortal(node, document.body)
+          : node;
+      }
+      return React.createElement(
+        React.Fragment,
+        null,
+        props.children,
+        portalize(aiDrawer),
+        portalize(reportModal)
+      );
+    };
   }
 
   function createReportModalFooter(React, opts) {
@@ -3965,10 +4393,14 @@
   }
 
   global.createPixReportIframeDrawer = createPixReportIframeDrawer;
+  global.createPixReportIframeModal = createPixReportIframeModal;
+  global.createPixAiAnalysisDrawer = createPixAiAnalysisDrawer;
+  global.registerPixAiStatisticsShell = registerPixAiStatisticsShell;
   global.createPixReportModalFooter = createReportModalFooter;
   global.enablePixReportIframeEdit = enablePixReportIframeEdit;
 
   global.mountPxAiAnalysisPanel = mountPxAiAnalysisPanel;
+  global.__pixSanitizeSavedReportHtml = sanitizeSavedReportHtml;
   global.mountPxAiStrengthPicker = mountPxAiStrengthPicker;
   global.registerPxAiAnalysisPanel = registerPxAiAnalysisPanel;
   global.registerPxSurveyAnalyticsSection = registerPxSurveyAnalyticsSection;

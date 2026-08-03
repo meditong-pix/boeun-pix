@@ -33,13 +33,17 @@
       ".rpt-sec-add-btn:hover{background:rgba(12,68,124,.06);border-color:rgba(12,68,124,.35);}",
       ".rpt-add-menu .rpt-add-stats{border-top:1px solid #eceae4;margin-top:4px;padding-top:4px;font-weight:700;color:#0C447C;}",
       ".rpt-stats-dialog-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}",
-      ".rpt-stats-dialog{width:min(420px,100%);background:#fff;border:1px solid #cfcdc5;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:16px 16px 14px;}",
+      ".rpt-stats-dialog{width:min(520px,100%);background:#fff;border:1px solid #cfcdc5;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:16px 16px 14px;max-height:min(80vh,640px);overflow:auto;}",
       ".rpt-stats-dialog h3{margin:0 0 6px;font-size:14px;color:#0C447C;}",
-      ".rpt-stats-dialog p{margin:0 0 10px;font-size:11px;color:#898781;line-height:1.5;}",
-      ".rpt-stats-dialog input{width:100%;box-sizing:border-box;border:1px solid #cfcdc5;border-radius:6px;padding:8px 10px;font-size:12.5px;margin-bottom:8px;}",
-      ".rpt-stats-suggest{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}",
-      ".rpt-stats-suggest button{border:1px solid #e3e1da;background:#faf9f6;border-radius:999px;padding:4px 9px;font-size:10.5px;cursor:pointer;color:#555;}",
-      ".rpt-stats-suggest button:hover{border-color:#0C447C;color:#0C447C;}",
+      ".rpt-stats-dialog p{margin:0 0 12px;font-size:11px;color:#898781;line-height:1.5;}",
+      ".rpt-stats-groups{display:flex;flex-direction:column;gap:14px;margin-bottom:10px;}",
+      ".rpt-stats-group-title{font-size:11px;font-weight:700;color:#555;margin:0 0 8px;letter-spacing:-.01em;}",
+      ".rpt-stats-badges{display:flex;flex-wrap:wrap;gap:6px;}",
+      ".rpt-stats-badge{border:1px solid #e3e1da;background:#faf9f6;border-radius:999px;padding:5px 11px;font-size:11px;cursor:pointer;color:#444;font-family:inherit;line-height:1.3;transition:border-color .12s,background .12s,color .12s;}",
+      ".rpt-stats-badge:hover{border-color:#0C447C;background:rgba(12,68,124,.06);color:#0C447C;}",
+      ".rpt-stats-badge.ai{border-color:#d4e3f2;background:#f4f8fc;color:#0C447C;}",
+      ".rpt-stats-badge.ai:hover{border-color:#0C447C;background:rgba(12,68,124,.1);}",
+      ".rpt-stats-badge:disabled{opacity:.55;cursor:wait;}",
       ".rpt-stats-msg{font-size:11px;min-height:16px;margin-bottom:8px;}",
       ".rpt-stats-msg.err{color:#791F1F;}",
       ".rpt-stats-msg.ok{color:#0C447C;}",
@@ -54,9 +58,42 @@
       ".rpt-sec-delete{position:absolute;top:0;right:0;border:1px solid #e8c4c4;border-radius:5px;background:#fdf8f8;color:#791F1F;font-size:10.5px;padding:3px 8px;cursor:pointer;z-index:4;}",
       ".rpt-sec-delete:hover{background:#f5e8e8;}",
       ".rpt-add-menu .rpt-add-section{font-weight:700;color:#0C447C;}",
-      ".doc.rpt-preview-mode .rpt-block-toolbar,.doc.rpt-preview-mode .rpt-sec-add-row,.doc.rpt-preview-mode .rpt-sec-delete{display:none!important;}",
+      ".rpt-stats-toolbar{position:sticky;top:0;z-index:10;display:flex;justify-content:flex-end;padding:8px 0 10px;margin:0 0 12px;border-bottom:1px dashed #cfcdc5;background:#eae8e2;}",
+      ".rpt-stats-toolbar-btn{border:1px dashed #0C447C;border-radius:6px;background:#f7f9fc;color:#0C447C;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;font-family:inherit;}",
+      ".rpt-stats-toolbar-btn:hover{background:rgba(12,68,124,.08);}",
+      ".rpt-stat-block{position:relative;margin:0 0 12px;padding:2px;border:1px dashed transparent;border-radius:6px;transition:border-color .15s,background .15s;}",
+      ".doc.rpt-editor-surface .rpt-stat-block:hover{border-color:rgba(12,68,124,.28);background:rgba(12,68,124,.02);}",
+      ".rpt-stat-remove{position:absolute;top:6px;right:6px;width:22px;height:22px;border:1px solid #e8c4c4;border-radius:4px;background:#fdf8f8;color:#791F1F;font-size:16px;line-height:18px;font-weight:700;cursor:pointer;padding:0;z-index:6;box-shadow:0 1px 3px rgba(0,0,0,.08);}",
+      ".rpt-stat-remove:hover{background:#f5e8e8;border-color:#d8a0a0;}",
+      "body.rpt-editor-mode{background:#d8d6d0!important;padding:28px 16px 48px!important;}",
+      ".doc.rpt-editor-surface{box-shadow:0 1px 0 #fff inset,0 2px 6px rgba(0,0,0,.06),0 16px 48px rgba(0,0,0,.1)!important;border:1px solid #c8c6c0!important;outline:1px solid rgba(255,255,255,.65);cursor:text;}",
+      ".doc.rpt-editor-surface [contenteditable=\"true\"]{cursor:text;border-radius:2px;transition:background .12s ease,outline-color .12s ease;}",
+      ".doc.rpt-editor-surface [contenteditable=\"true\"]:hover{background:rgba(12,68,124,.04)!important;outline:none!important;}",
+      ".doc.rpt-editor-surface [contenteditable=\"true\"]:focus{outline:2px solid rgba(12,68,124,.32)!important;outline-offset:1px;background:rgba(12,68,124,.06)!important;}",
+      ".doc.rpt-preview-mode .rpt-stats-toolbar,.doc.rpt-preview-mode .rpt-stat-remove,.doc.rpt-preview-mode .rpt-block-toolbar,.doc.rpt-preview-mode .rpt-sec-add-row,.doc.rpt-preview-mode .rpt-sec-delete{display:none!important;}",
+      ".doc:not(.rpt-preview-mode) .rpt-block-toolbar,.doc:not(.rpt-preview-mode) .rpt-sec-add-row,.doc:not(.rpt-preview-mode) .rpt-sec-delete{display:none!important;}",
       ".doc.rpt-preview-mode [contenteditable=\"true\"]{cursor:default;}",
-      ".doc.rpt-preview-mode [contenteditable=\"true\"]:hover,.doc.rpt-preview-mode [contenteditable=\"true\"]:focus{background:transparent;outline:none;}"
+      ".doc.rpt-preview-mode [contenteditable=\"true\"]:hover,.doc.rpt-preview-mode [contenteditable=\"true\"]:focus{background:transparent!important;outline:none!important;}",
+      ".doc.rpt-preview-mode.rpt-editor-surface,.doc.rpt-preview-mode{box-shadow:0 2px 14px rgba(0,0,0,.08)!important;border:none!important;outline:none!important;cursor:default;}",
+      ".rpt-wysiwyg-mock{margin:0 0 22px;border:1px solid #b8c4d0;font-family:\"Malgun Gothic\",Gulim,sans-serif;user-select:none;-webkit-user-select:none;}",
+      ".rpt-wysiwyg-toolbar{background:linear-gradient(180deg,#f2f5f9 0%,#d9e2eb 100%);border-bottom:1px solid #b8c4d0;padding:1px 2px 0;}",
+      ".rpt-wysiwyg-row{display:flex;align-items:center;flex-wrap:wrap;min-height:27px;padding:1px 0;}",
+      ".rpt-wysiwyg-row+.rpt-wysiwyg-row{border-top:1px solid #c5ced8;}",
+      ".rpt-wysiwyg-grp{display:flex;align-items:center;gap:1px;padding:0 4px;border-right:1px solid #c5ced8;flex-shrink:0;}",
+      ".rpt-wysiwyg-grp:last-child{border-right:none;}",
+      ".rpt-wysiwyg-btn{border:1px solid transparent;background:transparent;min-width:22px;height:22px;font-size:11px;line-height:1;cursor:default;padding:0 3px;color:#2a2a2a;display:inline-flex;align-items:center;justify-content:center;border-radius:2px;font-family:inherit;}",
+      ".rpt-wysiwyg-btn.w{font-weight:700;}",
+      ".rpt-wysiwyg-btn.i{font-style:italic;font-family:Georgia,serif;}",
+      ".rpt-wysiwyg-btn.u{text-decoration:underline;}",
+      ".rpt-wysiwyg-btn.s{text-decoration:line-through;}",
+      ".rpt-wysiwyg-select{border:1px solid #aab8c8;background:#fff;font-size:11px;height:22px;padding:0 4px;margin:0 1px;color:#333;pointer-events:none;font-family:inherit;}",
+      ".rpt-wysiwyg-color{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:22px;height:22px;font-size:12px;font-weight:700;line-height:1;}",
+      ".rpt-wysiwyg-color-bar{width:14px;height:3px;margin-top:1px;border-radius:1px;}",
+      ".rpt-wysiwyg-tabs{display:flex;background:#eef1f5;border-top:1px solid #b8c4d0;font-size:11px;}",
+      ".rpt-wysiwyg-tab{padding:5px 16px;border-right:1px solid #c5ced8;color:#666;cursor:default;}",
+      ".rpt-wysiwyg-tab.on{background:#fff;color:#1f1e1c;font-weight:700;position:relative;}",
+      ".rpt-wysiwyg-tab.on::after{content:\"\";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:#fff;}",
+      "@media print{.rpt-wysiwyg-mock{display:none!important;}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -72,7 +109,6 @@
   var editInitialized = false;
   var editActive = false;
   var docClickBound = false;
-  var gapKeyBound = false;
 
   var ROMAN_LABELS = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ"];
 
@@ -109,6 +145,8 @@
     Array.prototype.forEach.call(base.querySelectorAll(TEXT_EDIT_SELECTOR), function (el) {
       if (el.closest(".line-chart-wrap") || el.closest("svg") || el.closest(".bar-track")) return;
       if (el.closest(".rpt-block-toolbar") || el.closest(".rpt-add-menu") || el.closest(".rpt-sec-add-row")) return;
+      if (el.closest(".rpt-stat-remove")) return;
+      if (el.closest(".rpt-stat-remove")) return;
       if (el.getAttribute("contenteditable") === "true") return;
       el.setAttribute("contenteditable", "true");
       el.setAttribute("spellcheck", "false");
@@ -240,27 +278,222 @@
 
   function insertFromStatsResult(sec, afterNode, payload) {
     var result = payload.result;
-    var insertBefore = afterNode
-      ? afterNode.nextSibling
-      : sec.querySelector("[data-rpt-sec-add]");
-    sec.insertBefore(createGap(), insertBefore);
-    var wrap;
+    var insertBefore = afterNode ? afterNode.nextSibling : null;
 
     if (result.kind === "table") {
-      sec.insertBefore(result.table, insertBefore);
-      if (result.cap) sec.insertBefore(result.cap, insertBefore);
-      wrap = wrapMovable(result.table);
-      if (wrap && result.cap && result.cap.parentNode === sec) wrap.appendChild(result.cap);
+      if (insertBefore) {
+        sec.insertBefore(result.table, insertBefore);
+        if (result.cap) sec.insertBefore(result.cap, insertBefore);
+      } else {
+        sec.appendChild(result.table);
+        if (result.cap) sec.appendChild(result.cap);
+      }
     } else if (result.node) {
-      sec.insertBefore(result.node, insertBefore);
-      wrap = wrapMovable(result.node);
+      if (insertBefore) sec.insertBefore(result.node, insertBefore);
+      else sec.appendChild(result.node);
     }
 
-    applyTextEdit(wrap || sec);
-    if (wrap) {
-      var focusEl = wrap.querySelector(".chart-title, table.report-table th");
-      if (focusEl) focusEl.focus();
+    applyTextEdit(sec);
+    decorateRemovableBlocks(sec);
+    var focusEl = sec.querySelector(".chart-title, table.report-table th, .body");
+    if (focusEl) focusEl.focus();
+  }
+
+  function insertFromStatsResultBefore(sec, beforeNode, payload) {
+    var result = payload.result;
+    if (result.kind === "table") {
+      sec.insertBefore(result.table, beforeNode);
+      if (result.cap) sec.insertBefore(result.cap, beforeNode);
+    } else if (result.node) {
+      sec.insertBefore(result.node, beforeNode);
     }
+    applyTextEdit(sec);
+  }
+
+  function seedStatSlots() {
+    if (!global.PixReportStatsQuery) return;
+    var slots = Array.prototype.slice.call(root.querySelectorAll(".rpt-stat-slot[data-rpt-seed]:not([data-rpt-seeded])"));
+    slots.forEach(function (slot) {
+      var id = slot.getAttribute("data-rpt-seed");
+      if (!id) return;
+      var payload = global.PixReportStatsQuery.resolveCatalogItem(id);
+      if (!payload.ok) return;
+      var sec = slot.closest(".sec") || root;
+      insertFromStatsResultBefore(sec, slot, payload);
+      slot.setAttribute("data-rpt-seeded", "1");
+      if (slot.parentNode) slot.parentNode.removeChild(slot);
+    });
+    if (slots.length) decorateRemovableBlocks(root);
+  }
+
+  function collectStatGroup(el) {
+    var nodes = [el];
+    if (el.tagName === "TABLE" && el.classList.contains("report-table")) {
+      var next = el.nextElementSibling;
+      if (next && next.matches && next.matches("p.cap")) nodes.push(next);
+    }
+    return nodes;
+  }
+
+  function createStatRemoveBtn(wrap) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "rpt-stat-remove";
+    btn.setAttribute("contenteditable", "false");
+    btn.setAttribute("aria-label", "표·차트 삭제");
+    btn.title = "표·차트 삭제";
+    btn.textContent = "−";
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!window.confirm("이 표·차트를 삭제할까요?")) return;
+      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+    });
+    return btn;
+  }
+
+  function wrapRemovableStat(el) {
+    if (el.closest("[data-rpt-stat-block]")) return null;
+    var nodes = collectStatGroup(el);
+    if (!nodes[0] || !nodes[0].parentNode) return null;
+    var wrap = document.createElement("div");
+    wrap.className = "rpt-stat-block";
+    wrap.setAttribute("data-rpt-stat-block", "1");
+    wrap.setAttribute("contenteditable", "false");
+    var parent = nodes[0].parentNode;
+    parent.insertBefore(wrap, nodes[0]);
+    nodes.forEach(function (n) {
+      if (n.parentNode) wrap.appendChild(n);
+    });
+    wrap.appendChild(createStatRemoveBtn(wrap));
+    return wrap;
+  }
+
+  function decorateRemovableBlocks(scope) {
+    var base = scope || root;
+    var seen = [];
+    base.querySelectorAll("table.report-table, .chart-block, .kpi-strip").forEach(function (el) {
+      if (el.closest("[data-rpt-stat-block]")) return;
+      if (seen.indexOf(el) > -1) return;
+      seen.push(el);
+      wrapRemovableStat(el);
+    });
+  }
+
+  function stripStatBlockChrome() {
+    Array.prototype.slice.call(root.querySelectorAll("[data-rpt-stat-block]")).forEach(function (wrap) {
+      var parent = wrap.parentNode;
+      if (!parent) return;
+      Array.prototype.slice.call(wrap.childNodes).forEach(function (child) {
+        if (child.nodeType === 1 && child.classList && child.classList.contains("rpt-stat-remove")) return;
+        parent.insertBefore(child, wrap);
+      });
+      parent.removeChild(wrap);
+    });
+  }
+
+  function getTargetSectionForStats() {
+    var sel = window.getSelection();
+    if (sel && sel.anchorNode) {
+      var node = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
+      if (node && node.closest) {
+        var activeSec = node.closest(".sec");
+        if (activeSec) return activeSec;
+      }
+    }
+    var secs = getSections();
+    return secs.length ? secs[secs.length - 1] : root;
+  }
+
+  function stripLayoutChrome() {
+    root.querySelectorAll(".rpt-block-toolbar, .rpt-sec-add-row, .rpt-sec-delete").forEach(function (el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+    root.querySelectorAll(".rpt-gap").forEach(function (el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+    Array.prototype.slice.call(root.querySelectorAll(".rpt-layout-block")).forEach(function (wrap) {
+      var parent = wrap.parentNode;
+      if (!parent) return;
+      Array.prototype.slice.call(wrap.childNodes).forEach(function (child) {
+        if (child.nodeType === 1 && child.classList && child.classList.contains("rpt-block-toolbar")) return;
+        parent.insertBefore(child, wrap);
+      });
+      parent.removeChild(wrap);
+    });
+  }
+
+  function buildWysiwygMockHtml() {
+    function btn(label, cls) {
+      return '<button type="button" class="rpt-wysiwyg-btn' + (cls ? " " + cls : "") + '" tabindex="-1">' + label + "</button>";
+    }
+    function grp(inner) { return '<div class="rpt-wysiwyg-grp">' + inner + "</div>"; }
+    function sel(val, w) {
+      return '<select class="rpt-wysiwyg-select" disabled style="width:' + w + 'px" tabindex="-1"><option>' + val + "</option></select>";
+    }
+    function colorBtn(letter, bar) {
+      return '<span class="rpt-wysiwyg-color">' + letter + '<span class="rpt-wysiwyg-color-bar" style="background:' + bar + '"></span></span>';
+    }
+    var row1 = grp(btn("🗎") + btn("💾") + btn("🖨") + btn("🔍")) +
+      grp(btn("↶") + btn("↷")) +
+      grp(btn("✂") + btn("📋") + btn("📄")) +
+      grp(btn("T") + btn("☰") + btn("Ω") + btn("—") + btn("🌐") + btn("📅")) +
+      grp(btn("☺") + btn("▦") + btn("🖼") + btn("🎬")) +
+      grp(btn("⊞") + btn("⊟") + btn("⊠") + btn("▤") + btn("▥") + btn("▦")) +
+      grp(btn("&", "w") + btn("🔧") + btn("⛶") + btn("D5", "w"));
+    var row2 = grp(sel("기본 서식", 76) + sel("굴림", 58) + sel("12pt", 46) + sel("1.2", 36)) +
+      grp(btn("B", "w") + btn("I", "i") + btn("U", "u") + btn("A", "s") +
+        btn("x²") + btn("x₂") + btn("⌫") + btn("🔗")) +
+      grp(colorBtn("A", "#e24b4a") + colorBtn("▮", "#f4e04d")) +
+      grp(btn("1.") + btn("•") + btn("≡") + btn("≡") + btn("≡") + btn("≡") + btn("⇤") + btn("⇥"));
+    return '<div class="rpt-wysiwyg-toolbar">' +
+      '<div class="rpt-wysiwyg-row">' + row1 + "</div>" +
+      '<div class="rpt-wysiwyg-row">' + row2 + "</div></div>" +
+      '<div class="rpt-wysiwyg-tabs">' +
+      '<span class="rpt-wysiwyg-tab on">디자인</span>' +
+      '<span class="rpt-wysiwyg-tab">HTML</span>' +
+      '<span class="rpt-wysiwyg-tab">미리 보기</span>' +
+      '<span class="rpt-wysiwyg-tab">TEXT</span></div>';
+  }
+
+  function ensureWysiwygMock() {
+    if (root.querySelector("[data-rpt-wysiwyg-mock]")) return;
+    var firstSec = root.querySelector(".sec");
+    if (!firstSec || !firstSec.parentNode) return;
+    var wrap = document.createElement("div");
+    wrap.className = "rpt-wysiwyg-mock";
+    wrap.setAttribute("data-rpt-wysiwyg-mock", "1");
+    wrap.setAttribute("aria-hidden", "true");
+    wrap.innerHTML = buildWysiwygMockHtml();
+    firstSec.parentNode.insertBefore(wrap, firstSec);
+  }
+
+  function ensureStatsToolbar(show) {
+    var bar = root.querySelector("[data-rpt-stats-toolbar]");
+    if (!show) {
+      if (bar && bar.parentNode) bar.parentNode.removeChild(bar);
+      return;
+    }
+    if (bar) return;
+    bar = document.createElement("div");
+    bar.className = "rpt-stats-toolbar";
+    bar.setAttribute("data-rpt-stats-toolbar", "1");
+    bar.setAttribute("contenteditable", "false");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "rpt-stats-toolbar-btn";
+    btn.textContent = "통계에서 불러오기…";
+    btn.setAttribute("contenteditable", "false");
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openStatsDialog(getTargetSectionForStats(), null);
+    });
+    bar.appendChild(btn);
+    var anchor = root.querySelector(".doc-info-table") || root.querySelector(".doc-title") || root.firstChild;
+    if (anchor && anchor.nextSibling) root.insertBefore(bar, anchor.nextSibling);
+    else if (anchor) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+    else root.insertBefore(bar, root.firstChild);
   }
 
   function openStatsDialog(sec, afterNode) {
@@ -271,36 +504,49 @@
       return;
     }
     statsDialogContext = { sec: sec, afterNode: afterNode };
+    var catalog = global.PixReportStatsQuery.getImportCatalog();
     var backdrop = document.createElement("div");
     backdrop.className = "rpt-stats-dialog-backdrop";
     backdrop.setAttribute("data-rpt-stats-dialog", "1");
-    var suggestions = global.PixReportStatsQuery.getSuggestions();
     backdrop.innerHTML =
       '<div class="rpt-stats-dialog" role="dialog" aria-label="통계에서 불러오기">' +
         "<h3>통계에서 불러오기</h3>" +
-        "<p>통계 화면 목업 데이터에서 표·차트를 생성합니다. 원하는 내용을 입력하세요.</p>" +
-        '<input type="text" class="rpt-stats-input" placeholder="예: 의사영역 점수 6개월 추이" />' +
-        '<div class="rpt-stats-suggest">' +
-          suggestions.map(function (s) {
-            return '<button type="button" data-rpt-suggest="' + s.replace(/"/g, "&quot;") + '">' + s + "</button>";
+        "<p>항목을 클릭하면 보고서에 표·차트·분석 내용이 추가됩니다.</p>" +
+        '<div class="rpt-stats-groups">' +
+          catalog.groups.map(function (group) {
+            return (
+              '<section class="rpt-stats-group" data-rpt-stats-group="' + group.key + '">' +
+                '<div class="rpt-stats-group-title">' + group.title + "</div>" +
+                '<div class="rpt-stats-badges">' +
+                  group.items.map(function (item) {
+                    var aiClass = group.key === "ai" ? " ai" : "";
+                    return (
+                      '<button type="button" class="rpt-stats-badge' + aiClass + '" data-rpt-catalog-id="' + item.id + '">' +
+                        item.label +
+                      "</button>"
+                    );
+                  }).join("") +
+                "</div>" +
+              "</section>"
+            );
           }).join("") +
         "</div>" +
         '<div class="rpt-stats-msg"></div>' +
         '<div class="rpt-stats-actions">' +
-          '<button type="button" class="rpt-stats-cancel">취소</button>' +
-          '<button type="button" class="rpt-stats-submit">불러오기</button>' +
+          '<button type="button" class="rpt-stats-cancel">닫기</button>' +
         "</div>" +
       "</div>";
     document.body.appendChild(backdrop);
     statsDialog = backdrop;
-    var input = backdrop.querySelector(".rpt-stats-input");
     var msg = backdrop.querySelector(".rpt-stats-msg");
 
-    function runSubmit() {
-      var resolved = global.PixReportStatsQuery.resolveQuery(input.value);
+    function importItem(itemId, btn) {
+      if (btn) btn.disabled = true;
+      var resolved = global.PixReportStatsQuery.resolveCatalogItem(itemId);
       if (!resolved.ok) {
         msg.className = "rpt-stats-msg err";
         msg.textContent = resolved.message;
+        if (btn) btn.disabled = false;
         return;
       }
       insertFromStatsResult(statsDialogContext.sec, statsDialogContext.afterNode, resolved);
@@ -308,27 +554,20 @@
     }
 
     backdrop.querySelector(".rpt-stats-cancel").addEventListener("click", closeStatsDialog);
-    backdrop.querySelector(".rpt-stats-submit").addEventListener("click", runSubmit);
     backdrop.addEventListener("click", function (e) {
       if (e.target === backdrop) closeStatsDialog();
     });
     backdrop.querySelector(".rpt-stats-dialog").addEventListener("click", function (e) {
       e.stopPropagation();
     });
-    backdrop.querySelectorAll("[data-rpt-suggest]").forEach(function (btn) {
+    backdrop.querySelectorAll("[data-rpt-catalog-id]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        input.value = btn.getAttribute("data-rpt-suggest");
-        input.focus();
+        importItem(btn.getAttribute("data-rpt-catalog-id"), btn);
       });
     });
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        runSubmit();
-      }
+    backdrop.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closeStatsDialog();
     });
-    input.focus();
   }
 
   function showAddMenu(anchor, sec, insertAfterNode) {
@@ -688,21 +927,9 @@
       docClickBound = true;
       document.addEventListener("click", function (e) {
         if (!editActive) return;
-        if (e.target.closest("[data-rpt-add-menu]") || e.target.closest(".rpt-block-add") || e.target.closest(".rpt-sec-add-btn")) return;
-        if (e.target.closest(".rpt-sec-delete")) return;
+        if (e.target.closest("[data-rpt-stats-toolbar]")) return;
         if (e.target.closest("[data-rpt-stats-dialog]")) return;
         closeAddMenu();
-      });
-    }
-    if (!gapKeyBound) {
-      gapKeyBound = true;
-      root.addEventListener("keydown", function (e) {
-        if (!editActive) return;
-        if (e.key !== "Enter" || e.shiftKey) return;
-        var gap = e.target.closest("[data-rpt-gap]");
-        if (!gap) return;
-        e.preventDefault();
-        document.execCommand("insertLineBreak");
       });
     }
   }
@@ -711,11 +938,15 @@
     root.classList.remove("rpt-preview-mode");
     if (!editInitialized) {
       editInitialized = true;
-      root.querySelectorAll(".sec").forEach(initSection);
-      renumberSections();
       bindEditListeners();
     }
+    stripLayoutChrome();
     editActive = true;
+    document.body.classList.add("rpt-editor-mode");
+    root.classList.add("rpt-editor-surface");
+    ensureStatsToolbar(true);
+    seedStatSlots();
+    decorateRemovableBlocks(root);
     applyTextEdit(root);
     if (typeof global.__pixReportEnableTextEdit === "function") global.__pixReportEnableTextEdit();
   }
@@ -723,8 +954,12 @@
   function disableEditMode() {
     editActive = false;
     root.classList.add("rpt-preview-mode");
+    document.body.classList.remove("rpt-editor-mode");
+    root.classList.remove("rpt-editor-surface");
     closeAddMenu();
     closeStatsDialog();
+    ensureStatsToolbar(false);
+    stripStatBlockChrome();
     stripTextEdit(root);
   }
 
@@ -733,9 +968,13 @@
   global.PixReportLayoutEdit = {
     enable: enableEditMode,
     disable: disableEditMode,
-    isEditMode: function () { return editActive; }
+    isEditMode: function () { return editActive; },
+    seedStatSlots: seedStatSlots
   };
   global.__pixReportApplyTextEdit = applyTextEdit;
+
+  if (global.PixReportStatsQuery) seedStatSlots();
+  ensureWysiwygMock();
 
   window.addEventListener("message", function (e) {
     if (!e.data || e.data.type !== "pix-report-enable-edit") return;

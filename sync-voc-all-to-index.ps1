@@ -266,12 +266,6 @@ $loaderScript = @'
         function onClick(e) {
           var t = e.target;
           if (!t || !t.closest) return;
-          var reportBtn = t.closest(".voc-filter-action-secondary");
-          if (reportBtn) {
-            e.preventDefault();
-            if (typeof window.openVocAiReportModal === "function") window.openVocAiReportModal();
-            return;
-          }
           var btn = t.closest(".voc-filter-action");
           if (!btn) return;
           e.preventDefault();
@@ -294,7 +288,10 @@ $loaderScript = @'
           hideLevelSlider: true,
           showLoading: true,
           openMode: openModeRef.current,
-          onClose: function () { setOpen(false); }
+          onClose: function () { setOpen(false); setReportOpen(false); },
+          onOpenReport: function () {
+            setReportOpen(true);
+          }
         });
       }, [open]);
       var actions = global.pixReportDocActions || {};
@@ -307,27 +304,18 @@ $loaderScript = @'
           onPrint: function () { actions.print && actions.print(reportFrameRef.current, null); }
         })
         : null;
-      var modal = open
-        ? React.createElement(
-            "div",
-            {
-              className: "fixed inset-0 z-[120] bg-black/55 flex items-center justify-center p-4 sm:p-6 overflow-y-auto",
-              onClick: function () { setOpen(false); }
-            },
-            React.createElement(
-              "div",
-              {
-                className: "relative w-full max-w-[1200px] max-h-[90vh] overflow-y-auto rounded-[14px] shadow-2xl",
-                style: { background: "#17171c", color: "#e7e6ee", padding: "22px 26px", boxSizing: "border-box" },
-                onClick: function (e) { e.stopPropagation(); }
-              },
-              React.createElement("div", { ref: panelRef, style: { width: "100%" } })
-            )
-          )
+      var modal = typeof global.createPixAiAnalysisModalOverlay === "function"
+        ? global.createPixAiAnalysisModalOverlay(React, {
+          open: open,
+          reportOpen: reportOpen,
+          onOverlayClick: function () { setOpen(false); setReportOpen(false); },
+          children: React.createElement("div", { ref: panelRef, style: { width: "100%" } })
+        })
         : null;
       var reportDrawer = typeof global.createPixReportIframeDrawer === "function"
         ? global.createPixReportIframeDrawer(React, {
           open: reportOpen,
+          stackedWithModal: open && reportOpen,
           onClose: function () { setReportOpen(false); },
           title: "2026\uB144 6\uC6D4 VOC \uBD84\uC11D\uBCF4\uACE0\uC11C",
           subtitle: "\uB0B4\uBD80 \uBCF4\uACE0 \u00B7 \uC784\uC6D0 \uBCF4\uACE0\uC6A9 \u00B7 PIX AI \uD658\uC790\uACBD\uD5D8\uAD00\uB9AC",
