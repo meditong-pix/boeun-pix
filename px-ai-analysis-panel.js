@@ -293,6 +293,44 @@
     ".px-ai-saved-rpt-wrap{display:flex;flex-direction:column;gap:8px;height:100%;min-height:420px;}",
     ".px-ai-saved-rpt-meta{font-size:11px;color:#9b99a8;font-weight:600;}",
     ".px-ai-saved-rpt-frame{flex:1;width:100%;min-height:360px;border:1px solid #2d2c36;border-radius:10px;background:#fff;}",
+    ".px-ai-history-head-btn{border:1px solid #2d2c36;background:#201f27;color:#cfcdda;font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap;}",
+    ".px-ai-history-head-btn:hover{border-color:#8b5cf6;color:#fff;background:#241f36;}",
+    ".px-ai-history-head-btn.on{border-color:#8b5cf6;color:#ddd6fe;background:rgba(139,92,246,.14);}",
+    ".px-ai-history-back{border:none;background:transparent;color:#8fb4e0;font-size:12px;font-weight:700;padding:8px 2px;cursor:pointer;font-family:inherit;}",
+    ".px-ai-history-back:hover{color:#fff;}",
+    ".px-ai-history-filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}",
+    ".px-ai-history-filter{border:1px solid #2d2c36;background:#201f27;color:#cfcdda;font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;}",
+    ".px-ai-history-filter.on{border-color:#8b5cf6;background:rgba(139,92,246,.16);color:#fff;}",
+    ".px-ai-history-item-kind{display:inline-flex;align-items:center;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:700;margin-right:6px;background:#24303e;color:#8fb4e0;}",
+    ".px-ai-history-item-kind.survey{background:#2a2438;color:#c7a6f2;}",
+    ".px-ai-history-list{display:flex;flex-direction:column;gap:16px;padding-bottom:8px;}",
+    ".px-ai-history-day{font-size:11px;font-weight:800;color:#9b99a8;letter-spacing:.04em;margin:0 0 6px;}",
+    ".px-ai-history-items{display:flex;flex-direction:column;gap:8px;}",
+    ".px-ai-history-item{border:1px solid #2d2c36;border-radius:10px;background:#201f27;padding:12px 14px;text-align:left;font-family:inherit;width:100%;transition:border-color .15s,background .15s;}",
+    ".px-ai-history-item:hover{border-color:#4a4560;background:#24232c;}",
+    ".px-ai-history-item.on{border-color:#8b5cf6;background:#241f36;}",
+    ".px-ai-history-item-main{border:0;background:transparent;padding:0;text-align:left;cursor:pointer;width:100%;font-family:inherit;color:inherit;}",
+    ".px-ai-history-item-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}",
+    ".px-ai-history-dl-btn{border:1px solid #3a3848;background:#17171c;color:#cfcdda;font-size:10px;font-weight:700;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.2;}",
+    ".px-ai-history-dl-btn:hover:not(:disabled){border-color:#8b5cf6;background:rgba(139,92,246,.12);color:#fff;}",
+    ".px-ai-history-dl-btn:disabled{opacity:.42;cursor:not-allowed;}",
+    ".px-ai-history-item-title{font-size:13px;font-weight:700;color:#fff;margin:0 0 4px;}",
+    ".px-ai-history-item-meta{font-size:11px;color:#7a7887;margin:0;line-height:1.5;}",
+    ".px-ai-history-item-badge{display:inline-flex;align-items:center;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:700;margin-right:6px;}",
+    ".px-ai-history-item-badge.saved{background:rgba(74,222,128,.12);color:#7fd6b0;}",
+    ".px-ai-history-item-badge.draft{background:rgba(251,191,36,.12);color:#e8c46a;}",
+    ".px-ai-history-item-badge.empty{background:#2d2c36;color:#7a7887;}",
+    ".px-ai-history-empty{font-size:12px;color:#7a7887;line-height:1.6;padding:12px 0;margin:0;}",
+    ".px-ai-history-detail-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;}",
+    ".px-ai-history-detail-actions{display:flex;justify-content:flex-end;margin:0 0 10px;}",
+    ".px-ai-history-detail-tab{border:1px solid #2d2c36;background:#201f27;color:#cfcdda;font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;}",
+    ".px-ai-history-detail-tab.on{border-color:#8b5cf6;background:rgba(139,92,246,.16);color:#fff;}",
+    ".px-ai-history-detail-banner{font-size:11px;color:#9b99a8;background:#201f27;border:1px solid #2d2c36;border-radius:8px;padding:8px 10px;margin:0 0 10px;line-height:1.5;}",
+    ".px-ai-history-detail-frame{flex:1;width:100%;min-height:360px;border:1px solid #2d2c36;border-radius:10px;background:#fff;}",
+    ".px-ai-history-detail-host{flex:1;min-height:360px;border:1px solid #2d2c36;border-radius:10px;background:#17171c;overflow:auto;}",
+    ".px-ai-history-report-head{border:1px solid #2d2c36;border-radius:10px;background:#201f27;padding:10px 12px;margin:0 0 10px;}",
+    ".px-ai-history-report-title{font-size:13px;font-weight:800;color:#fff;margin:0 0 4px;}",
+    ".px-ai-history-report-sub{font-size:11px;color:#9b99a8;margin:0;line-height:1.5;}",
     ".px-ai-setup-chip-base{font-size:12px;padding:8px 14px;border-radius:999px;border:1px solid #2d2c36;background:#201f27;color:#7a7887;}",
     ".px-ai-setup-chip{font-size:12px;padding:8px 14px;border-radius:999px;border:1px solid #2d2c36;background:#201f27;color:#cfcdda;cursor:pointer;}",
     ".px-ai-strength-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}",
@@ -1222,6 +1260,8 @@
     var si = 0;
     var disposed = false;
     var savedReportEntry = null;
+    var selectedHistoryEntry = null;
+    var historyFilter = "all";
     var mainViewTab = "analysis";
     host.innerHTML = "";
     var root = document.createElement("div");
@@ -1243,6 +1283,7 @@
             '<div><div class="px-ai-voc-title">' + esc(data.title || (variant === "voc" ? "VOC AI 상세 분석" : "환자경험평가 AI 상세 분석")) + '</div>' +
             '<div class="px-ai-voc-sub" data-role="period"></div></div>' +
             '<div class="px-ai-top-actions">' +
+              '<button type="button" class="px-ai-history-head-btn" data-role="history-btn">보고서 이력확인</button>' +
               '<button type="button" class="px-ai-report-head-btn" data-role="report-btn" style="display:none">보고서 작성 ↗</button>' +
               '<button type="button" class="px-ai-close" data-role="close" aria-label="닫기">✕</button>' +
             '</div>' +
@@ -1255,6 +1296,7 @@
         '</div>' +
         '<div class="px-ai-scroll" data-role="scroll">' +
           '<div data-pane="analysis">' + analysisBodyHtml + '</div>' +
+          '<div data-role="history-pane" style="display:none"></div>' +
           '<div data-role="saved-report-pane" style="display:none"></div>' +
           '<div data-pane="report" style="display:none">' +
             '<div class="px-ai-rpt-doc-wrap" data-role="report-doc"></div>' +
@@ -1329,6 +1371,8 @@
       reportBtn: root.querySelector('[data-role="report-btn"]'),
       savedReportTabs: root.querySelector('[data-role="saved-report-tabs"]'),
       savedReportPane: root.querySelector('[data-role="saved-report-pane"]'),
+      historyBtn: root.querySelector('[data-role="history-btn"]'),
+      historyPane: root.querySelector('[data-role="history-pane"]'),
       close: root.querySelector('[data-role="close"]')
     };
 
@@ -1339,6 +1383,7 @@
       if (els.breadcrumb) els.breadcrumb.style.display = "none";
       if (els.close) els.close.style.display = "none";
       if (els.reportBtn) els.reportBtn.style.display = "none";
+      if (els.historyBtn) els.historyBtn.style.display = "none";
       root.classList.add("px-ai-archive-embed");
       var archiveScroll = root.querySelector('[data-role="scroll"]');
       if (archiveScroll) {
@@ -1960,6 +2005,300 @@
         });
       }
     }
+    function formatHistoryDayLabel(dayKey) {
+      if (!dayKey) return "보고서";
+      if (String(dayKey).indexOf("mock:") === 0) return String(dayKey).slice(5);
+      try {
+        var d = new Date(dayKey + "T00:00:00");
+        if (Number.isNaN(d.getTime())) return dayKey;
+        var wd = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+        return dayKey.replace(/-/g, ".") + " (" + wd + ")";
+      } catch (_e) {
+        return dayKey;
+      }
+    }
+    function entryHistoryVariant(entry) {
+      return resolvePixHistoryEntryVariant(entry, variant);
+    }
+    function annotateHistoryEntries(list, kind) {
+      return (list || []).map(function (entry) {
+        return Object.assign({}, entry, { historyVariant: kind });
+      });
+    }
+    function sortHistoryEntries(entries) {
+      return (entries || []).slice().sort(function (a, b) {
+        if (a.hasData !== b.hasData) return a.hasData ? -1 : 1;
+        return String(b.storageKey).localeCompare(String(a.storageKey));
+      });
+    }
+    function loadReportHistoryEntries(filterKey) {
+      var key = filterKey || historyFilter;
+      if (typeof global.__pixAiReportArchiveLoadTabEntries !== "function") return [];
+      if (key === "voc") return sortHistoryEntries(annotateHistoryEntries(global.__pixAiReportArchiveLoadTabEntries("voc"), "voc"));
+      if (key === "survey") return sortHistoryEntries(annotateHistoryEntries(global.__pixAiReportArchiveLoadTabEntries("survey"), "survey"));
+      return sortHistoryEntries(
+        annotateHistoryEntries(global.__pixAiReportArchiveLoadTabEntries("voc"), "voc").concat(
+          annotateHistoryEntries(global.__pixAiReportArchiveLoadTabEntries("survey"), "survey")
+        )
+      );
+    }
+    function getHistoryTabCfg(entry) {
+      var tabKey = entry ? entryHistoryVariant(entry) : (historyFilter === "survey" ? "survey" : historyFilter === "voc" ? "voc" : variant);
+      if (tabKey === "all") tabKey = variant;
+      if (typeof global.__pixAiReportArchiveTabConfig === "function") {
+        return global.__pixAiReportArchiveTabConfig(tabKey === "voc" ? "voc" : "survey");
+      }
+      return null;
+    }
+    function historyKindBadge(entry) {
+      var kind = entryHistoryVariant(entry);
+      if (kind === "voc") return '<span class="px-ai-history-item-kind">VOC</span>';
+      if (kind === "survey") return '<span class="px-ai-history-item-kind survey">환자경험평가</span>';
+      return "";
+    }
+    function groupHistoryEntriesByDate(entries) {
+      var mockGroups = {};
+      var dateGroups = {};
+      (entries || []).forEach(function (entry) {
+        if (entry.savedAt) {
+          var day = String(entry.savedAt).slice(0, 10);
+          if (!dateGroups[day]) dateGroups[day] = [];
+          dateGroups[day].push(entry);
+          return;
+        }
+        var periodKey = entry.analysisPeriod || entry.period || entry.title || entry.storageKey;
+        if (!mockGroups[periodKey]) mockGroups[periodKey] = [];
+        mockGroups[periodKey].push(entry);
+      });
+      var groups = Object.keys(mockGroups).sort(function (a, b) { return b.localeCompare(a); }).map(function (periodKey) {
+        return {
+          day: "mock:" + periodKey,
+          items: mockGroups[periodKey].slice().sort(function (a, b) {
+            return String(b.storageKey).localeCompare(String(a.storageKey));
+          })
+        };
+      });
+      Object.keys(dateGroups).sort(function (a, b) { return b.localeCompare(a); }).forEach(function (day) {
+        groups.push({
+          day: day,
+          items: dateGroups[day].slice().sort(function (a, b) {
+            return String(b.savedAt || b.storageKey).localeCompare(String(a.savedAt || a.storageKey));
+          })
+        });
+      });
+      return groups;
+    }
+    function historyStatusBadge(status, hasData) {
+      if (!hasData) return '<span class="px-ai-history-item-badge empty">미작성</span>';
+      if (status === "draft") return '<span class="px-ai-history-item-badge draft">임시저장</span>';
+      return '<span class="px-ai-history-item-badge saved">저장됨</span>';
+    }
+    function dispatchHistorySelected(entry) {
+      try {
+        global.dispatchEvent(new CustomEvent("pix-report-history-selected", {
+          detail: {
+            panelVariant: variant,
+            variant: entryHistoryVariant(entry),
+            entry: entry
+          }
+        }));
+      } catch (_e) {}
+    }
+    function closeHistoryReportModal() {
+      try {
+        global.dispatchEvent(new CustomEvent("pix-history-report-close", {
+          detail: { panelVariant: variant }
+        }));
+      } catch (_e) {}
+    }
+    function openHistoryReportModal(entry) {
+      if (!entry) return;
+      try {
+        global.dispatchEvent(new CustomEvent("pix-history-report-open", {
+          detail: {
+            panelVariant: variant,
+            variant: entryHistoryVariant(entry),
+            entry: entry
+          }
+        }));
+      } catch (_e) {}
+    }
+    function dispatchHistoryCleared() {
+      closeHistoryReportModal();
+      try {
+        global.dispatchEvent(new CustomEvent("pix-report-history-cleared", {
+          detail: { panelVariant: variant }
+        }));
+      } catch (_e) {}
+    }
+    function renderHistoryFilterBar() {
+      return '<div class="px-ai-history-filters">' +
+        [
+          { key: "all", label: "전체" },
+          { key: "voc", label: "VOC" },
+          { key: "survey", label: "환자경험평가" }
+        ].map(function (item) {
+          return '<button type="button" class="px-ai-history-filter' + (historyFilter === item.key ? " on" : "") +
+            '" data-history-filter="' + item.key + '">' + item.label + "</button>";
+        }).join("") +
+      "</div>";
+    }
+    function renderHistoryList() {
+      if (!els.historyPane) return;
+      var entries = loadReportHistoryEntries();
+      var groups = groupHistoryEntriesByDate(entries);
+      if (!groups.length) {
+        els.historyPane.innerHTML =
+          renderHistoryFilterBar() +
+          '<p class="px-ai-history-empty">등록된 보고서가 없습니다.<br>AI 분석 후 보고서를 저장하면 일자별로 이 목록에 표시됩니다.</p>';
+        bindHistoryFilterClicks();
+        return;
+      }
+      els.historyPane.innerHTML =
+        renderHistoryFilterBar() +
+        '<div class="px-ai-history-list">' +
+          groups.map(function (group) {
+            return '<section class="px-ai-history-group">' +
+              '<p class="px-ai-history-day">' + esc(formatHistoryDayLabel(group.day)) + "</p>" +
+              '<div class="px-ai-history-items">' +
+                group.items.map(function (entry) {
+                  var on = selectedHistoryEntry && selectedHistoryEntry.storageKey === entry.storageKey;
+                  var time = entry.hasData && entry.savedAt
+                    ? formatSavedReportTime(entry.savedAt).slice(11)
+                    : (entry.hasData ? "-" : "미작성");
+                  var meta = entry.hasData
+                    ? esc(time) + " · " + esc(entry.analysisPeriod || entry.period || "-")
+                    : esc(entry.year || "-") + " · " + esc(entry.analysisPeriod || entry.period || "-") + " · 등록일 -";
+                  return '<div class="px-ai-history-item' + (on ? " on" : "") + '">' +
+                    '<button type="button" class="px-ai-history-item-main" data-history-key="' + esc(entry.storageKey) + '">' +
+                      '<p class="px-ai-history-item-title">' +
+                        (historyFilter === "all" ? historyKindBadge(entry) : "") +
+                        historyStatusBadge(entry.status, entry.hasData) +
+                        esc(entry.title || entry.period) +
+                      "</p>" +
+                      '<p class="px-ai-history-item-meta">' + meta + "</p>" +
+                    "</button>" +
+                    '<div class="px-ai-history-item-actions">' +
+                      '<button type="button" class="px-ai-history-dl-btn" data-history-dl="report" data-history-key="' + esc(entry.storageKey) + '"' +
+                        (entry.hasData ? "" : " disabled") + ">보고서 ↓</button>" +
+                      '<button type="button" class="px-ai-history-dl-btn" data-history-dl="stats" data-history-key="' + esc(entry.storageKey) + '">통계 ↓</button>' +
+                      '<button type="button" class="px-ai-history-dl-btn" data-history-dl="analysis" data-history-key="' + esc(entry.storageKey) + '">분석 ↓</button>' +
+                    "</div>" +
+                  "</div>";
+                }).join("") +
+              "</div></section>";
+          }).join("") +
+        "</div>";
+      bindHistoryFilterClicks();
+      bindHistoryDownloadClicks();
+      Array.prototype.forEach.call(els.historyPane.querySelectorAll(".px-ai-history-item-main[data-history-key]"), function (btn) {
+        btn.addEventListener("click", function () {
+          selectHistoryEntry(btn.getAttribute("data-history-key"));
+        });
+      });
+    }
+    function findHistoryEntryByKey(storageKey) {
+      return loadReportHistoryEntries("all").filter(function (item) {
+        return item.storageKey === storageKey;
+      })[0] || null;
+    }
+    function bindHistoryDownloadClicks() {
+      if (!els.historyPane) return;
+      Array.prototype.forEach.call(els.historyPane.querySelectorAll("[data-history-dl]"), function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (btn.disabled) return;
+          var key = btn.getAttribute("data-history-key");
+          var kind = btn.getAttribute("data-history-dl");
+          var entry = findHistoryEntryByKey(key);
+          if (!entry) return;
+          if (kind === "report") {
+            if (typeof global.__pixDownloadHistoryReport === "function") {
+              global.__pixDownloadHistoryReport(entry, options.showToast);
+            }
+            return;
+          }
+          if (typeof global.__pixDownloadHistorySnapshotPage === "function") {
+            global.__pixDownloadHistorySnapshotPage(entry, kind, options.showToast);
+          }
+        });
+      });
+    }
+    function bindHistoryFilterClicks() {
+      if (!els.historyPane) return;
+      Array.prototype.forEach.call(els.historyPane.querySelectorAll("[data-history-filter]"), function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          var next = btn.getAttribute("data-history-filter") || "all";
+          if (next === historyFilter) return;
+          historyFilter = next;
+          selectedHistoryEntry = null;
+          dispatchHistoryCleared();
+          renderHistoryList();
+        });
+      });
+    }
+    function restoreLiveAnalysisPane() {
+      if (!els.body || !useDarkModal) return;
+      if (analysisPhase === "ready") {
+        renderChipBasedAnalysis();
+        if (els.reportDoc) renderReportPane();
+        updateReportButton(true);
+      } else if (analysisPhase === "strength") {
+        renderStep2Strength();
+        updateReportButton(false);
+      } else if (analysisPhase === "loading") {
+        var loadingText = variant === "voc"
+          ? "VOC 데이터를 분석하고 있습니다…"
+          : "환자경험평가 데이터를 분석하고 있습니다…";
+        els.body.innerHTML = '<p class="px-ai-voc-loading">' + loadingText + "</p>";
+        updateReportButton(false);
+      }
+    }
+    function applyHistoryAnalysisToMainPane(entry) {
+      if (!els.body || !entry) return;
+      if (entry.analysisSnapshot && entry.analysisSnapshot.html) {
+        els.body.innerHTML =
+          '<iframe class="px-ai-history-detail-frame" style="min-height:420px;width:100%;border:0;border-radius:10px;background:#17171c" title="저장된 AI 분석"></iframe>';
+        var frame = els.body.querySelector("iframe");
+        if (frame && typeof global.__pixBuildArchiveSnapshotDoc === "function") {
+          frame.srcdoc = global.__pixBuildArchiveSnapshotDoc(entry.analysisSnapshot, "analysis");
+        }
+        return;
+      }
+      var levelKey = (entry.analysisSnapshot && entry.analysisSnapshot.level) || "deep";
+      var idx = LV_KEYS.indexOf(levelKey);
+      if (idx >= 0) curLv = idx;
+      global.__pxAiAnalysisLevel = LV_KEYS[curLv];
+      analysisPhase = "ready";
+      appliedAnalysisBlocks = blocksForLevel(LV_KEYS[curLv]);
+      activeAnalysisBlocks = appliedAnalysisBlocks ? appliedAnalysisBlocks.slice() : null;
+      renderChipBasedAnalysis();
+      if (els.reportDoc) renderReportPane();
+      updateReportButton(true);
+    }
+    function selectHistoryEntry(storageKey) {
+      var entries = loadReportHistoryEntries("all");
+      var entry = entries.filter(function (item) { return item.storageKey === storageKey; })[0];
+      if (!entry) return;
+      selectedHistoryEntry = entry;
+      if (entry.hasData) {
+        applySavedReportEntry({
+          storageKey: entry.storageKey,
+          status: entry.status,
+          savedAt: entry.savedAt,
+          html: entry.html
+        });
+      }
+      if (els.period) {
+        els.period.textContent = entry.analysisPeriod || entry.period || data.periodText || "";
+      }
+      dispatchHistorySelected(entry);
+      applyHistoryAnalysisToMainPane(entry);
+      openHistoryReportModal(entry);
+      switchMainViewTab("analysis", { preserveHistorySelection: true });
+    }
     function renderSavedReportPane() {
       if (!els.savedReportPane || !savedReportEntry) return;
       var statusLabel = savedReportEntry.status === "draft" ? "임시저장" : "저장됨";
@@ -1972,14 +2311,41 @@
       var frame = els.savedReportPane.querySelector("iframe");
       if (frame) frame.srcdoc = sanitizeSavedReportHtml(savedReportEntry.html);
     }
-    function switchMainViewTab(tab) {
+    function switchMainViewTab(tab, tabOpts) {
+      tabOpts = tabOpts || {};
       if (!useDarkModal) return;
-      mainViewTab = tab === "saved" && savedReportEntry ? "saved" : "analysis";
-      if (els.analysisTabBtn) els.analysisTabBtn.classList.toggle("on", mainViewTab === "analysis");
+      if (tab === "saved" && !savedReportEntry) tab = "analysis";
+      mainViewTab = tab;
+      if (els.historyBtn) els.historyBtn.classList.toggle("on", mainViewTab === "history");
+      if (els.analysisTabBtn) {
+        els.analysisTabBtn.classList.toggle("on", mainViewTab === "analysis");
+        els.analysisTabBtn.style.display = mainViewTab === "history" ? "none" : "";
+      }
+      if (els.innerTabs && els.savedReportTabs) {
+        els.savedReportTabs.style.display = mainViewTab === "history" ? "none" : "";
+      }
+      if (els.breadcrumb) {
+        els.breadcrumb.style.display = mainViewTab === "history" ? "none" : "";
+      }
       if (els.analysisPane) els.analysisPane.style.display = mainViewTab === "analysis" ? "" : "none";
+      if (els.historyPane) {
+        els.historyPane.style.display = mainViewTab === "history" ? "" : "none";
+        if (mainViewTab === "history") renderHistoryList();
+      }
       if (els.savedReportPane) {
         els.savedReportPane.style.display = mainViewTab === "saved" ? "" : "none";
         if (mainViewTab === "saved") renderSavedReportPane();
+      }
+      if (mainViewTab === "analysis") {
+        if (selectedHistoryEntry && tabOpts.preserveHistorySelection) {
+          // keep history-applied analysis in the main pane
+        } else if (selectedHistoryEntry) {
+          selectedHistoryEntry = null;
+          dispatchHistoryCleared();
+          restoreLiveAnalysisPane();
+        } else {
+          restoreLiveAnalysisPane();
+        }
       }
       renderSavedReportTabs();
     }
@@ -3305,6 +3671,18 @@
         openExternalReportDrawer();
       });
     }
+    if (els.historyBtn) {
+      els.historyBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (mainViewTab === "history") {
+          selectedHistoryEntry = null;
+          dispatchHistoryCleared();
+          switchMainViewTab("analysis");
+          return;
+        }
+        switchMainViewTab("history");
+      });
+    }
     if (els.close) {
       if (typeof options.onClose === "function") {
         els.close.addEventListener("click", function (e) {
@@ -3467,6 +3845,7 @@
 
     return function dispose() {
       disposed = true;
+      dispatchHistoryCleared();
       captureKeys.forEach(function (key) {
         if (global.__pixAnalysisPanelCaptures && global.__pixAnalysisPanelCaptures[key] === captureAnalysisSnapshot) {
           delete global.__pixAnalysisPanelCaptures[key];
@@ -3692,6 +4071,34 @@
     return null;
   };
 
+  global.__pixApplyStatsSnapshotToHost = function (host, snapshot, variant, showToast) {
+    if (!host) return;
+    host.innerHTML = "";
+    if (!snapshot || !snapshot.html) {
+      if (variant === "voc" && typeof global.__pixMountVocStatisticsEmbed === "function") {
+        host.className = "voc-embed-root animate-fadeIn";
+        host.style.width = "100%";
+        global.__pixMountVocStatisticsEmbed(host);
+      } else if (variant === "survey" && typeof global.__pixSurveyStatsEmbedRenderer === "function") {
+        host.className = "flex flex-col h-full animate-fadeIn font-sans";
+        global.__pixSurveyStatsEmbedRenderer(host, showToast);
+      }
+      return;
+    }
+    var doc = typeof global.__pixBuildArchiveSnapshotDoc === "function"
+      ? global.__pixBuildArchiveSnapshotDoc(snapshot, "stats")
+      : snapshot.html;
+    host.className = variant === "voc"
+      ? "voc-embed-root animate-fadeIn"
+      : "flex flex-col h-full animate-fadeIn font-sans";
+    host.style.width = "100%";
+    var iframe = document.createElement("iframe");
+    iframe.title = "통계 스냅샷";
+    iframe.srcdoc = doc;
+    iframe.style.cssText = "width:100%;min-height:720px;border:0;display:block;background:#fff;";
+    host.appendChild(iframe);
+  };
+
   global.__pixBuildArchiveSnapshotDoc = function (snapshot, kind) {
     if (!snapshot || !snapshot.html) return "";
     if (kind === "analysis") {
@@ -3851,8 +4258,33 @@
     if (document.getElementById("pix-report-drawer-css")) return;
     var drawerStyle = document.createElement("style");
     drawerStyle.id = "pix-report-drawer-css";
-    drawerStyle.textContent = "@keyframes pixReportSpin{to{transform:rotate(360deg)}}";
+    drawerStyle.textContent =
+      "@keyframes pixReportSpin{to{transform:rotate(360deg)}}" +
+      ".pix-report-wing-stack{position:absolute;right:0;top:50%;transform:translate(100%,-50%);display:flex;flex-direction:column;gap:10px;z-index:12;padding-left:2px;}" +
+      ".pix-report-wing-btn{border:1px solid #0C447C;background:#fff;color:#0C447C;border-radius:0 12px 12px 0;padding:14px 10px;font-size:11px;font-weight:800;line-height:1.45;cursor:pointer;font-family:inherit;box-shadow:4px 4px 14px rgba(0,0,0,.14);white-space:pre-line;text-align:center;min-width:52px;transition:background .15s,color .15s;}" +
+      ".pix-report-wing-btn:hover{background:#0C447C;color:#fff;}";
     document.head.appendChild(drawerStyle);
+  }
+
+  function renderPixReportSideWings(React, wings) {
+    if (!wings || !wings.length) return null;
+    return React.createElement(
+      "div",
+      { className: "pix-report-wing-stack" },
+      wings.map(function (wing, idx) {
+        return React.createElement(
+          "button",
+          {
+            key: wing.key || String(idx),
+            type: "button",
+            className: "pix-report-wing-btn",
+            onClick: wing.onClick,
+            title: wing.title || wing.label
+          },
+          wing.label
+        );
+      })
+    );
   }
 
   function enablePixReportIframeEdit(iframe) {
@@ -3912,11 +4344,15 @@
     }
 
     useEffect(function () {
-      setPhase("generating");
       setEditing(false);
+      if (opts.skipGeneration || opts.reportSrcDoc) {
+        setPhase("ready");
+        return undefined;
+      }
+      setPhase("generating");
       var timer = setTimeout(function () { setPhase("ready"); }, PIX_REPORT_GEN_MS);
       return function () { clearTimeout(timer); };
-    }, [opts.open, opts.reportUrl]);
+    }, [opts.open, opts.reportUrl, opts.reportSrcDoc, opts.skipGeneration]);
 
     useEffect(function () {
       if (phase !== "ready" || !editing) return undefined;
@@ -3938,12 +4374,13 @@
 
     var showSplash = phase === "generating";
     var isModal = opts.layout === "modal";
+    var hasSideWings = !!(opts.sideWings && opts.sideWings.length);
 
-    var panelNode = React.createElement(
+    var panelInner = React.createElement(
       "div",
       {
         className: isModal
-          ? "relative w-full max-w-[960px] h-[92vh] max-h-[92vh] overflow-hidden rounded-[14px] shadow-2xl border border-[#cfcdc5] flex flex-col"
+          ? "w-full max-w-[960px] h-[92vh] max-h-[92vh] overflow-hidden rounded-[14px] shadow-2xl border border-[#cfcdc5] flex flex-col"
           : "absolute top-0 right-0 h-full w-full max-w-[900px] shadow-2xl animate-drawerSlideIn overflow-hidden border-l border-[#cfcdc5] pointer-events-auto",
         style: isModal
           ? {
@@ -4049,7 +4486,9 @@
           React.createElement("iframe", {
             ref: opts.iframeRef,
             "data-pix-report-frame": "1",
-            src: opts.reportUrl,
+            src: opts.reportSrcDoc ? undefined : opts.reportUrl,
+            srcDoc: opts.reportSrcDoc || undefined,
+            sandbox: opts.reportSrcDoc ? "allow-same-origin" : undefined,
             title: opts.iframeTitle || opts.title,
             style: {
               width: "100%",
@@ -4102,10 +4541,24 @@
         phase === "ready" ? opts.footer || null : null
       );
 
+    var panelNode = hasSideWings
+      ? React.createElement(
+          "div",
+          {
+            className: isModal ? "relative w-full max-w-[960px]" : "relative h-full w-full max-w-[900px] pointer-events-auto",
+            style: { overflow: "visible" },
+            onClick: function (e) { e.stopPropagation(); }
+          },
+          panelInner,
+          renderPixReportSideWings(React, opts.sideWings)
+        )
+      : panelInner;
+
     return React.createElement(
       "div",
       {
-        className: "fixed inset-0 z-[130] " + (isModal ? "flex items-center justify-center p-2 sm:p-3" : "")
+        className: "fixed inset-0 z-[130] " + (isModal ? "flex items-center justify-center p-2 sm:p-3" : ""),
+        style: hasSideWings && isModal ? { overflow: "visible" } : undefined
       },
       React.createElement("div", {
         className: "absolute inset-0 bg-black/45",
@@ -4152,6 +4605,83 @@
     );
   }
 
+  function resolvePixHistoryEntryVariant(entry, fallback) {
+    if (!entry) return fallback || "voc";
+    if (entry.historyVariant) return entry.historyVariant;
+    if (entry.storageKey && entry.storageKey.indexOf("pix_voc_") === 0) return "voc";
+    if (entry.storageKey && entry.storageKey.indexOf("pix_survey_") === 0) return "survey";
+    return fallback || "voc";
+  }
+
+  function resolvePixHistoryModalCfg(entry, panelCfg) {
+    var entryVariant = resolvePixHistoryEntryVariant(entry, panelCfg.variant);
+    var tabCfg = typeof global.__pixAiReportArchiveTabConfig === "function"
+      ? global.__pixAiReportArchiveTabConfig(entryVariant)
+      : null;
+    if (!tabCfg) return panelCfg;
+    var exportCfg = entryVariant === "voc"
+      ? {
+        reportLabel: "VOC \uBCF4\uACE0\uC11C",
+        wordFilename: "VOC_\uBD84\uC11D\uBCF4\uACE0\uC11C_2026-06.doc"
+      }
+      : {
+        reportLabel: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBCF4\uACE0\uC11C",
+        wordFilename: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00_\uBD84\uC11D\uBCF4\uACE0\uC11C_2026-06.doc"
+      };
+    return Object.assign({}, panelCfg, exportCfg, {
+      reportUrl: tabCfg.reportUrl,
+      reportTitle: tabCfg.reportTitle,
+      reportSubtitle: tabCfg.reportSubtitle,
+      iframeTitle: tabCfg.iframeTitle
+    });
+  }
+
+  global.__pixDownloadHistorySnapshotPage = function (entry, kind, showToast) {
+    if (!entry) return;
+    var entryVariant = resolvePixHistoryEntryVariant(entry, "voc");
+    var snapshot = kind === "stats" ? entry.statsSnapshot : entry.analysisSnapshot;
+    if ((!snapshot || !snapshot.html) && kind === "stats" && typeof global.__pixCaptureReportStatsSnapshot === "function") {
+      snapshot = global.__pixCaptureReportStatsSnapshot(entryVariant);
+    }
+    if ((!snapshot || !snapshot.html) && kind === "analysis" && typeof global.__pixCaptureReportAnalysisSnapshot === "function") {
+      snapshot = global.__pixCaptureReportAnalysisSnapshot(entry.storageKey, entryVariant);
+    }
+    if (!snapshot || !snapshot.html) {
+      notifyReportAction(
+        kind === "stats" ? "다운로드할 통계 페이지가 없습니다." : "다운로드할 AI 분석 페이지가 없습니다.",
+        showToast
+      );
+      return;
+    }
+    var doc = typeof global.__pixBuildArchiveSnapshotDoc === "function"
+      ? global.__pixBuildArchiveSnapshotDoc(snapshot, kind)
+      : snapshot.html;
+    var period = String(entry.analysisPeriod || entry.period || entry.year || "report").replace(/\s+/g, "_");
+    var prefix = entryVariant === "voc" ? "VOC" : "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00";
+    var filename = kind === "stats"
+      ? prefix + "_\uD1B5\uACC4_" + period + ".html"
+      : prefix + "_AI\uBD84\uC11D_" + period + ".html";
+    downloadReportBlob(filename, new Blob([doc], { type: "text/html;charset=utf-8" }));
+    notifyReportAction((kind === "stats" ? "\uD1B5\uACC4" : "AI \uBD84\uC11D") + " \uD398\uC774\uC9C0\uB97C \uB2E4\uC6B4\uB85C\uB4DC\uD588\uC2B5\uB2C8\uB2E4.", showToast);
+  };
+
+  global.__pixDownloadHistoryReport = function (entry, showToast) {
+    if (!entry) return;
+    if (!entry.hasData || !entry.html) {
+      notifyReportAction("\uB2E4\uC6B4\uB85C\uB4DC\uD560 \uBCF4\uACE0\uC11C\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.", showToast);
+      return;
+    }
+    var entryVariant = resolvePixHistoryEntryVariant(entry, "voc");
+    var html = typeof global.__pixSanitizeSavedReportHtml === "function"
+      ? global.__pixSanitizeSavedReportHtml(entry.html)
+      : entry.html;
+    var period = String(entry.analysisPeriod || entry.period || entry.year || "report").replace(/\s+/g, "_");
+    var prefix = entryVariant === "voc" ? "VOC" : "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00";
+    var filename = prefix + "_\uBCF4\uACE0\uC11C_" + period + ".html";
+    downloadReportBlob(filename, new Blob([html], { type: "text/html;charset=utf-8" }));
+    notifyReportAction("\uBCF4\uACE0\uC11C\uB97C \uB2E4\uC6B4\uB85C\uB4DC\uD588\uC2B5\uB2C8\uB2E4.", showToast);
+  };
+
   function registerPixAiStatisticsShell(deps, cfg) {
     var React = deps.React;
     var useState = deps.useState || React.useState;
@@ -4166,11 +4696,63 @@
       var _reportOpen = useState(false);
       var reportOpen = _reportOpen[0];
       var setReportOpen = _reportOpen[1];
+      var _historyReportOpen = useState(false);
+      var historyReportOpen = _historyReportOpen[0];
+      var setHistoryReportOpen = _historyReportOpen[1];
+      var _historyReportEntry = useState(null);
+      var historyReportEntry = _historyReportEntry[0];
+      var setHistoryReportEntry = _historyReportEntry[1];
       var panelRef = useRef(null);
       var reportFrameRef = useRef(null);
+      var historyReportFrameRef = useRef(null);
+      var statsHostRef = useRef(null);
       var openModeRef = useRef("analysis");
       var openGlobal = cfg.variant === "voc" ? "openVocAiModal" : "openPxSurveyAiModal";
       var openReportGlobal = cfg.variant === "voc" ? "openVocAiReportModal" : "openPxSurveyAiReportModal";
+      useEffect(function () {
+        function onHistorySelected(ev) {
+          var detail = ev && ev.detail;
+          if (!detail || detail.panelVariant !== cfg.variant || !statsHostRef.current) return;
+          var entry = detail.entry || {};
+          var entryVariant = detail.variant || resolvePixHistoryEntryVariant(entry, cfg.variant);
+          if (typeof global.__pixApplyStatsSnapshotToHost === "function") {
+            global.__pixApplyStatsSnapshotToHost(statsHostRef.current, entry.statsSnapshot || null, entryVariant, props.showToast);
+          }
+        }
+        function onHistoryCleared(ev) {
+          var detail = ev && ev.detail;
+          if (!detail || detail.panelVariant !== cfg.variant || !statsHostRef.current) return;
+          if (typeof global.__pixApplyStatsSnapshotToHost === "function") {
+            global.__pixApplyStatsSnapshotToHost(statsHostRef.current, null, cfg.variant, props.showToast);
+          }
+        }
+        global.addEventListener("pix-report-history-selected", onHistorySelected);
+        global.addEventListener("pix-report-history-cleared", onHistoryCleared);
+        return function () {
+          global.removeEventListener("pix-report-history-selected", onHistorySelected);
+          global.removeEventListener("pix-report-history-cleared", onHistoryCleared);
+        };
+      }, [props.showToast]);
+      useEffect(function () {
+        function onHistoryReportOpen(ev) {
+          var detail = ev && ev.detail;
+          if (!detail || detail.panelVariant !== cfg.variant || !detail.entry) return;
+          setHistoryReportEntry(detail.entry);
+          setHistoryReportOpen(true);
+        }
+        function onHistoryReportClose(ev) {
+          var detail = ev && ev.detail;
+          if (!detail || detail.panelVariant !== cfg.variant) return;
+          setHistoryReportOpen(false);
+          setHistoryReportEntry(null);
+        }
+        global.addEventListener("pix-history-report-open", onHistoryReportOpen);
+        global.addEventListener("pix-history-report-close", onHistoryReportClose);
+        return function () {
+          global.removeEventListener("pix-history-report-open", onHistoryReportOpen);
+          global.removeEventListener("pix-history-report-close", onHistoryReportClose);
+        };
+      }, []);
       useEffect(function () {
         global[openGlobal] = function () {
           openModeRef.current = "analysis";
@@ -4211,7 +4793,12 @@
           openMode: openModeRef.current,
           showToast: props.showToast,
           reportStorageKey: cfg.storageKey,
-          onClose: function () { setOpen(false); setReportOpen(false); },
+          onClose: function () {
+            setOpen(false);
+            setReportOpen(false);
+            setHistoryReportOpen(false);
+            setHistoryReportEntry(null);
+          },
           onOpenReport: function () { setReportOpen(true); }
         });
       }, [open, props.showToast]);
@@ -4228,8 +4815,66 @@
       var aiDrawer = typeof global.createPixAiAnalysisDrawer === "function"
         ? global.createPixAiAnalysisDrawer(React, {
           open: open,
-          onClose: function () { setOpen(false); setReportOpen(false); },
+          onClose: function () {
+            setOpen(false);
+            setReportOpen(false);
+            setHistoryReportOpen(false);
+            setHistoryReportEntry(null);
+          },
           children: React.createElement("div", { ref: panelRef, style: { width: "100%" } })
+        })
+        : null;
+      var historyEntry = historyReportEntry || {};
+      var historyModalCfg = resolvePixHistoryModalCfg(historyEntry, cfg);
+      var historyReportSrcDoc = historyEntry.hasData && historyEntry.html && typeof global.__pixSanitizeSavedReportHtml === "function"
+        ? global.__pixSanitizeSavedReportHtml(historyEntry.html)
+        : (historyEntry.hasData && historyEntry.html ? historyEntry.html : null);
+      var historyStorageKey = historyEntry.storageKey || historyModalCfg.storageKey;
+      var historyReportFooter = historyEntry.hasData && typeof global.createPixReportModalFooter === "function"
+        ? global.createPixReportModalFooter(React, {
+          onDraft: function () { actions.draft && actions.draft(historyStorageKey, historyReportFrameRef.current, historyModalCfg.reportLabel, props.showToast); },
+          onSave: function () { actions.save && actions.save(historyStorageKey, historyReportFrameRef.current, historyModalCfg.reportLabel, props.showToast); },
+          onWord: function () { actions.word && actions.word(historyModalCfg.wordFilename, historyReportFrameRef.current, props.showToast); },
+          onPdf: function () { actions.pdf && actions.pdf(historyReportFrameRef.current, props.showToast); },
+          onPrint: function () { actions.print && actions.print(historyReportFrameRef.current, props.showToast); }
+        })
+        : null;
+      var historyReportModal = typeof global.createPixReportIframeModal === "function"
+        ? global.createPixReportIframeModal(React, {
+          open: historyReportOpen,
+          onClose: function () { setHistoryReportOpen(false); setHistoryReportEntry(null); },
+          title: historyEntry.title || historyModalCfg.reportTitle,
+          subtitle: historyEntry.hasData
+            ? historyModalCfg.reportSubtitle
+            : (historyModalCfg.reportSubtitle + " · 템플릿 미리보기"),
+          reportUrl: historyReportSrcDoc ? undefined : historyModalCfg.reportUrl,
+          reportSrcDoc: historyReportSrcDoc || undefined,
+          skipGeneration: true,
+          iframeTitle: historyModalCfg.iframeTitle,
+          iframeRef: historyReportFrameRef,
+          footer: historyReportFooter,
+          sideWings: [
+            {
+              key: "stats-download",
+              label: "통계 페이지\n다운받기",
+              title: "통계 페이지 HTML 다운로드",
+              onClick: function () {
+                if (typeof global.__pixDownloadHistorySnapshotPage === "function") {
+                  global.__pixDownloadHistorySnapshotPage(historyEntry, "stats", props.showToast);
+                }
+              }
+            },
+            {
+              key: "analysis-download",
+              label: "분석 페이지\n다운받기",
+              title: "AI 분석 페이지 HTML 다운로드",
+              onClick: function () {
+                if (typeof global.__pixDownloadHistorySnapshotPage === "function") {
+                  global.__pixDownloadHistorySnapshotPage(historyEntry, "analysis", props.showToast);
+                }
+              }
+            }
+          ]
         })
         : null;
       var reportModal = typeof global.createPixReportIframeModal === "function"
@@ -4253,9 +4898,10 @@
       return React.createElement(
         React.Fragment,
         null,
-        props.children,
+        React.createElement("div", { ref: statsHostRef, style: { width: "100%" } }, props.children),
         portalize(aiDrawer),
-        portalize(reportModal)
+        portalize(reportModal),
+        portalize(historyReportModal)
       );
     };
   }
