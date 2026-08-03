@@ -235,7 +235,122 @@ $loaderScript = @'
   }
 
   function registerVocPixStatisticsPage(deps) {
-    return createVocLightDomPage(deps, { title: "VOC \uD1B5\uACC4", templateKey: "statistics" });
+    var React = deps.React;
+    var useState = deps.useState || React.useState;
+    var useRef = deps.useRef || React.useRef;
+    var useEffect = deps.useEffect || React.useEffect;
+    var ReactDOM = deps.ReactDOM;
+    var Base = createVocLightDomPage(deps, { title: "VOC \uD1B5\uACC4", templateKey: "statistics" });
+    var VOC_REPORT_URL = "voc-analysis-report.html";
+    var VOC_REPORT_STORAGE_KEY = "pix_voc_report_2026_06";
+    return function VocPixStatisticsWithAiModal() {
+      var _open = useState(false);
+      var open = _open[0];
+      var setOpen = _open[1];
+      var _reportOpen = useState(false);
+      var reportOpen = _reportOpen[0];
+      var setReportOpen = _reportOpen[1];
+      var panelRef = useRef(null);
+      var reportFrameRef = useRef(null);
+      var openModeRef = useRef("analysis");
+      useEffect(function () {
+        window.openVocAiModal = function () {
+          openModeRef.current = "analysis";
+          setReportOpen(false);
+          setOpen(true);
+        };
+        window.openVocAiReportModal = function () {
+          setOpen(false);
+          setReportOpen(true);
+        };
+        function onClick(e) {
+          var t = e.target;
+          if (!t || !t.closest) return;
+          var reportBtn = t.closest(".voc-filter-action-secondary");
+          if (reportBtn) {
+            e.preventDefault();
+            if (typeof window.openVocAiReportModal === "function") window.openVocAiReportModal();
+            return;
+          }
+          var btn = t.closest(".voc-filter-action");
+          if (!btn) return;
+          e.preventDefault();
+          openModeRef.current = "analysis";
+          setReportOpen(false);
+          setOpen(true);
+        }
+        document.addEventListener("click", onClick, true);
+        return function () {
+          document.removeEventListener("click", onClick, true);
+          try { if (window.openVocAiModal) delete window.openVocAiModal; } catch (_e) {}
+          try { if (window.openVocAiReportModal) delete window.openVocAiReportModal; } catch (_e) {}
+        };
+      }, []);
+      useEffect(function () {
+        if (!open || !panelRef.current || typeof global.mountPxAiAnalysisPanel !== "function") return undefined;
+        return global.mountPxAiAnalysisPanel(panelRef.current, {
+          variant: "voc",
+          level: "basic",
+          hideLevelSlider: true,
+          showLoading: true,
+          openMode: openModeRef.current,
+          onClose: function () { setOpen(false); }
+        });
+      }, [open]);
+      var actions = global.pixReportDocActions || {};
+      var reportFooter = typeof global.createPixReportModalFooter === "function"
+        ? global.createPixReportModalFooter(React, {
+          onDraft: function () { actions.draft && actions.draft(VOC_REPORT_STORAGE_KEY, reportFrameRef.current, "VOC \uBCF4\uACE0\uC11C", null); },
+          onSave: function () { actions.save && actions.save(VOC_REPORT_STORAGE_KEY, reportFrameRef.current, "VOC \uBCF4\uACE0\uC11C", null); },
+          onWord: function () { actions.word && actions.word("VOC_\uBD84\uC11D\uBCF4\uACE0\uC11C_2026-06.doc", reportFrameRef.current, null); },
+          onPdf: function () { actions.pdf && actions.pdf(reportFrameRef.current, null); },
+          onPrint: function () { actions.print && actions.print(reportFrameRef.current, null); }
+        })
+        : null;
+      var modal = open
+        ? React.createElement(
+            "div",
+            {
+              className: "fixed inset-0 z-[120] bg-black/55 flex items-center justify-center p-4 sm:p-6 overflow-y-auto",
+              onClick: function () { setOpen(false); }
+            },
+            React.createElement(
+              "div",
+              {
+                className: "relative w-full max-w-[1200px] max-h-[90vh] overflow-y-auto rounded-[14px] shadow-2xl",
+                style: { background: "#17171c", color: "#e7e6ee", padding: "22px 26px", boxSizing: "border-box" },
+                onClick: function (e) { e.stopPropagation(); }
+              },
+              React.createElement("div", { ref: panelRef, style: { width: "100%" } })
+            )
+          )
+        : null;
+      var reportDrawer = typeof global.createPixReportIframeDrawer === "function"
+        ? global.createPixReportIframeDrawer(React, {
+          open: reportOpen,
+          onClose: function () { setReportOpen(false); },
+          title: "2026\uB144 6\uC6D4 VOC \uBD84\uC11D\uBCF4\uACE0\uC11C",
+          subtitle: "\uB0B4\uBD80 \uBCF4\uACE0 \u00B7 \uC784\uC6D0 \uBCF4\uACE0\uC6A9 \u00B7 PIX AI \uD658\uC790\uACBD\uD5D8\uAD00\uB9AC",
+          reportUrl: VOC_REPORT_URL,
+          iframeTitle: "VOC \uBD84\uC11D\uBCF4\uACE0\uC11C",
+          iframeRef: reportFrameRef,
+          footer: reportFooter
+        })
+        : null;
+      function portalize(node) {
+        if (!node) return null;
+        return typeof ReactDOM !== "undefined" && ReactDOM.createPortal
+          ? ReactDOM.createPortal(node, document.body)
+          : node;
+      }
+      return React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(Base, null),
+        portalize(modal),
+        portalize(reportDrawer)
+      );
+    };
   }
 
   function registerVocPixSettingsPage(deps) {

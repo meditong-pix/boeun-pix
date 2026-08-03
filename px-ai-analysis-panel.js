@@ -77,14 +77,21 @@
     ".px-ai-rpt-header{padding:14px 0 12px;border-bottom:0.5px solid var(--border);}",
     ".px-ai-rpt-setup{padding:14px 0 4px;}",
     ".px-ai-analysis-setup{padding:0 0 6px;}",
+    ".px-ai-analysis-steps{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;}",
+    ".px-ai-analysis-step{color:#7a7887;font-weight:600;}",
+    ".px-ai-analysis-step.on{color:#c7a6f2;}",
+    ".px-ai-analysis-step-sep{color:#5a5868;font-size:11px;}",
     ".px-ai-rpt-desc{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;}",
     ".px-ai-rpt-level{font-size:12px;color:#a9a7b6;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}",
     ".px-ai-rpt-level-note{color:#7a7887;}",
     ".px-ai-level-tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;background:#2a2438;color:#c7a6f2;border:0.5px solid rgba(124,108,255,0.35);}",
     ".px-ai-rpt-blocks-lbl{font-size:11px;color:#7a7887;margin:0 0 8px;}",
+    ".px-ai-rpt-group-lbl{font-size:11px;font-weight:700;color:#cfcdda;margin:16px 0 8px;}",
     ".px-ai-rpt-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}",
     ".px-ai-rpt-chip{cursor:pointer;font-size:11px;padding:5px 11px;border-radius:999px;border:1px solid #2d2c36;background:#201f27;color:#7a7887;user-select:none;}",
     ".px-ai-rpt-chip.on{border-color:#8b5cf6;background:#241f36;color:#c7a6f2;}",
+    ".px-ai-rpt-chip-fixed{cursor:default;opacity:0.92;border-color:#3d3a4a;background:#1a1922;color:#a9a7b6;}",
+    ".px-ai-rpt-chip-fixed.on{border-color:#5b5570;background:#1f1e28;color:#cfcdda;}",
     ".px-ai-rpt-sec{margin-bottom:16px;position:relative;}",
     ".px-ai-rpt-sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}",
     ".px-ai-rpt-sec-ttl{font-size:12px;font-weight:700;color:#fff;margin:0;}",
@@ -194,7 +201,7 @@
   ].join("");
 
   var VOC_CSS = [
-    ".px-ai-root.px-ai-voc{background:#17171c;color:#e7e6ee;font-family:-apple-system,BlinkMacSystemFont,\"Apple SD Gothic Neo\",\"Malgun Gothic\",sans-serif;}",
+    ".px-ai-root.px-ai-voc{background:#17171c;color:#e7e6ee;font-family:-apple-system,BlinkMacSystemFont,\"Apple SD Gothic Neo\",\"Malgun Gothic\",sans-serif;overflow:visible;}",
     ".px-ai-root.px-ai-voc .px-ai-head{background:transparent;padding:0 0 0;}",
     ".px-ai-root.px-ai-voc .px-ai-scroll{padding:0;}",
     ".px-ai-voc-title{font-size:17px;font-weight:700;color:#fff;margin:0 0 2px;}",
@@ -271,7 +278,144 @@
     ".px-ai-area-bar-row{margin-bottom:8px;}",
     ".px-ai-area-bar-meta{display:flex;justify-content:space-between;font-size:11px;color:#cfcdda;margin-bottom:3px;}",
     ".px-ai-area-bar-track{height:6px;border-radius:3px;background:#2d2c36;overflow:hidden;}",
-    ".px-ai-area-bar-fill{height:100%;}"
+    ".px-ai-area-bar-fill{height:100%;}",
+    ".px-ai-breadcrumb{font-size:12px;font-weight:700;color:#9b99a8;margin:4px 0 14px;}",
+    ".px-ai-inner-tabs{display:flex;gap:18px;border-bottom:1px solid #2d2c36;margin:0;}",
+    ".px-ai-inner-tab{border:none;background:transparent;font-size:13px;color:#7a7887;padding:8px 2px 9px;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;}",
+    ".px-ai-inner-tab.on{color:#fff;font-weight:700;border-bottom-color:#fff;}",
+    ".px-ai-setup-chip-base{font-size:12px;padding:8px 14px;border-radius:999px;border:1px solid #2d2c36;background:#201f27;color:#7a7887;}",
+    ".px-ai-setup-chip{font-size:12px;padding:8px 14px;border-radius:999px;border:1px solid #2d2c36;background:#201f27;color:#cfcdda;cursor:pointer;}",
+    ".px-ai-strength-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}",
+    ".px-ai-strength-card{border:1px solid #2d2c36;border-radius:10px;padding:12px 14px;cursor:pointer;background:#201f27;transition:border-color .15s,background .15s;}",
+    ".px-ai-strength-card.on{border-color:#8b5cf6;background:#241f36;}",
+    ".px-ai-strength-title{font-size:13px;font-weight:700;color:#fff;margin:0 0 6px;}",
+    ".px-ai-strength-desc{font-size:11px;color:#7a7887;line-height:1.55;margin:0;}",
+    "@media (max-width:820px){.px-ai-strength-grid{grid-template-columns:1fr;}}",
+    ".px-ai-gen-inline{width:auto;margin-top:0;}",
+    ".px-ai-preset-btn{cursor:pointer;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid #2d2c36;background:#201f27;color:#cfcdda;}",
+    ".px-ai-link-btn{cursor:pointer;font-size:11px;color:#8fb4e0;}",
+    ".px-ai-link-btn.muted{color:#7a7887;}",
+    ".px-ai-rpt-section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #35334a;}",
+    ".px-ai-rpt-section-ttl{font-size:14px;font-weight:800;color:#fff;margin:0;}",
+    ".px-ai-import-btn{cursor:pointer;font-size:11px;font-weight:700;color:#8fb4e0;border:1px solid #2d2c36;border-radius:8px;padding:5px 10px;background:transparent;font-family:inherit;}",
+    ".px-ai-import-item{border:1px dashed #4a4560;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}",
+    ".px-ai-import-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:24px 16px;}",
+    ".px-ai-import-dialog{background:#17171c;border:1px solid #2d2c36;border-radius:14px;padding:1.5rem 1.75rem;max-width:420px;width:100%;}",
+    ".px-ai-import-pick{cursor:pointer;padding:10px 12px;border:1px solid #2d2c36;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}",
+    ".px-ai-import-pick:hover{border-color:#4a4560;}",
+    ".px-ai-rpt-builder{display:block;margin-top:4px;}",
+    ".px-ai-rpt-doc-wrap{margin-top:4px;padding-bottom:12px;}",
+    ".px-ai-rpt-doc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #2d2c36;}",
+    ".px-ai-rpt-doc-head-exec{display:block;border-bottom:none;padding-bottom:0;margin-bottom:24px;}",
+    ".px-ai-rpt-doc-badge{font-size:11px;color:#9b99a8;margin:0 0 6px;}",
+    ".px-ai-rpt-doc-title{font-size:15px;font-weight:800;color:#fff;margin:0;}",
+    ".px-ai-rpt-doc-head-exec .px-ai-rpt-doc-title{font-size:22px;margin-bottom:4px;}",
+    ".px-ai-rpt-doc-author{font-size:12px;font-style:italic;color:#9b99a8;margin:0 0 16px;}",
+    ".px-ai-rpt-overview-box{border-left:3px solid #8b5cf6;background:#201f27;border:1px solid #2d2c36;border-left-width:3px;border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.75;color:#dcdae6;margin-bottom:4px;}",
+    ".px-ai-rpt-exec-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}",
+    ".px-ai-rpt-exec-tbl th{background:#1f1e1c;color:#fff;font-weight:700;padding:10px 12px;text-align:center;border:1px solid #2d2c36;}",
+    ".px-ai-rpt-exec-tbl td{padding:10px 12px;text-align:center;border:1px solid #2d2c36;color:#cfcdda;}",
+    ".px-ai-rpt-exec-tbl td:first-child{text-align:left;font-weight:600;color:#fff;}",
+    ".px-ai-rpt-exec-tbl .good{color:#7ea6ff;font-weight:700;}",
+    ".px-ai-rpt-exec-tbl .bad{color:#f2949c;font-weight:700;}",
+    ".px-ai-rpt-exec-tbl .neu{color:#8fb4e0;font-weight:700;}",
+    ".px-ai-rpt-status-intro{font-size:13px;line-height:1.7;color:#dcdae6;margin:0 0 12px;}",
+    ".px-ai-rpt-status-narr{font-size:13px;line-height:1.75;color:#dcdae6;margin:16px 0 0;}",
+    ".px-ai-rpt-bullet-list{margin:8px 0 0;padding-left:18px;color:#dcdae6;font-size:12px;line-height:1.8;}",
+    ".px-ai-rpt-bullet-list li{margin-bottom:6px;}",
+    ".px-ai-rpt-feature-quote{font-style:italic;color:#9b99a8;font-size:12px;line-height:1.7;margin:8px 0 8px 16px;padding-left:12px;border-left:2px solid #35334a;}",
+    ".px-ai-rpt-risk-row{margin:8px 0;font-size:12px;line-height:1.7;color:#dcdae6;padding-left:12px;}",
+    ".px-ai-rpt-risk-k{font-weight:700;margin-right:6px;}",
+    ".px-ai-rpt-risk-k.good{color:#7ea6ff;}",
+    ".px-ai-rpt-risk-k.neu{color:#9b99a8;}",
+    ".px-ai-rpt-risk-k.bad{color:#f2949c;}",
+    ".px-ai-rpt-opt-block{margin:14px 0 10px;}",
+    ".px-ai-rpt-opt-title{font-size:13px;font-weight:700;color:#fff;margin:0 0 4px;}",
+    ".px-ai-rpt-opt-title span{color:#8fb4e0;margin-right:8px;}",
+    ".px-ai-rpt-opt-desc{font-size:11px;color:#9b99a8;line-height:1.65;margin:0 0 0 16px;}",
+    ".px-ai-rpt-rec-box{border-left:3px solid #8b5cf6;background:#201f27;border:1px solid #2d2c36;border-left-width:3px;border-radius:8px;padding:14px 16px;font-size:13px;font-weight:700;line-height:1.7;color:#fff;margin-top:8px;}",
+    ".px-ai-rpt-doc-info{width:100%;border-collapse:collapse;font-size:11px;margin:12px 0 20px;}",
+    ".px-ai-rpt-doc-info td{border-top:1px solid #2d2c36;border-bottom:1px solid #2d2c36;padding:7px 10px;color:#cfcdda;}",
+    ".px-ai-rpt-doc-info td.lbl{width:72px;background:#201f27;font-weight:700;color:#9b99a8;border-right:1px solid #35334a;}",
+    ".px-ai-rpt-kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px;}",
+    ".px-ai-rpt-kpi-box{border:1px solid #2d2c36;border-radius:8px;padding:9px 8px;background:#201f27;}",
+    ".px-ai-rpt-kpi-box .kl{font-size:10px;color:#9b99a8;margin-bottom:3px;}",
+    ".px-ai-rpt-kpi-box .kv{font-size:15px;font-weight:800;color:#fff;}",
+    ".px-ai-rpt-kpi-box .kd{font-size:10px;font-weight:700;margin-top:2px;color:#9b99a8;}",
+    ".px-ai-rpt-kpi-box .kd.good{color:#7ea6ff;}",
+    ".px-ai-rpt-exec-tbl td.rowlabel{text-align:left;font-weight:700;background:#201f27;color:#fff;}",
+    ".px-ai-rpt-cap{font-size:10px;color:#9b99a8;margin:-4px 0 14px;line-height:1.55;}",
+    ".px-ai-rpt-chart-block{border:1px solid #2d2c36;border-radius:8px;padding:13px 14px 10px;margin-bottom:14px;background:#201f27;}",
+    ".px-ai-rpt-chart-title{font-size:11px;font-weight:700;color:#cfcdda;margin:0 0 10px;}",
+    ".px-ai-rpt-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}",
+    ".px-ai-rpt-bar-name{width:120px;font-size:10px;color:#9b99a8;flex-shrink:0;}",
+    ".px-ai-rpt-bar-track{flex:1;background:#17171c;border-radius:3px;height:12px;overflow:hidden;}",
+    ".px-ai-rpt-bar-fill{height:100%;border-radius:3px;}",
+    ".px-ai-rpt-bar-val{width:72px;font-size:10px;text-align:right;font-weight:700;color:#cfcdda;flex-shrink:0;}",
+    ".px-ai-rpt-kw-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}",
+    ".px-ai-rpt-kw-hd{font-size:11px;font-weight:700;margin:0 0 8px;}",
+    ".px-ai-rpt-kw-hd.pos{color:#7ea6ff;}",
+    ".px-ai-rpt-kw-hd.neg{color:#f2949c;}",
+    ".px-ai-rpt-trend-legend{display:flex;gap:14px;font-size:10px;color:#9b99a8;margin-top:8px;}",
+    ".px-ai-rpt-trend-legend span{display:inline-flex;align-items:center;gap:5px;}",
+    ".px-ai-rpt-trend-dot{width:9px;height:9px;border-radius:2px;display:inline-block;}",
+    ".px-ai-rpt-body-intro{font-size:12px;line-height:1.75;color:#dcdae6;margin:0 0 12px;}",
+    ".px-ai-rpt-flag-card{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}",
+    ".px-ai-rpt-flag-tag{flex-shrink:0;font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#3a1f24;color:#f2a6ad;}",
+    ".px-ai-rpt-flag-tag.purple{background:#2a2438;color:#c7a6f2;}",
+    ".px-ai-rpt-flag-body{font-size:12px;color:#dcdae6;line-height:1.6;}",
+    ".px-ai-rpt-flag-cnt{font-weight:800;color:#fff;}",
+    ".px-ai-rpt-quote-box{border-left:3px solid #35334a;padding:4px 0 4px 12px;margin-bottom:8px;font-size:12px;font-style:italic;color:#9b99a8;}",
+    ".px-ai-rpt-quote-meta{font-size:10px;color:#7a7887;font-style:normal;margin-left:6px;}",
+    ".px-ai-rpt-risk-badge-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}",
+    ".px-ai-rpt-risk-badge{flex-shrink:0;width:92px;text-align:center;font-size:10px;font-weight:800;padding:6px 0;border-radius:4px;color:#fff;}",
+    ".px-ai-rpt-risk-badge.low{background:#0C447C;}",
+    ".px-ai-rpt-risk-badge.mid{background:#A67A1E;}",
+    ".px-ai-rpt-risk-badge.high{background:#791F1F;}",
+    ".px-ai-rpt-opt-rec{display:inline-block;font-size:9px;font-weight:800;color:#fff;background:#0C447C;padding:2px 6px;border-radius:3px;margin-left:6px;}",
+    ".px-ai-rpt-tl-week{font-weight:800;color:#8fb4e0;}",
+    ".px-ai-rpt-doc-footer{margin-top:28px;padding-top:12px;border-top:1px solid #2d2c36;font-size:9px;color:#7a7887;display:flex;justify-content:space-between;}",
+    "@media (max-width:820px){.px-ai-rpt-kpi-strip{grid-template-columns:repeat(2,1fr);}.px-ai-rpt-kw-grid{grid-template-columns:1fr;}}",
+    ".px-ai-rpt-doc-section{margin-bottom:28px;}",
+    ".px-ai-rpt-doc-section:last-child{margin-bottom:0;}",
+    ".px-ai-root.px-ai-voc .px-ai-rpt-section-ttl{font-size:15px;font-weight:800;}",
+    ".px-ai-root.px-ai-voc .px-ai-rpt-sec{margin-bottom:14px;}",
+    ".px-ai-root.px-ai-voc .px-ai-rpt-sec:last-child{margin-bottom:0;}",
+    "[data-role=\"report-out\"]{margin-top:16px;}",
+    ".px-ai-rpt-builder-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}",
+    ".px-ai-rpt-builder-title{font-size:14px;font-weight:700;color:#1f1e1c;margin:0;}",
+    ".px-ai-rpt-builder-note{font-size:11px;color:#898781;margin:0 0 12px;line-height:1.5;}",
+    ".px-ai-rpt-row{border:1px solid #cfcdc5;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff;}",
+    ".px-ai-rpt-row-title{font-size:13px;font-weight:700;color:#1f1e1c;margin:0 0 4px;}",
+    ".px-ai-rpt-row-desc{font-size:11px;color:#898781;margin:0 0 10px;line-height:1.5;}",
+    ".px-ai-rpt-row-opts{display:flex;flex-wrap:wrap;gap:12px;}",
+    ".px-ai-rpt-opt{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5f5e5a;cursor:pointer;user-select:none;}",
+    ".px-ai-rpt-opt input{accent-color:#8b5cf6;width:14px;height:14px;}",
+    ".px-ai-rpt-opt.on{color:#1f1e1c;font-weight:600;}",
+    ".px-ai-rpt-builder-actions{margin-top:14px;padding-top:12px;border-top:1px solid #cfcdc5;}",
+    ".px-ai-rpt-builder-actions .px-ai-gen{width:100%;margin-top:0;}",
+    ".px-ai-rpt-preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #2d2c36;}",
+    ".px-ai-rpt-preview-title{font-size:15px;font-weight:800;color:#fff;margin:0;}",
+    ".px-ai-rpt-preview-sum{background:#201f27;border:1px solid #2d2c36;border-radius:10px;padding:14px;margin-bottom:12px;}",
+    ".px-ai-rpt-preview-sum-hd{font-size:12px;font-weight:700;color:#cfcdda;margin:0 0 10px;}",
+    ".px-ai-rpt-sum-part{margin-bottom:10px;}",
+    ".px-ai-rpt-sum-part:last-child{margin-bottom:0;}",
+    ".px-ai-rpt-sum-k{font-size:10px;font-weight:700;color:#8b5cf6;margin:0 0 4px;letter-spacing:.02em;}",
+    ".px-ai-rpt-sum-v{font-size:12px;color:#dcdae6;line-height:1.7;margin:0;}",
+    ".px-ai-rpt-preview-block{background:#201f27;border:1px solid #2d2c36;border-radius:10px;padding:12px 14px;margin-bottom:10px;}",
+    ".px-ai-rpt-preview-block-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;gap:8px;}",
+    ".px-ai-rpt-preview-block-ttl{font-size:12px;font-weight:700;color:#fff;margin:0;}",
+    ".px-ai-rpt-preview-block-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;}",
+    ".px-ai-rpt-preview-block-tag.ai{background:#2a2438;color:#c7a6f2;}",
+    ".px-ai-rpt-preview-block-tag.stat{background:#24303e;color:#8fb4e0;}",
+    ".px-ai-rpt-sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}",
+    ".px-ai-rpt-sw{font-size:11px;line-height:1.6;border-radius:8px;padding:8px 10px;}",
+    ".px-ai-rpt-sw.pos{background:rgba(74,222,128,0.08);border-left:2px solid #4ade80;color:#cfcdda;}",
+    ".px-ai-rpt-sw.neg{background:rgba(248,113,113,0.08);border-left:2px solid #f87171;color:#cfcdda;}",
+    ".px-ai-rpt-sw-k{font-size:10px;font-weight:700;margin:0 0 4px;}",
+    ".px-ai-rpt-sw-k.pos{color:#7ea6ff;}",
+    ".px-ai-rpt-sw-k.neg{color:#f2949c;}",
+    "@media (max-width:900px){.px-ai-rpt-doc-wrap{max-height:none;}}"
   ].join("");
 
   var STRENGTH_CSS = [
@@ -352,7 +496,8 @@
 
   function surveyDataset() {
     return {
-      periodText: "2025년 5차 환자경험평가 · 전월 대비 분석",
+      periodText: "2025년 5차 환자경험평가 · 전월 대비",
+      periodShort: "2025년 5차 · 전월 대비",
       title: "환자경험평가 AI 상세 분석",
       sum: {
         simple: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 7개 영역 중 5개 영역이 상승했고, 정서적 지지는 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데 '위로와 공감' 문항이 하락을 견인했으며, 전반적인 평가는 71.11점으로 전월 대비 1.96점 하락하며 입원 경험 평가 문항 하락이 이어졌습니다.",
@@ -512,16 +657,36 @@
         deep: ["overview", "kpi", "dist", "matrix", "areas", "issues", "plan"]
       },
       analysisBlockDefs: [
-        { key: "summary", name: "AI 요약" },
-        { key: "insight", name: "AI 인사이트" },
-        { key: "kpi", name: "핵심 지표" },
         { key: "matrix", name: "영역 진단 매트릭스" },
         { key: "areas", name: "변화 영역 TOP3" },
-        { key: "issues", name: "권장 조치" },
+        { key: "actions", name: "권장 조치" },
         { key: "changes", name: "영역별 점수 변화" },
         { key: "monitor", name: "모니터링" }
       ],
-      analysisDefaultBlocks: ["summary", "insight", "kpi", "areas", "issues"],
+      analysisDefaultBlocks: ["matrix"],
+      reportStatsBlockDefs: [
+        { key: "stat_overview", name: "전체 현황" },
+        { key: "stat_area", name: "영역·문항 분석" },
+        { key: "stat_org", name: "조직별 분석" },
+        { key: "stat_priority", name: "개선 우선순위" }
+      ],
+      reportStatsDefaultBlocks: ["stat_overview", "stat_area"],
+      reportStatsDrafts: {
+        stat_overview: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 응답자는 9명이며, 전반적 만족 66.67점·타인 추천 의향 75.56점으로 핵심 지표 간 방향성이 엇갈렸습니다.",
+        stat_area: "7개 평가 영역 중 입원 중 간호사(87.14점)가 가장 높고 정서적 지지(62.89점)가 가장 낮습니다. 문19 재문의(+20.0점)와 문21 위로와 공감(-15.0점)이 문항 변화폭 TOP에 해당합니다.",
+        stat_org: "병동별로는 6병동(57.52점, ▼16.81점)이 최저이며, 진료과별로는 심장혈관흉부외과(57.52점, ▼16.63점)가 하락폭이 가장 컸습니다.",
+        stat_priority: "저점 영역 TOP3는 정서적 지지·전반적인 평가·투약 및 치료 과정이며, 저점 문항 TOP3는 위로와 공감·입원 경험 평가·통증 관리 관련 문항입니다."
+      },
+      surveyOrgWards: [
+        { name: "6병동", score: "57.52", delta: "-16.81" },
+        { name: "51병동", score: "78.40", delta: "+4.20" },
+        { name: "52병동", score: "82.15", delta: "+2.85" }
+      ],
+      surveyOrgDepts: [
+        { name: "심장혈관흉부외과", score: "57.52", delta: "-16.63" },
+        { name: "내과", score: "84.20", delta: "+3.10" },
+        { name: "정형외과", score: "79.88", delta: "+1.45" }
+      ],
       reportOverview: {
         simple: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 7개 영역 중 5개 영역이 상승했고, 정서적 지지는 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데 '위로와 공감' 문항이 하락을 견인했으며, 전반적인 평가는 71.11점으로 전월 대비 1.96점 하락하며 입원 경험 평가 문항 하락이 이어졌습니다.",
         basic: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 정서적 지지 영역은 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데, '위로와 공감' 문항 62.89점이 이 하락을 견인하고 있습니다. 반면 입원 중 간호사 영역은 87.14점(+12.67점), 환자권리보장 영역은 86.31점(+11.69점)으로 상승폭이 가장 컸습니다. 6병동과 심장혈관흉부외과에서 점수 하락폭이 가장 크게 나타나 개별 관리가 필요합니다.",
@@ -542,18 +707,25 @@
         ["보통", "입원 경험 개선", "2개월 내"],
         ["낮음", "투약 및 치료 과정 설명 강화", "3개월 내"]
       ],
-      reportPrefix: "환자경험평가"
+      reportPrefix: "환자경험평가",
+      summaryStructured: {
+        conclusion: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다.",
+        cause: "정서적 지지(-11.77점)와 전반적인 평가(-1.96점) 하락이 견인했으며, '위로와 공감' 문항이 핵심 원인입니다.",
+        impact: "6병동·심장혈관흉부외과에서 조직 단위 하락폭이 확대되어, 전체 평균 상승에도 취약 구간이 존재합니다.",
+        recommendation: "정서적 지지 강화와 6병동·심장혈관흉부외과 집중 관리를 1개월 내 착수하고 모니터링을 유지하십시오."
+      }
     };
   }
 
   function vocDataset() {
     return {
-      periodText: "2026-07 기준 전월 대비 분석",
+      periodText: "2026-06 기준 전월 대비",
+      periodShort: "2026-06 기준 전월 대비",
       title: "VOC AI 상세 분석",
       sum: {
-        simple: "2026년 7월 VOC 종합 부정률은 43.7%로 전월 대비 1.1%p 상승했으며, 접수 건수는 8,323건으로 전월 대비 214건 늘었습니다. 부서칭찬 420건, 직원칭찬 820건으로 현장 서비스에 대한 긍정 평가도 함께 증가해, 전반적으로는 만족도 둔화와 긍정 반응 증가가 동시에 나타난 한 달이었습니다.",
-        basic: "2026년 7월 VOC 종합 부정률은 43.7%로 전월 대비 1.1%p 상승했습니다. 시스템 및 서비스 유형은 '예약 절차 복잡' 언급이 9건 늘며 부정률 상승을 견인했고, 비용관련 유형도 '비용 부담' 언급 증가로 부정률이 함께 올랐습니다. 반면 인적응대관련 유형은 '친절함'(+8건) 언급 증가로 개선되었고, 서비스제공관련 유형도 '세심함'(+6건) 언급 증가로 개선세를 보였습니다. 환자안전 플래그는 12건으로 전월 대비 3건 늘어 주의가 필요합니다.",
-        deep: "2026년 7월 VOC 종합 부정률은 43.7%로 전월 대비 1.1%p 상승했습니다. 시스템 및 서비스 유형은 '예약 절차 복잡' 언급 증가로 부정률이 4.2%p 상승했고, 비용관련 유형도 '비용 부담' 언급이 늘며 부정률이 올라 두 유형 모두 심각도 '높음'으로 분류되었습니다. 병동·진료과 단위에서는 7병동과 심장혈관흉부외과의 부정률 상승폭이 가장 커 개별 원인 분석이 필요합니다. 반면 인적응대관련 유형은 '친절함'(+8건) 언급 증가로 2.1%p 개선되었고, 서비스제공관련 유형도 '세심함'(+6건) 언급 증가로 1.8%p 개선되어 유형 간 온도차가 뚜렷했습니다. 비용관련·시스템 및 서비스 유형은 1개월 내 부정률이 각각 41.7%, 58.6% 이하로 복귀하는지 모니터링이 필요한 우선 관리 대상입니다."
+        simple: "6월 VOC는 총 8,323건 접수(▲214건)되었고, 대부분 유형에서 부정률이 개선되었으나 시스템 및 서비스·환경관련 유형은 악화되었습니다.",
+        basic: "6월 VOC는 총 8,323건 접수, 언급 9,120건입니다. 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p) 유형 부정률이 악화되었고, 환자안전 플래그 12건(▲3건)으로 늘었습니다.",
+        deep: "6월 VOC는 총 8,323건 접수(▲214건), 언급 9,120건 · 평균 태그 1.10개입니다. 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p) 유형이 악화되었고, 7병동·내과 중환자실·내과 김의사 그룹에서 부정률이 올랐습니다. 환자안전 플래그 12건(▲3건) 전수 검토가 필요합니다."
       },
       stats: [
         { k: "접수된 VOC", v: "8,323건", d: "+214건", up: true },
@@ -638,9 +810,9 @@
         monitor: { label: "모니터링", value: "시스템 및 서비스 부정률", chip: "부정률 상승 · 60% 이하 유지 여부", tone: "info" }
       },
       metricChanges: [
-        { k: "전체 부정률", v: "43.7%", d: "▲1.1%p", tone: "bad" },
-        { k: "접수된 VOC 건수", v: "8,323건", d: "▲214건", tone: "neu" },
+        { k: "접수된 VOC", v: "8,323건", d: "▲214건", tone: "neu" },
         { k: "환자안전 플래그", v: "12건", d: "▲3건", tone: "bad" },
+        { k: "시스템 및 서비스", v: "▲2.1%p", d: "부정률 악화", tone: "bad" },
         { k: "직원칭찬 건수", v: "820건", d: "▲32건", tone: "good" }
       ],
       positiveKeywords: [
@@ -686,37 +858,239 @@
         { key: "keywords", name: "변화 키워드 TOP3" },
         { key: "issues", name: "주요 이슈 및 권장 조치" },
         { key: "plan", name: "개선 액션 플랜" },
+        { key: "monitor", name: "모니터링" },
         { key: "quotes", name: "원문 및 인사이트" }
       ],
       reportDefaultBlocks: {
         simple: ["overview", "kpi"],
         basic: ["overview", "kpi", "dist", "keywords", "issues"],
-        deep: ["overview", "kpi", "dist", "matrix", "keywords", "issues", "plan", "quotes"]
+        deep: ["overview", "kpi", "dist", "matrix", "keywords", "issues", "plan", "monitor", "quotes"]
+      },
+      reportSectionOrder: ["개요", "현황 — 무엇이 달라졌나", "분석 — 어디서 달라졌나", "이슈 및 평가", "결론 및 제언", "모니터링 계획"],
+      reportSectionMap: {
+        overview: "개요",
+        status: "현황 — 무엇이 달라졌나",
+        kpi: "현황 — 무엇이 달라졌나",
+        statusNarrative: "현황 — 무엇이 달라졌나",
+        dist: "현황 — 무엇이 달라졌나",
+        analysisOrg: "분석 — 어디서 달라졌나",
+        analysis: "분석 — 어디서 달라졌나",
+        matrix: "분석 — 어디서 달라졌나",
+        keywords: "분석 — 어디서 달라졌나",
+        issuesEval: "이슈 및 평가",
+        quotes: "이슈 및 평가",
+        riskScenarios: "이슈 및 평가",
+        issues: "이슈 및 평가",
+        conclusionOpts: "결론 및 제언",
+        options: "결론 및 제언",
+        recommendation: "결론 및 제언",
+        plan: "결론 및 제언",
+        monitorPlan: "모니터링 계획",
+        monitor: "모니터링 계획"
+      },
+      reportImportableItems: {
+        "개요": [{ src: "통계 페이지", name: "전체 VOC 현황 헤드라인 카드" }],
+        "현황 — 무엇이 달라졌나": [
+          { src: "통계 페이지", name: "유형별 접수 현황 카드" },
+          { src: "통계 페이지", name: "채널별 접수 도넛 차트" },
+          { src: "통계 페이지", name: "월별 추이 라인 차트" }
+        ],
+        "분석 — 어디서 달라졌나": [
+          { src: "통계 페이지", name: "병동별 VOC 현황 표" },
+          { src: "통계 페이지", name: "진료과별 VOC 현황 표" },
+          { src: "통계 페이지", name: "의사별 VOC 현황 표" }
+        ],
+        "이슈 및 평가": [
+          { src: "통계 페이지", name: "환자안전·감염관리 플래그" },
+          { src: "통계 페이지", name: "VOC 원문 사례" }
+        ],
+        "결론 및 제언": [{ src: "상세분석 페이지", name: "권장 조치 목록" }],
+        "모니터링 계획": [{ src: "통계 페이지", name: "부정률 전월대비 표" }]
+      },
+      reportPresets: {
+        exec: { label: "경영진 보고용", blocks: ["kpi", "matrix"] },
+        team: { label: "실무 회의용", blocks: ["matrix", "issues", "plan"] },
+        full: { label: "전체 상세", blocks: ["kpi", "dist", "matrix", "keywords", "issues", "plan", "monitor", "quotes"] }
       },
       analysisBlockDefs: [
-        { key: "summary", name: "AI 요약" },
-        { key: "insight", name: "AI 인사이트" },
-        { key: "kpi", name: "핵심 지표" },
         { key: "matrix", name: "유형 진단 매트릭스" },
         { key: "keywords", name: "변화 키워드 TOP3" },
-        { key: "issues", name: "권장 조치" },
-        { key: "changes", name: "부정률 변화" },
+        { key: "actions", name: "권장 조치" },
+        { key: "dist", name: "유형별 분포" },
         { key: "monitor", name: "모니터링" }
       ],
-      analysisDefaultBlocks: ["summary", "insight", "kpi", "keywords", "issues"],
+      analysisDefaultBlocks: ["matrix"],
+      reportStatsBlockDefs: [
+        { key: "stat_overview", name: "전체 VOC 현황" },
+        { key: "stat_type", name: "유형별 접수 현황" },
+        { key: "stat_trend", name: "VOC 월별 추이" },
+        { key: "stat_channel", name: "채널별 접수" },
+        { key: "stat_praise", name: "칭찬 현황" },
+        { key: "stat_demographic", name: "응답자 구성" },
+        { key: "stat_category", name: "카테고리·키워드" },
+        { key: "stat_group", name: "그룹별 VOC" }
+      ],
+      reportStatsDefaultBlocks: ["stat_overview", "stat_type"],
+      reportStatsDrafts: {
+        stat_overview: "2026년 7월 접수된 VOC는 8,323건(▲214건), 언급된 VOC는 9,120건(▲340건)입니다. 평균 태그 수 1.10개, 부서칭찬 420건, 직원칭찬 820건으로 접수 규모와 칭찬 흐름이 함께 증가했습니다.",
+        stat_type: "유형별로는 인적응대관련(67% 긍정)과 서비스제공관련(66% 긍정)이 상대적으로 양호하고, 비용관련(75% 부정)과 시스템 및 서비스(62% 부정) 유형의 부정 비중이 높습니다.",
+        stat_trend: "최근 6개월 긍정·부정 건수 추이를 보면 2월 긍정 건수가 11,520건으로 가장 높았고, 6월에는 긍정 7,645건·부정 7,056건으로 격차가 좁혀졌습니다.",
+        stat_channel: "채널별 접수 비중은 메디통 픽스(앱) 38.1%, 고객의견카드 23.9%, 직접 전화 14.2% 순입니다. 앱 채널 접수가 전월 대비 가장 크게 증가했습니다.",
+        stat_praise: "부서칭찬은 간호부(142건), 원무팀(98건) 순으로 집중되었고, 직원칭찬은 간호사 A(28건), 간호사 B(22건) 등 현장 응대 직군 중심으로 나타났습니다.",
+        stat_demographic: "응답자 성별은 남 50%·여 50%로 균형을 이루며, 연령대는 40대(24%)·50대(22%) 비중이 가장 높습니다.",
+        stat_category: "진료 및 치료·검사관련 카테고리에서 긍정 TOP5는 '친절함', '설명', '신속 응대' 순이며, 부정 TOP5는 '예약 절차 복잡', '대기시간', '통증 조절 부족' 순입니다.",
+        stat_group: "병동별로는 12병동 부정률 18%로 주의가 필요하고, 진료과별로는 정형외과(+2.4%p) 하락폭이 두드러집니다."
+      },
+      vocMonthlyTrend: [
+        { month: "1월", pos: "7,549", neg: "6,969" },
+        { month: "2월", pos: "11,520", neg: "2,880" },
+        { month: "3월", pos: "7,799", neg: "6,915" },
+        { month: "4월", pos: "7,389", neg: "7,388" },
+        { month: "5월", pos: "7,950", neg: "6,504" },
+        { month: "6월", pos: "7,645", neg: "7,056" }
+      ],
+      vocChannels: [
+        { name: "메디통 픽스(앱)", count: "3,454건", pct: "38.1%", delta: "+5.2%p" },
+        { name: "고객의견카드", count: "2,167건", pct: "23.9%", delta: "+1.1%p" },
+        { name: "직접 전화", count: "1,287건", pct: "14.2%", delta: "-0.4%p" },
+        { name: "기타", count: "2,157건", pct: "23.8%", delta: "+0.3%p" }
+      ],
+      vocPraiseDepts: [
+        { name: "간호부", count: "142건", delta: "+8건" },
+        { name: "원무팀", count: "98건", delta: "+5건" },
+        { name: "영양팀", count: "64건", delta: "+3건" }
+      ],
+      vocPraiseStaff: [
+        { name: "간호사 A", count: "28건", delta: "+4건" },
+        { name: "간호사 B", count: "22건", delta: "+3건" },
+        { name: "원무 김OO", count: "18건", delta: "+2건" }
+      ],
+      reportMeta: {
+        badge: "내부 보고 · 임원 보고용 · PIX AI 환자경험관리",
+        title: "2026년 6월 VOC 분석보고서",
+        author: "",
+        docInfo: {
+          dept: "의료기획팀 · 환자경험관리파트",
+          date: "2026. 07. 03.",
+          audience: "병원장 · 진료부원장",
+          subject: "2026년 6월 접수 VOC (8,323건)"
+        },
+        footerNote: "메디통 픽스 AI · 내부 보고 문서 (VOC 통계 목업 기준)"
+      },
+      reportDoc: {
+        overviewHeadlineHtml: "6월 VOC는 총 8,323건 접수(전월 대비 ▲214건)되었고, 언급 기준 9,120건 · VOC 1건당 평균 1.10개 유형이 태깅되었습니다.<br>대부분 유형에서 부정률이 개선되었으나, <b>시스템 및 서비스(▲2.1%p)</b>와 <b>환경관련(▲1.0%p)</b> 유형은 부정률이 악화되었고, 환자안전 관련 VOC도 12건(▲3건)으로 늘어 별도 확인이 필요합니다.",
+        typeRows: [
+          ["진료 및 치료·검사관련", "2,410건", "29.0%", "▼1.2%p", "good"],
+          ["인적응대관련", "1,350건", "16.2%", "▼0.9%p", "good"],
+          ["서비스제공관련", "940건", "11.3%", "▲0.4%p", "bad"],
+          ["시스템 및 서비스", "780건", "9.4%", "▲2.1%p", "bad"],
+          ["환경관련", "705건", "8.5%", "▲1.0%p", "bad"],
+          ["비용관련", "612건", "7.4%", "▲0.6%p", "bad"],
+          ["기타문의", "286건", "3.4%", "▼0.2%p", "good"],
+          ["미분류", "42건", "-", "▼3건", "good"]
+        ],
+        typeCaption: "※ 하나의 VOC에 여러 유형이 함께 태깅될 수 있어 합계는 접수 건수(8,323건)보다 많습니다. 미분류는 비중 대신 건수 증감만 표기합니다.",
+        kwPos: [
+          { name: "친절함", cnt: 320 },
+          { name: "세심함 · 시설 만족", cnt: 210 },
+          { name: "신속 응대", cnt: 165 },
+          { name: "의사 설명", cnt: 164 },
+          { name: "식사 만족 · 병실 청결", cnt: 150 }
+        ],
+        kwNeg: [
+          { name: "비용 부담", cnt: 210 },
+          { name: "예약 절차 복잡", cnt: 180 },
+          { name: "응대 지연", cnt: 140 },
+          { name: "앱 오류", cnt: 130 },
+          { name: "치료 속도", cnt: 129 }
+        ],
+        kwCaption: "※ 7개 유형별 키워드 TOP5 데이터를 동일 키워드 기준으로 합산한 결과입니다.",
+        channels: [
+          { name: "메디통 픽스(앱)", cnt: 3450, pct: 38.1, color: "#378ADD" },
+          { name: "고객의견카드", cnt: 2166, pct: 23.9, color: "#1baf7a" },
+          { name: "직접 전화", cnt: 1289, pct: 14.2, color: "#e8a33d" },
+          { name: "카카오톡·채널톡", cnt: 988, pct: 10.9, color: "#e0559a" },
+          { name: "홈페이지", cnt: 626, pct: 6.9, color: "#8f7fe0" },
+          { name: "현장 상담", cnt: 380, pct: 4.2, color: "#3aa0a0" },
+          { name: "기타", cnt: 166, pct: 1.8, color: "#b7b3a8" }
+        ],
+        channelTotal: "9,065건",
+        analysisIntro: "병동·진료과·의사 그룹별 부정률 변화(전월 대비)를 확인한 결과, 정형외과와 정형외과 원장의 개선폭이 가장 크고, 7병동·내과 중환자실·내과·내과 김의사는 부정률이 악화되었습니다.",
+        wardRows: [
+          ["3병동", "36.0%", "▼2.0%p", "good"],
+          ["12병동", "34.8%", "▼3.1%p", "good"],
+          ["5병동", "39.1%", "▼1.1%p", "good"],
+          ["내과 중환자실", "38.1%", "▲0.5%p", "bad"],
+          ["7병동", "40.1%", "▲1.2%p", "bad"]
+        ],
+        deptRows: [
+          ["정형외과", "810건", "▼3.8%p", "good"],
+          ["신경외과", "3,330건", "▼1.5%p", "good"],
+          ["외과", "3,864건", "▼2.1%p", "good"],
+          ["재활의학과", "3,125건", "▲1.1%p", "bad"],
+          ["내과", "3,550건", "▲0.6%p", "bad"]
+        ],
+        doctorRows: [
+          ["정형외과 원장", "정형외과", "88건", "▼4.2%p", "good"],
+          ["외과 박의사", "외과", "61건", "▼1.7%p", "good"],
+          ["신경외과 이의사", "신경외과", "55건", "▼0.8%p", "good"],
+          ["재활의학과 최의사", "재활의학과", "49건", "▲1.4%p", "bad"],
+          ["내과 김의사", "내과", "67건", "▲2.8%p", "bad"]
+        ],
+        orgCaption: "※ 진료과·의사 표는 부정 건수 상위 그룹 기준이며, 부정률 변화는 전월 대비 긍정 비율 변화(%p)의 부호를 반전한 값입니다.",
+        flags: [
+          { tag: "환자안전", cls: "", cnt: "12건", delta: "▲3건", desc: " — AI가 자유 텍스트에서 감지한 플래그입니다." },
+          { tag: "감염관리", cls: "purple", cnt: "5건", delta: "▼1건", desc: "" }
+        ],
+        quotesIntro: "실제 접수된 VOC 원문 중 이번 달 흐름을 보여주는 사례입니다.",
+        quotes: [
+          { text: "환자가 침대에서 낙상할 뻔했습니다. 안전바가 없었어요.", meta: "3병동 · 환자안전" },
+          { text: "손 소독제가 비치되어 있지 않았습니다.", meta: "7병동 · 감염관리" },
+          { text: "회진 설명이 친절했습니다.", meta: "내과 · 직원칭찬(김의사)" }
+        ],
+        risksIntro: "리스크는 다음과 같이 진단됩니다.",
+        risks: [
+          { badge: "국지적", cls: "low", desc: "현재는 7병동·내과 중환자실 등 일부 그룹에 한정된 부정률 악화이며, 전체 8종 유형 중 6종은 개선 추세입니다." },
+          { badge: "확산 우려", cls: "mid", desc: "시스템 및 서비스(▲2.1%p), 환경관련(▲1.0%p) 유형 부정률 상승이 이어지면 다른 병동·진료과로 번질 가능성이 있습니다." },
+          { badge: "환자안전 영향", cls: "high", desc: "환자안전 플래그가 3건 늘어난 만큼, 방치 시 환자경험평가 환자안전 관련 문항 점수와 수가 가감산에 부정적 영향을 줄 수 있습니다." }
+        ],
+        optionRows: [
+          { id: "A", content: "환자안전 플래그 12건 전수 검토 및 재발방지 대책 수립", duration: "1주 내", priority: "높음", priorityCls: "bad", recommend: true },
+          { id: "B", content: "시스템 및 서비스 · 환경관련 유형 원인 점검 (관련 부서 합동)", duration: "2주", priority: "중간", priorityCls: "", recommend: false },
+          { id: "C", content: "7병동 · 내과 중환자실 · 내과 대상 부정률 악화 원인 모니터링 강화", duration: "2~3주", priority: "중간", priorityCls: "", recommend: false }
+        ],
+        recommendationHtml: "결정은 경영진의 몫이나, 실무팀은 환자안전과 직결된 <b>옵션 A</b>를 최우선 권고합니다.",
+        monitorRows: [
+          { week: "7월 1주차", content: "환자안전 플래그 12건 재발방지 조치 이행 여부 확인" },
+          { week: "7월 2주차", content: "시스템·환경관련 유형 부정률 재점검" },
+          { week: "7월 말", content: "7병동 · 내과 중환자실 · 내과 부정률 재평가 후 다음 임원 보고에 반영" }
+        ]
+      },
       reportOverview: {
-        simple: "2026년 7월 VOC 종합 부정률은 43.7%로 전월 대비 1.1%p 상승했으며, 접수 건수는 8,323건으로 전월 대비 214건 늘었습니다. 부서칭찬 420건, 직원칭찬 820건으로 현장 서비스에 대한 긍정 평가도 함께 증가해, 전반적으로는 만족도 둔화와 긍정 반응 증가가 동시에 나타난 한 달이었습니다.",
-        basic: "2026년 7월 VOC 종합 부정률은 43.7%로 전월 대비 1.1%p 상승했습니다. 시스템 및 서비스 유형은 '예약 절차 복잡' 언급이 9건 늘며 부정률 상승을 견인했고, 비용관련 유형도 '비용 부담' 언급 증가로 부정률이 함께 올랐습니다. 반면 인적응대관련 유형은 '친절함'(+8건) 언급 증가로 개선되었고, 서비스제공관련 유형도 '세심함'(+6건) 언급 증가로 개선세를 보였습니다. 환자안전 플래그는 12건으로 전월 대비 3건 늘어 주의가 필요합니다.",
-        deep: "2026년 7월 VOC 종합 부정률은 43.7%로 전월 대비 1.1%p 상승했습니다. 시스템 및 서비스 유형은 '예약 절차 복잡' 언급 증가로 부정률이 4.2%p 상승했고, 비용관련 유형도 '비용 부담' 언급이 늘며 부정률이 올라 두 유형 모두 심각도 '높음'으로 분류되었습니다. 병동·진료과 단위에서는 7병동과 심장혈관흉부외과의 부정률 상승폭이 가장 커 개별 원인 분석이 필요합니다. 반면 인적응대관련 유형은 '친절함'(+8건) 언급 증가로 2.1%p 개선되었고, 서비스제공관련 유형도 '세심함'(+6건) 언급 증가로 1.8%p 개선되어 유형 간 온도차가 뚜렷했습니다. 비용관련·시스템 및 서비스 유형은 1개월 내 부정률이 각각 41.7%, 58.6% 이하로 복귀하는지 모니터링이 필요한 우선 관리 대상입니다."
+        simple: "6월 VOC는 총 8,323건 접수(▲214건)되었고, 대부분 유형에서 부정률이 개선되었으나 시스템 및 서비스·환경관련 유형은 악화되었습니다.",
+        basic: "6월 VOC는 총 8,323건 접수, 언급 9,120건입니다. 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p) 유형 부정률이 악화되었고, 환자안전 플래그 12건(▲3건)으로 늘었습니다.",
+        deep: "6월 VOC는 총 8,323건 접수(▲214건), 언급 9,120건 · 평균 태그 1.10개입니다. 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p) 유형이 악화되었고, 7병동·내과 중환자실·내과 김의사 그룹에서 부정률이 올랐습니다. 정형외과·정형외과 원장은 개선폭이 가장 컸으며, 환자안전 플래그 12건(▲3건) 전수 검토가 필요합니다."
       },
       reportDrafts: {
-        kpi: "이번 달 접수된 VOC 건수는 8,323건으로 전월 대비 214건 증가했으며, 실제 카테고리에 태깅된 언급 건수는 9,120건으로 접수 건수보다 많습니다. 종합 부정률은 43.7%로 전월 대비 1.1%p 상승했고, 부서칭찬은 420건(전월 대비 +18건), 직원칭찬은 820건(전월 대비 +32건)으로 현장 서비스에 대한 긍정 반응도 함께 증가했습니다.",
+        overview: "6월 VOC는 총 8,323건 접수(전월 대비 ▲214건)되었고, 언급 기준 9,120건 · VOC 1건당 평균 1.10개 유형이 태깅되었습니다. 대부분 유형에서 부정률이 개선되었으나, 시스템 및 서비스(▲2.1%p)와 환경관련(▲1.0%p) 유형은 부정률이 악화되었고, 환자안전 관련 VOC도 12건(▲3건)으로 늘어 별도 확인이 필요합니다.",
+        status: "8개 유형 가운데 6종은 전월 대비 부정률이 개선되었고, 진료 및 치료·검사관련(▼1.2%p)·인적응대관련(▼0.9%p)에서 두드러집니다. 반면 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p)·비용관련(▲0.6%p)은 악화 추세입니다. 긍정 키워드는 '친절함'·'세심함'이, 부정 키워드는 '비용 부담'·'예약 절차 복잡'이 상위를 차지했습니다.",
+        analysisOrg: "병동·진료과·의사 그룹별 부정률 변화(전월 대비)를 확인한 결과, 정형외과와 정형외과 원장의 개선폭이 가장 크고, 7병동·내과 중환자실·내과·내과 김의사는 부정률이 악화되었습니다.",
+        issuesEval: "실제 접수된 VOC 원문 중 이번 달 흐름을 보여주는 사례입니다.\n\n리스크는 다음과 같이 진단됩니다. 현재는 7병동·내과 중환자실 등 일부 그룹에 한정된 부정률 악화이며, 시스템·환경관련 유형 부정률 상승이 이어지면 확산 우려가 있습니다. 환자안전 플래그 증가는 환자경험평가·수가 가감산에 부정적 영향을 줄 수 있습니다.",
+        conclusionOpts: "아래 세 가지 대응 옵션 중 경영진의 결정이 필요합니다. 실무팀은 환자안전과 직결된 옵션 A를 최우선 권고합니다.",
+        kpi: "주요 지표는 전월 대비 다음과 같이 변화했습니다.",
+        statusNarrative: "개선은 인적응대관련 유형에서 뚜렷하게 나타났으며, 3병동·5병동 두 곳이 전체 개선분의 과반을 차지합니다. 반면 7병동은 부정률이 전월 대비 3.2%p 상승해 유일하게 악화된 병동입니다.",
+        analysis: "",
         dist: "8개 유형 가운데 긍정 비율이 가장 높은 유형은 인적응대관련(67%)이며, 그 뒤를 서비스제공관련(66%)이 잇고 있어 사람 중심 서비스 영역에서 안정적인 만족도를 확보하고 있는 것으로 보입니다. 반대로 부정 비율이 가장 높은 유형은 비용관련(75%)이며, 시스템 및 서비스 유형(62%)도 절반을 크게 웃도는 부정 비율을 보여 두 영역에 대한 우선적인 개선 검토가 필요합니다.",
         matrix: "부정률 50%를 기준으로 절대 수준과 변화 방향을 함께 보면, 시스템 및 서비스·비용관련 2개 유형이 부정률도 높고 계속 악화되고 있어 '긴급 대응' 구간에 속합니다. 진료 및 치료·검사관련·기타문의는 부정률은 높지만 개선 추세라 '개선 중' 구간에, 인적응대관련·서비스제공관련은 부정률도 낮고 계속 좋아지고 있어 '우수 사례' 구간에 속합니다. 환경관련은 아직 부정률은 낮지만 소음 키워드 중심으로 악화되고 있어 '주의 관찰'이 필요합니다.",
         keywords: "긍정 키워드 중에서는 '친절함'(+8건), '세심함'(+6건), '신속 응대'(+5건) 순으로 언급이 늘었으며, 이는 대부분 간호·안내 응대 과정에서 반복적으로 나타난 표현입니다. 부정 키워드 중에서는 '예약 절차 복잡'(+9건), '대기시간'(+7건), '통증 조절 부족'(+6건) 순으로 증가폭이 컸으며, 특히 '예약 절차 복잡'은 시스템 및 서비스 유형 부정률 상승과 직접적으로 연결되는 핵심 원인으로 확인됩니다.",
         issues: "긍정 이슈로는 인적응대관련 유형의 '친절함' 언급 증가와 서비스제공관련 유형의 '세심함' 언급 증가가 두드러지며, 이는 최근 현장 응대 교육 및 서비스 개선 노력이 실제 지표 개선으로 이어지고 있음을 시사합니다. 부정 이슈로는 비용관련 유형의 '비용 부담' 언급 상승과 시스템 및 서비스 유형의 '예약 절차 복잡' 언급 급증이 심각도 '높음'으로 분류되어 우선 대응이 필요합니다.",
         plan: "가장 시급한 과제는 비용 안내 강화와 예약 시스템 개선으로, 두 과제 모두 심각도 '높음'으로 분류된 이슈에서 도출되었으며 1~2개월 내 착수를 목표로 합니다. 소음 저감 조치와 응대 인력 재배치 검토는 중간 우선순위 과제로 2개월 내 원인 분석과 개선안 마련을 병행하는 것을 권고합니다.",
-        quotes: "긍정 원문에서는 간호사·의료진의 친절한 응대와 세심한 설명을 언급하는 표현이 반복적으로 나타나며, 이는 인적응대관련 유형의 긍정 비율 상승을 뒷받침하는 실제 근거로 볼 수 있습니다. 반면 개선 제안 원문에서는 예약 절차의 복잡성과 대기시간에 대한 불편이 가장 빈번하게 언급되었으며, 통증 조절이나 병동 소음처럼 입원 생활 전반의 쾌적함과 관련된 의견도 함께 나타났습니다."
+        quotes: "환자 VOC 원문 중 이번 달 흐름을 가장 잘 보여주는 표현입니다.",
+        riskScenarios: "리스크 시나리오는 다음과 같이 진단됩니다.",
+        options: "아래 세 가지 대응 옵션 중 하나를 선택해 주시기 바랍니다.",
+        recommendation: "결정은 경영진의 몫이나, 실무팀은 옵션 A(합동 점검)를 우선 권고합니다.",
+        monitorPlan: "• 7월 1주차: 환자안전 플래그 12건 재발방지 조치 이행 여부 확인\n• 7월 2주차: 시스템·환경관련 유형 부정률 재점검\n• 7월 말: 7병동 · 내과 중환자실 · 내과 부정률 재평가 후 다음 임원 보고에 반영",
+        monitor: "8월 1주차 시스템 및 서비스 VOC 중간 점검, 8월 3주차 12병동 재평가, 8월 말 전체 지표 재집계 후 다음 임원 보고에 반영합니다."
       },
       typeSentiment: [
         { type: "시스템 및 서비스", cnt: 780, negChange: 4.2, pos: 38, neg: 62, org: "IT팀 · 예약센터", topKw: "예약 절차 복잡", kwShare: 43 },
@@ -759,7 +1133,13 @@
         ["부서칭찬 건수", "420건"],
         ["직원칭찬 건수", "820건"],
         ["전체 부정률", "43.7%"]
-      ]
+      ],
+      summaryStructured: {
+        conclusion: "6월 VOC는 총 8,323건 접수(▲214건)되었고, 대부분 유형에서 부정률이 개선되었습니다.",
+        cause: "시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p) 유형 부정률 악화와 환자안전 플래그 12건(▲3건) 증가가 주요 이슈입니다.",
+        impact: "7병동·내과 중환자실·내과·내과 김의사 그룹에서 부정률이 악화되어, 국지적이나 환자안전과 연계된 리스크가 있습니다.",
+        recommendation: "환자안전 플래그 12건 전수 검토(옵션 A)를 1주 내 착수하고, 시스템·환경관련 유형 원인 점검을 병행하십시오."
+      }
     };
   }
 
@@ -810,32 +1190,38 @@
     options = options || {};
     var variant = options.variant === "voc" ? "voc" : "survey";
     var data = applySnapshot(variant === "voc" ? vocDataset() : surveyDataset(), options.data || global.__pxAiPanelData);
+    var panelOpenMode = options.openMode === "reportDirect" ? "reportDirect" : "analysis";
+    var hideSlider = options.hideLevelSlider !== false && (options.hideLevelSlider || variant === "voc" || variant === "survey");
     var level = options.level || "basic";
+    if (panelOpenMode === "reportDirect") level = options.level || "deep";
     var curLv = Math.max(0, LV_KEYS.indexOf(level));
     if (curLv < 0) curLv = 1;
     var curTab = "analysis";
     var generated = false;
     var activeBlocks = null;
     var activeAnalysisBlocks = null;
+    var appliedAnalysisBlocks = null;
+    var analysisPhase = "strength";
+    var importedItems = {};
+    var removedReportBlocks = {};
+    var reportSectionSel = null;
     var drag = false;
     var sx = 0;
     var si = 0;
     var disposed = false;
-
-    var hideSlider = options.hideLevelSlider || variant === "voc" || variant === "survey";
     host.innerHTML = "";
     var root = document.createElement("div");
     var useDarkModal = variant === "voc" || variant === "survey";
     root.className = "px-ai-root" + (useDarkModal ? " px-ai-voc" : "");
     var reportPaneInner = useDarkModal
-      ? '<div class="px-ai-rpt-setup" data-role="report-setup"></div>'
-      : '<div class="px-ai-rpt-header">' +
-          '<div class="px-ai-rpt-desc">분석 결과를 기반으로 PIX AI 분석 보고서를 생성합니다.</div>' +
-          '<button type="button" class="px-ai-gen" data-role="gen">보고서 생성 ↗</button>' +
-        '</div>';
+      ? ""
+      : '<div data-role="report-setup">' +
+          '<div class="px-ai-rpt-header">' +
+            '<div class="px-ai-rpt-desc">분석 결과를 기반으로 PIX AI 분석 보고서를 생성합니다.</div>' +
+            '<button type="button" class="px-ai-gen" data-role="gen">보고서 생성 ↗</button>' +
+          '</div></div>';
     var analysisBodyHtml = useDarkModal
-      ? '<div class="px-ai-rpt-setup px-ai-analysis-setup" data-role="analysis-setup"></div>' +
-        '<div data-role="body" class="px-ai-voc-body"></div>'
+      ? '<div data-role="body" class="px-ai-voc-body"></div>'
       : '<div data-role="body" class="px-ai-voc-body"></div>';
     var panelHtml = useDarkModal
       ? '<div class="px-ai-head">' +
@@ -845,12 +1231,25 @@
             '<button type="button" class="px-ai-close" data-role="close" aria-label="닫기">✕</button>' +
           '</div>' +
         '</div>' +
+        '<p class="px-ai-breadcrumb" data-role="breadcrumb"></p>' +
+        '<div class="px-ai-inner-tabs" data-role="inner-tabs" style="display:none">' +
+          '<button type="button" class="px-ai-inner-tab on" data-tab="analysis" data-role="analysis-tab">분석</button>' +
+          '<button type="button" class="px-ai-inner-tab" data-tab="report">보고서 작성</button>' +
+        '</div>' +
         '<div class="px-ai-scroll" data-role="scroll">' +
           '<div data-pane="analysis">' + analysisBodyHtml + '</div>' +
-          '<div data-pane="report" style="display:none">' + reportPaneInner +
+          '<div data-pane="report" style="display:none">' +
+            '<div class="px-ai-rpt-doc-wrap" data-role="report-doc"></div>' +
             '<div data-role="report-out" style="display:none"></div></div>' +
         '</div>' +
-        '<div class="px-ai-rpt-actions px-ai-panel-actions" data-role="panel-actions"></div>'
+        '<div class="px-ai-import-overlay" data-role="import-overlay" style="display:none">' +
+          '<div class="px-ai-import-dialog">' +
+            '<div style="display:flex;justify-content:flex-end;margin-bottom:-8px">' +
+              '<button type="button" class="px-ai-close" data-role="import-close">✕</button>' +
+            '</div>' +
+            '<div data-role="import-body"></div>' +
+          '</div>' +
+        '</div>'
       : '<div class="px-ai-head">' +
           '<div class="px-ai-top">' +
             '<div class="px-ai-title-wrap">' +
@@ -888,6 +1287,9 @@
 
     var els = {
       period: root.querySelector('[data-role="period"]'),
+      breadcrumb: root.querySelector('[data-role="breadcrumb"]'),
+      innerTabs: root.querySelector('[data-role="inner-tabs"]'),
+      analysisTabBtn: root.querySelector('[data-role="analysis-tab"]'),
       title: root.querySelector('[data-role="title"]'),
       sum: root.querySelector('[data-role="sum"]'),
       insight: root.querySelector('[data-role="insight"]'),
@@ -896,13 +1298,16 @@
       thumb: root.querySelector('[data-role="thumb"]'),
       gen: root.querySelector('[data-role="gen"]'),
       reportSetup: root.querySelector('[data-role="report-setup"]'),
-      analysisSetup: root.querySelector('[data-role="analysis-setup"]'),
+      reportDoc: root.querySelector('[data-role="report-doc"]'),
       reportOut: root.querySelector('[data-role="report-out"]'),
       analysisPane: root.querySelector('[data-pane="analysis"]'),
       reportPane: root.querySelector('[data-pane="report"]'),
-      panelActions: root.querySelector('[data-role="panel-actions"]'),
+      importOverlay: root.querySelector('[data-role="import-overlay"]'),
+      importBody: root.querySelector('[data-role="import-body"]'),
+      importClose: root.querySelector('[data-role="import-close"]'),
       labels: root.querySelectorAll(".px-ai-hlbl"),
       tabs: root.querySelectorAll(".px-ai-tab"),
+      innerTabBtns: root.querySelectorAll(".px-ai-inner-tab"),
       close: root.querySelector('[data-role="close"]')
     };
 
@@ -1302,6 +1707,25 @@
       return '<div class="px-ai-card"><div class="px-ai-card-hd"><span class="px-ai-card-ttl">모니터링 ' +
         monCount + "개 · 심각도 높음 이슈 기준</span></div>" + mons + "</div>";
     }
+    function summaryForLevel(lvKey) {
+      if (data.sum && data.sum[lvKey]) return (data.sum[lvKey] || "").replace(/\\n/g, "\n");
+      var texts = data.reportOverview || {};
+      return (texts[lvKey] || texts.basic || deepSummaryText()).replace(/\\n/g, "\n");
+    }
+    function blocksForLevel(lv) {
+      if (variant === "survey") {
+        if (lv === "simple") return ["areas"];
+        if (lv === "basic") return ["areas", "actions"];
+        return ["matrix", "areas", "actions", "changes", "monitor"];
+      }
+      if (lv === "simple") return ["keywords"];
+      if (lv === "basic") return ["keywords", "actions", "dist"];
+      return ["matrix", "keywords", "actions", "dist", "monitor"];
+    }
+    function resolveAnalysisBlocks() {
+      var lv = LV_KEYS[curLv];
+      return appliedAnalysisBlocks || blocksForLevel(lv);
+    }
     function deepSummaryText() {
       if (data.sum && data.sum.deep) {
         return (data.sum.deep || "").replace(/\\n/g, "\n");
@@ -1310,40 +1734,46 @@
       return (texts.deep || texts.basic || "").replace(/\\n/g, "\n");
     }
     function renderChipBasedAnalysis() {
-      if (!activeAnalysisBlocks) activeAnalysisBlocks = defaultAnalysisBlocks();
-      var blocks = activeAnalysisBlocks;
-      var sumText = deepSummaryText();
-      var rightHtml = "";
-      if (blocks.indexOf("insight") > -1) rightHtml += renderInsightCard();
-      if (blocks.indexOf("kpi") > -1) rightHtml += renderMetricChanges();
-      if (blocks.indexOf("matrix") > -1) {
-        rightHtml += variant === "voc" ? renderCategoryMatrix() : renderSurveyAreaMatrix();
-      }
-      if (blocks.indexOf("keywords") > -1 && variant === "voc") rightHtml += renderKeywordTop();
-      if (blocks.indexOf("areas") > -1 && variant === "survey") rightHtml += renderSurveyTopAreas();
-      if (blocks.indexOf("issues") > -1) rightHtml += renderVocDetailJudgement(false);
-      if (blocks.indexOf("changes") > -1) rightHtml += renderChangesCard();
-      if (blocks.indexOf("monitor") > -1) rightHtml += renderMonitorCard();
-      var html;
-      if (blocks.indexOf("summary") > -1) {
-        html = '<div class="px-ai-voc-grid" style="grid-template-columns:1fr 1.3fr">' +
-          '<div class="px-ai-card px-ai-sum-card"><div class="px-ai-card-hd">' +
-          '<span class="px-ai-card-ttl">🩺 AI 요약</span><span class="px-ai-card-sub">결론 + 원인 + 영향 범위 + 권고</span></div>' +
-          '<p class="px-ai-voc-sum">' + esc(sumText) + "</p></div>" +
-          "<div>" + (rightHtml || '<p class="px-ai-voc-loading" style="padding:20px 0">표시할 영역을 선택해 주세요.</p>') + "</div>" +
-          "</div>";
-      } else if (rightHtml) {
-        html = '<div class="px-ai-voc-grid" style="grid-template-columns:1fr">' + rightHtml + "</div>";
+      var lv = LV_KEYS[curLv];
+      var optional = resolveAnalysisBlocks();
+      var sumText = summaryForLevel(lv);
+      var periodSub = esc(data.periodShort || data.periodText || "");
+      var rightHtml = renderInsightCard() + renderMetricChanges();
+      if (lv === "simple") {
+        if (variant === "voc") rightHtml += renderKeywordTop();
+        if (variant === "survey") rightHtml += renderSurveyTopAreas();
       } else {
-        html = '<p class="px-ai-voc-loading" style="padding:30px 0">표시할 영역을 1개 이상 선택해 주세요.</p>';
+        if (optional.indexOf("dist") > -1 && variant === "voc") rightHtml += renderDistCard();
+        if (optional.indexOf("keywords") > -1 && variant === "voc") rightHtml += renderKeywordTop();
+        if (optional.indexOf("areas") > -1 && variant === "survey") rightHtml += renderSurveyTopAreas();
+        if (lv === "basic" || lv === "deep") {
+          if (lv === "basic" || optional.indexOf("actions") > -1 || optional.indexOf("issues") > -1) {
+            rightHtml += renderVocDetailJudgement(lv === "deep", lv === "basic" ? 5 : undefined, lv === "basic" ? 5 : undefined);
+          }
+        }
       }
-      els.body.innerHTML = html;
+      if (lv === "deep") {
+        if (optional.indexOf("matrix") > -1) {
+          rightHtml += variant === "voc" ? renderCategoryMatrix() : renderSurveyAreaMatrix();
+        }
+        if (optional.indexOf("changes") > -1 && variant === "survey") rightHtml += renderChangesCard();
+        if (optional.indexOf("monitor") > -1) rightHtml += renderMonitorCard();
+      }
+      els.body.innerHTML =
+        '<div class="px-ai-voc-grid" style="grid-template-columns:1fr 1.3fr">' +
+          '<div class="px-ai-card px-ai-sum-card"><div class="px-ai-card-hd">' +
+          '<span class="px-ai-card-ttl">🩺 AI 요약</span><span class="px-ai-card-sub">' + periodSub +
+          ' · <span class="px-ai-level-tag">' + esc(LV_NAMES[curLv]) + "</span></span></div>" +
+          '<p class="px-ai-voc-sum">' + esc(sumText) + "</p></div>" +
+          "<div>" + rightHtml + "</div>" +
+        "</div>";
     }
     function renderAnalysis() {
       var lv = LV_KEYS[curLv];
       if (variant === "voc" || variant === "survey") {
         if (els.period) els.period.textContent = data.periodText;
-        renderChipBasedAnalysis();
+        if (analysisPhase === "ready") renderChipBasedAnalysis();
+        else if (analysisPhase === "strength") renderStep2Strength();
         return;
       }
       els.period.textContent = data.periodText;
@@ -1424,52 +1854,807 @@
       return '<p style="margin:0">' + esc(text || "") + "</p>";
     }
     function defaultAnalysisBlocks() {
-      return (data.analysisDefaultBlocks || ["summary", "insight", "kpi", "areas", "issues"]).slice();
+      return (data.analysisDefaultBlocks || []).slice();
     }
-    function renderAnalysisSetup() {
-      if (!els.analysisSetup || !useDarkModal) return;
-      if (!activeAnalysisBlocks) activeAnalysisBlocks = defaultAnalysisBlocks();
-      var blocks = data.analysisBlockDefs || [];
-      var chips = blocks.map(function (b) {
-        var on = activeAnalysisBlocks.indexOf(b.key) > -1;
-        return '<span class="px-ai-rpt-chip' + (on ? " on" : "") + '" data-analysis-block-key="' + esc(b.key) + '">' +
-          (on ? "✓ " : "") + esc(b.name) + "</span>";
+    var ANALYSIS_BASE_BLOCKS = [
+      { key: "summary", name: "AI 요약" },
+      { key: "insight", name: "AI 인사이트" },
+      { key: "kpi", name: "핵심 지표" }
+    ];
+    function renderDistCard() {
+      return '<div class="px-ai-card"><div class="px-ai-card-hd"><span class="px-ai-card-ttl">유형별 분포</span></div>' +
+        reportTypeDistHtml() + "</div>";
+    }
+    function updateBreadcrumb() {
+      if (!els.breadcrumb) return;
+      els.breadcrumb.textContent = analysisPhase === "strength"
+        ? "1. 분석 강도 → 2. AI 분석 결과"
+        : "1. 분석 강도 → 2. AI 분석 결과";
+    }
+    function syncInnerTabVisibility() {
+      if (els.analysisTabBtn) {
+        els.analysisTabBtn.style.display = panelOpenMode === "reportDirect" ? "none" : "";
+      }
+    }
+    function updateInnerTabs(show) {
+      if (els.innerTabs) {
+        els.innerTabs.style.display = show ? "flex" : "none";
+        if (show) syncInnerTabVisibility();
+      }
+    }
+    function renderStep2Strength() {
+      if (!els.body || !useDarkModal) return;
+      analysisPhase = "strength";
+      updateBreadcrumb();
+      updateInnerTabs(false);
+      var meta = STRENGTH_META[variant] || STRENGTH_META.voc;
+      var cards = LV_KEYS.map(function (key, i) {
+        var on = i === curLv;
+        return '<div class="px-ai-strength-card' + (on ? " on" : "") + '" data-strength="' + key + '">' +
+          '<p class="px-ai-strength-title">' + esc(LV_NAMES[i]) + "</p>" +
+          '<p class="px-ai-strength-desc">' + esc(meta.cards[key]) + "</p></div>";
       }).join("");
-      els.analysisSetup.innerHTML =
-        '<p class="px-ai-rpt-blocks-lbl" style="margin-top:0">표시할 영역</p>' +
-        '<div class="px-ai-rpt-chips">' + chips + "</div>" +
-        '<p class="px-ai-rpt-level-note" style="margin:10px 0 0">— 칩을 눌러 분석 영역을 넣거나 뺄 수 있습니다.</p>';
+      els.body.innerHTML =
+        '<p class="px-ai-rpt-blocks-lbl" style="margin-top:0;color:#9b99a8">분석 강도</p>' +
+        '<p style="font-size:12px;color:#7a7887;margin:0 0 14px">' + esc(meta.subtitle) + "</p>" +
+        '<div class="px-ai-strength-grid">' + cards + "</div>" +
+        '<button type="button" class="px-ai-gen px-ai-gen-inline" data-role="request-analysis">분석 시작 ↗</button>';
     }
-    function toggleAnalysisBlock(key) {
-      if (!activeAnalysisBlocks) activeAnalysisBlocks = defaultAnalysisBlocks();
-      var idx = activeAnalysisBlocks.indexOf(key);
-      if (idx > -1) activeAnalysisBlocks.splice(idx, 1);
-      else activeAnalysisBlocks.push(key);
-      renderAnalysisSetup();
-      renderChipBasedAnalysis();
+    function pickStrength(key) {
+      var idx = LV_KEYS.indexOf(key);
+      if (idx >= 0) curLv = idx;
+      global.__pxAiAnalysisLevel = LV_KEYS[curLv];
+      if (analysisPhase === "strength") renderStep2Strength();
+      else if (analysisPhase === "ready") {
+        appliedAnalysisBlocks = blocksForLevel(LV_KEYS[curLv]);
+        renderChipBasedAnalysis();
+        renderReportPane();
+      }
+    }
+    function requestAnalysis() {
+      if (disposed) return;
+      appliedAnalysisBlocks = blocksForLevel(LV_KEYS[curLv]);
+      removedReportBlocks = {};
+      importedItems = {};
+      analysisPhase = "loading";
+      updateBreadcrumb();
+      updateInnerTabs(true);
+      switchToTab("analysis");
+      var loadingText = variant === "voc"
+        ? "VOC 데이터를 분석하고 있습니다…"
+        : "환자경험평가 데이터를 분석하고 있습니다…";
+      els.body.innerHTML = '<p class="px-ai-voc-loading">' + loadingText + "</p>";
+      window.setTimeout(function () {
+        if (disposed) return;
+        analysisPhase = "ready";
+        renderChipBasedAnalysis();
+        renderReportPane();
+        switchToTab("analysis");
+      }, 700);
     }
     function defaultReportBlocks() {
       var defs = data.reportDefaultBlocks || {};
       var lv = LV_KEYS[curLv];
       return (defs[lv] || defs.basic || ["overview", "kpi"]).slice();
     }
-    function renderReportPane() {
-      if (!els.reportSetup) return;
+    function reportBlockChipsHtml(blocks) {
       if (!activeBlocks) activeBlocks = defaultReportBlocks();
-      var blocks = data.reportBlockDefs || [];
-      var chips = blocks.map(function (b) {
+      return (blocks || []).map(function (b) {
         var on = activeBlocks.indexOf(b.key) > -1;
         return '<span class="px-ai-rpt-chip' + (on ? " on" : "") + '" data-block-key="' + esc(b.key) + '">' +
           (on ? "✓ " : "") + esc(b.name) + "</span>";
       }).join("");
-      var header = useDarkModal
-        ? '<p class="px-ai-rpt-level-note" style="margin:0 0 14px">분석 결과를 바탕으로 보고서에 넣을 블록을 선택하세요.</p>'
-        : '<div class="px-ai-rpt-level">현재 분석 강도 <span class="px-ai-level-tag">' + esc(LV_NAMES[curLv]) + "</span>" +
-          '<span class="px-ai-rpt-level-note">— 아래 블록을 눌러 보고서에 넣거나 뺄 수 있습니다.</span></div>';
+    }
+    function appendSelectedReportBlocks(html, nRef, defs, blockContent) {
+      var out = html;
+      (defs || []).forEach(function (b) {
+        if (activeBlocks.indexOf(b.key) > -1) {
+          var c = blockContent[b.key];
+          if (c) out += reportSection(b.key, nRef.n++ + ". " + c[0], c[1], c[2]);
+        }
+      });
+      return out;
+    }
+    function reportStatTableHtml(rows) {
+      return '<table class="px-ai-rpt-kpi-tbl">' + (rows || []).map(function (r) {
+        return "<tr><td>" + esc(r[0]) + '</td><td>' + esc(r[1]) +
+          (r[2] != null ? '</td><td style="text-align:right">' + esc(r[2]) : "") + "</td></tr>";
+      }).join("") + "</table>";
+    }
+    function reportVocStatTrendHtml() {
+      var rows = (data.vocMonthlyTrend || []).map(function (m) {
+        return [m.month, "긍정 " + m.pos + " · 부정 " + m.neg];
+      });
+      return reportStatTableHtml(rows);
+    }
+    function reportVocStatChannelHtml() {
+      var rows = (data.vocChannels || []).map(function (c) {
+        return [c.name, c.count + " (" + c.pct + ")", c.delta];
+      });
+      return reportStatTableHtml(rows);
+    }
+    function reportVocStatPraiseHtml() {
+      var deptRows = (data.vocPraiseDepts || []).map(function (d) {
+        return ["부서 · " + d.name, d.count, d.delta];
+      });
+      var staffRows = (data.vocPraiseStaff || []).map(function (s) {
+        return ["직원 · " + s.name, s.count, s.delta];
+      });
+      return reportStatTableHtml(deptRows.concat(staffRows));
+    }
+    function reportVocStatDemographicHtml() {
+      return '<p style="font-size:12px;color:#cfcdda;margin:0 0 8px">성별: 남 50% · 여 50%</p>' +
+        reportStatTableHtml([
+          ["20대 미만", "8%"], ["30대", "18%"], ["40대", "24%"],
+          ["50대", "22%"], ["60대", "16%"], ["70대 이상", "12%"]
+        ]);
+    }
+    function reportVocStatCategoryHtml() {
+      var pos = (data.positiveKeywords || []).slice(0, 5).map(function (k, i) {
+        return [(i + 1) + ". " + k.name, k.delta];
+      });
+      var neg = (data.negativeKeywords || []).slice(0, 5).map(function (k, i) {
+        return [(i + 1) + ". " + k.name, k.delta];
+      });
+      return '<p style="font-size:11px;font-weight:700;color:#7ea6ff;margin:0 0 6px">긍정 TOP5</p>' +
+        reportStatTableHtml(pos) +
+        '<p style="font-size:11px;font-weight:700;color:#f2949c;margin:14px 0 6px">부정 TOP5</p>' +
+        reportStatTableHtml(neg);
+    }
+    function reportVocStatGroupHtml() {
+      var wardRows = (data.wards || []).map(function (w) {
+        return ["병동 · " + w.name, w.score, w.delta + " · " + w.st];
+      });
+      var deptRows = (data.depts || []).map(function (d) {
+        return ["진료과 · " + d.name, d.score, d.delta + " · " + d.st];
+      });
+      return reportStatTableHtml(wardRows.concat(deptRows));
+    }
+    function reportSurveyStatOverviewHtml() {
+      return reportSurveyKpiTableHtml();
+    }
+    function reportSurveyStatAreaHtml() {
+      return reportAreaBarHtml() +
+        reportStatTableHtml((data.areas || []).map(function (a) {
+          return [a.name, a.score + (/\d$/.test(a.score) ? "점" : ""), a.delta + " · " + a.eval];
+        }));
+    }
+    function reportSurveyStatOrgHtml() {
+      var wardRows = (data.surveyOrgWards || []).map(function (w) {
+        return ["병동 · " + w.name, w.score + "점", w.delta + "점"];
+      });
+      var deptRows = (data.surveyOrgDepts || []).map(function (d) {
+        return ["진료과 · " + d.name, d.score + "점", d.delta + "점"];
+      });
+      return reportStatTableHtml(wardRows.concat(deptRows));
+    }
+    function reportSurveyStatPriorityHtml() {
+      var areaRows = (data.priority || []).map(function (p, i) {
+        return ["영역 " + (i + 1), p[0] + " " + p[1], p[2]];
+      });
+      var qRows = (data.low || []).slice(0, 3).map(function (t, i) {
+        return ["문항 " + (i + 1), t.no + " " + t.name, t.delta];
+      });
+      return '<p style="font-size:11px;font-weight:700;color:#f2949c;margin:0 0 6px">저점 영역·문항</p>' +
+        reportStatTableHtml(areaRows.concat(qRows));
+    }
+    function getReportBuilderSections() {
+      if (data.reportBuilderSections) return data.reportBuilderSections;
+      if (variant === "survey") {
+        var sections = [
+          { key: "overview", title: "종합 AI 요약", desc: "결론 · 원인 · 영향 범위 · 권고", aiBlock: "overview", statBlock: "stat_overview", defaultAi: true, defaultStat: true },
+          { key: "kpi", title: "핵심 지표", desc: "종합점수 · 응답자 · 추천의향", aiBlock: "kpi", statBlock: "stat_overview", defaultAi: true, defaultStat: false },
+          { key: "matrix", title: "영역 진단 매트릭스", desc: "75점 기준 4분면 진단", aiBlock: "matrix", statBlock: "stat_area", defaultAi: true, defaultStat: false }
+        ];
+        (data.pxAreas || []).forEach(function (a, i) {
+          sections.push({
+            key: "area_" + i,
+            title: (sections.length) + ". " + a.name,
+            desc: a.org + " · 가중치 " + a.weight + "%",
+            area: a,
+            aiBlock: "area",
+            statBlock: "stat_area",
+            defaultAi: i < 4,
+            defaultStat: i < 2
+          });
+        });
+        sections.push(
+          { key: "org", title: "조직별 분석", desc: "병동 · 진료과 비교", aiBlock: "areas", statBlock: "stat_org", defaultAi: false, defaultStat: true },
+          { key: "issues", title: "이슈 및 권장 조치", desc: "상승 · 하락 영역 권장 조치", aiBlock: "issues", statBlock: "stat_priority", defaultAi: true, defaultStat: false },
+          { key: "plan", title: "개선 액션 플랜", desc: "우선순위 · 일정별 과제", aiBlock: "plan", statBlock: null, defaultAi: false, defaultStat: false }
+        );
+        return sections;
+      }
+      return [
+        { key: "overview", title: "종합 AI 요약", desc: "결론 · 원인 · 영향 범위 · 권고", aiBlock: "overview", statBlock: null, defaultAi: true, defaultStat: false },
+        { key: "kpi", title: "핵심 지표", desc: "접수 · 부정률 · 칭찬 현황", aiBlock: "kpi", statBlock: "stat_overview", defaultAi: true, defaultStat: true },
+        { key: "dist", title: "유형별 분포", desc: "8개 유형 긍·부정 비율", aiBlock: "dist", statBlock: "stat_type", defaultAi: true, defaultStat: true },
+        { key: "matrix", title: "유형 진단 매트릭스", desc: "부정률 50% 기준 4분면", aiBlock: "matrix", statBlock: null, defaultAi: true, defaultStat: false },
+        { key: "keywords", title: "변화 키워드 TOP3", desc: "긍·부정 키워드 변화", aiBlock: "keywords", statBlock: "stat_category", defaultAi: true, defaultStat: false },
+        { key: "issues", title: "주요 이슈 및 권장 조치", desc: "심각도 · 우선순위 매칭", aiBlock: "issues", statBlock: "stat_group", defaultAi: true, defaultStat: true },
+        { key: "plan", title: "개선 액션 플랜", desc: "우선순위별 실행 과제", aiBlock: "plan", statBlock: null, defaultAi: false, defaultStat: false },
+        { key: "monitor", title: "모니터링", desc: "고심각도 이슈 추적", aiBlock: "monitor", statBlock: null, defaultAi: true, defaultStat: false },
+        { key: "quotes", title: "원문 및 인사이트", desc: "긍정 · 개선 제안 원문", aiBlock: "quotes", statBlock: null, defaultAi: false, defaultStat: false }
+      ];
+    }
+    function defaultReportSectionSel() {
+      var sel = {};
+      getReportBuilderSections().forEach(function (s) {
+        sel[s.key] = { ai: !!s.defaultAi, stat: !!s.defaultStat };
+      });
+      return sel;
+    }
+    function syncActiveBlocksFromSelection() {
+      var blocks = [];
+      var seen = {};
+      getReportBuilderSections().forEach(function (s) {
+        var st = (reportSectionSel || {})[s.key] || {};
+        if (st.ai && s.aiBlock && s.aiBlock !== "area" && !seen[s.aiBlock]) {
+          blocks.push(s.aiBlock);
+          seen[s.aiBlock] = true;
+        }
+        if (st.stat && s.statBlock && !seen[s.statBlock]) {
+          blocks.push(s.statBlock);
+          seen[s.statBlock] = true;
+        }
+      });
+      if (variant === "voc" && blocks.indexOf("overview") === -1) blocks.unshift("overview");
+      activeBlocks = blocks.length ? blocks : defaultReportBlocks();
+    }
+    function renderStructuredSummaryHtml() {
+      var s = data.summaryStructured || {};
+      var labels = { conclusion: "결론", cause: "원인", impact: "영향 범위", recommendation: "권고" };
+      return '<div class="px-ai-rpt-preview-sum">' +
+        '<p class="px-ai-rpt-preview-sum-hd">AI 요약</p>' +
+        ["conclusion", "cause", "impact", "recommendation"].map(function (k) {
+          return '<div class="px-ai-rpt-sum-part"><p class="px-ai-rpt-sum-k">' + labels[k] +
+            '</p><p class="px-ai-rpt-sum-v">' + esc(s[k] || "") + "</p></div>";
+        }).join("") +
+        "</div>";
+    }
+    function renderAreaPreviewBlock(section, mode) {
+      var a = section.area;
+      if (!a) return "";
+      var up = a.change >= 0;
+      var deltaCls = up ? "good" : "bad";
+      var sign = up ? "▲" : "▼";
+      var barColor = up ? "#4ade80" : "#f87171";
+      var posText = up
+        ? a.name + " 영역이 " + a.score.toFixed(2) + "점으로 전월 대비 +" + Math.abs(a.change).toFixed(2) + "점 상승했습니다. " + a.org + " 협업 성과가 두드러집니다."
+        : "";
+      var negText = !up
+        ? a.name + " 영역이 " + a.score.toFixed(2) + "점으로 전월 대비 -" + Math.abs(a.change).toFixed(2) + "점 하락했습니다. " + a.org + " 중심 원인 분석이 필요합니다."
+        : "";
+      var body = mode === "stat"
+        ? '<div class="px-ai-area-bar-row"><div class="px-ai-area-bar-meta"><span>' + esc(a.name) +
+          "</span><span>" + a.score.toFixed(2) + "점 " + sign + Math.abs(a.change).toFixed(2) + "</span></div>" +
+          '<div class="px-ai-area-bar-track"><div class="px-ai-area-bar-fill" style="width:' + a.score +
+          "%;background:" + barColor + '"></div></div></div>'
+        : '<div class="px-ai-rpt-sw-grid">' +
+          (posText ? '<div class="px-ai-rpt-sw pos"><p class="px-ai-rpt-sw-k pos">강점</p>' + esc(posText) + "</div>" : "") +
+          (negText ? '<div class="px-ai-rpt-sw neg"><p class="px-ai-rpt-sw-k neg">약점</p>' + esc(negText) + "</div>" : "") +
+          "</div>";
+      return '<div class="px-ai-rpt-preview-block">' +
+        '<div class="px-ai-rpt-preview-block-hd"><p class="px-ai-rpt-preview-block-ttl">' + esc(section.title) +
+        '</p><span class="px-ai-rpt-preview-block-tag ' + (mode === "stat" ? "stat" : "ai") + '">' +
+        (mode === "stat" ? "통계" : "AI 상세분석") + "</span></div>" + body + "</div>";
+    }
+    function renderSectionPreviewBlock(section, mode) {
+      if (section.area) return renderAreaPreviewBlock(section, mode);
+      var tag = mode === "stat" ? "stat" : "ai";
+      var drafts = data.reportDrafts || {};
+      var statsDrafts = data.reportStatsDrafts || {};
+      var aiEmbed = {
+        overview: "",
+        kpi: reportSurveyKpiTableHtml(),
+        dist: reportTypeDistHtml(),
+        matrix: variant === "voc" ? renderCategoryMatrix() : renderSurveyAreaMatrix(),
+        keywords: renderKeywordTop(),
+        areas: renderSurveyTopAreas(),
+        issues: reportIssuesEmbedHtml(),
+        plan: reportActionPlanHtml(),
+        monitor: renderMonitorCard(),
+        quotes: reportQuoteListHtml()
+      };
+      var statEmbed = {
+        stat_overview: reportKpiTableHtml(),
+        stat_type: reportTypeDistHtml(),
+        stat_area: reportAreaBarHtml(),
+        stat_org: reportSurveyStatOrgHtml(),
+        stat_priority: reportSurveyStatPriorityHtml(),
+        stat_category: reportVocStatCategoryHtml(),
+        stat_group: reportVocStatGroupHtml()
+      };
+      var blockKey = mode === "stat" ? section.statBlock : section.aiBlock;
+      if (!blockKey) return "";
+      var text = mode === "stat" ? (statsDrafts[blockKey] || "") : (drafts[blockKey] || overviewReportText());
+      if (blockKey === "overview") text = overviewReportText();
+      var embed = mode === "stat" ? (statEmbed[blockKey] || "") : (aiEmbed[blockKey] || "");
+      if (variant === "survey" && blockKey === "kpi" && mode === "ai") embed = reportSurveyKpiTableHtml();
+      return '<div class="px-ai-rpt-preview-block">' +
+        '<div class="px-ai-rpt-preview-block-hd"><p class="px-ai-rpt-preview-block-ttl">' + esc(section.title) +
+        '</p><span class="px-ai-rpt-preview-block-tag ' + tag + '">' + (mode === "stat" ? "통계" : "AI 상세분석") + "</span></div>" +
+        '<p class="px-ai-rpt-sum-v" style="margin:0 0 8px">' + esc(text) + "</p>" + embed + "</div>";
+    }
+    function renderReportPreview() {
+      if (!els.reportRight) return;
+      if (analysisPhase !== "ready") {
+        els.reportRight.innerHTML = '<p style="font-size:12px;color:#7a7887;padding:40px 0;text-align:center">AI 분석 결과를 먼저 생성해 주세요.</p>';
+        return;
+      }
+      var html = '<div class="px-ai-rpt-preview-head">' +
+        '<p class="px-ai-rpt-preview-title">AI Insight Report</p>' +
+        '<span class="px-ai-level-tag">' + esc(LV_NAMES[curLv]) + "</span></div>" +
+        renderStructuredSummaryHtml();
+      var hasKpi = false;
+      getReportBuilderSections().forEach(function (s) {
+        var st = (reportSectionSel || {})[s.key] || {};
+        if (st.ai && s.key === "kpi") hasKpi = true;
+        if (st.stat && s.key === "kpi") hasKpi = true;
+      });
+      if (hasKpi) html += '<div style="margin-bottom:12px">' + renderMetricChanges() + "</div>";
+      getReportBuilderSections().forEach(function (s) {
+        var st = (reportSectionSel || {})[s.key] || {};
+        if (s.key === "overview") return;
+        if (st.ai) html += renderSectionPreviewBlock(s, "ai");
+        if (st.stat) html += renderSectionPreviewBlock(s, "stat");
+      });
+      if (html.indexOf("px-ai-rpt-preview-block") === -1 && html.indexOf("px-ai-metric") === -1) {
+        html += '<p style="font-size:12px;color:#7a7887;padding:20px 0;text-align:center">좌측에서 AI 상세분석 또는 통계를 선택하면 미리보기가 표시됩니다.</p>';
+      }
+      els.reportRight.innerHTML = html;
+    }
+    function getReportDocumentStructure() {
+      if (variant === "survey") {
+        return [
+          { num: 1, title: "개요", importSection: "개요", blocks: [{ key: "overview", label: "개요" }] },
+          { num: 2, title: "현황", importSection: "현황", blocks: [
+            { key: "kpi", label: "핵심 지표" },
+            { key: "dist", label: "영역별 분포" }
+          ]},
+          { num: 3, title: "분석", importSection: "분석", blocks: [
+            { key: "matrix", label: "영역 진단 매트릭스" },
+            { key: "areas", label: "변화 영역 및 문항 TOP3" }
+          ]},
+          { num: 4, title: "이슈 및 평가", importSection: "이슈 및 평가", blocks: [
+            { key: "issues", label: "주요 이슈 및 권장 조치" }
+          ]},
+          { num: 5, title: "결론 및 제언", importSection: "결론 및 제언", blocks: [
+            { key: "conclusion", label: "결론 및 제언" },
+            { key: "plan", label: "개선 액션 플랜" }
+          ]},
+          { num: 6, title: "모니터링 계획", importSection: "모니터링 계획", blocks: [
+            { key: "monitor", label: "모니터링" }
+          ]}
+        ];
+      }
+      return [
+        { num: 1, title: "개요", importSection: "개요", blocks: [{ key: "overview", label: "" }] },
+        { num: 2, title: "현황 — 무엇이 달라졌나", importSection: "현황 — 무엇이 달라졌나", blocks: [{ key: "status", label: "" }] },
+        { num: 3, title: "분석 — 어디서 달라졌나", importSection: "분석 — 어디서 달라졌나", blocks: [{ key: "analysisOrg", label: "" }] },
+        { num: 4, title: "이슈 및 평가", importSection: "이슈 및 평가", blocks: [{ key: "issuesEval", label: "" }] },
+        { num: 5, title: "결론 및 제언", importSection: "결론 및 제언", blocks: [{ key: "conclusionOpts", label: "" }] },
+        { num: 6, title: "모니터링 계획", importSection: "모니터링 계획", blocks: [{ key: "monitorPlan", label: "" }] }
+      ];
+    }
+    function getReportBlockDraft(key) {
+      var drafts = data.reportDrafts || {};
+      if (key === "overview") {
+        return drafts.overview || overviewReportText();
+      }
+      if (key === "conclusion") {
+        var s = data.summaryStructured || {};
+        return [
+          "결론: " + (s.conclusion || ""),
+          "원인: " + (s.cause || ""),
+          "영향 범위: " + (s.impact || ""),
+          "권고: " + (s.recommendation || "")
+        ].join("\n\n");
+      }
+      if (key === "analysis") {
+        var bullets = data.reportAnalysisBullets || [];
+        if (bullets.length) return bullets.map(function (b) { return "• " + b; }).join("\n");
+        return drafts.analysis || "";
+      }
+      if (key === "recommendation") {
+        return data.reportExecRecommendation || drafts.recommendation || "";
+      }
+      if (key === "status") {
+        return drafts.status || drafts.statusNarrative || "";
+      }
+      if (key === "analysisOrg") {
+        return drafts.analysisOrg || reportDocData().analysisIntro || "";
+      }
+      if (key === "issuesEval") {
+        if (drafts.issuesEval) return drafts.issuesEval;
+        var docIssues = reportDocData();
+        return [docIssues.quotesIntro, docIssues.risksIntro].filter(Boolean).join("\n\n");
+      }
+      if (key === "conclusionOpts") {
+        if (drafts.conclusionOpts) return drafts.conclusionOpts;
+        var recHtml = reportDocData().recommendationHtml || "";
+        return recHtml.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim() || drafts.recommendation || "";
+      }
+      if (key === "monitorPlan") {
+        var planBullets = data.reportMonitorBullets || [];
+        if (planBullets.length) return planBullets.map(function (b) { return "• " + b; }).join("\n");
+        if (drafts.monitorPlan) return drafts.monitorPlan;
+        var monRows = reportDocData().monitorRows || [];
+        if (monRows.length) {
+          return monRows.map(function (r) { return "• " + r.week + ": " + r.content; }).join("\n");
+        }
+        return drafts.monitor || "";
+      }
+      if (key === "monitor" && !drafts.monitor) {
+        return (data.detailMonitors || []).map(function (m) {
+          return m.name + "\n" + m.avg + "\n" + m.criteria;
+        }).join("\n\n");
+      }
+      return drafts[key] || "";
+    }
+    function reportDocData() {
+      return data.reportDoc || {};
+    }
+    function renderReportBarRows(rows, colorKey) {
+      var max = Math.max.apply(null, rows.map(function (r) { return r.cnt; }));
+      return rows.map(function (r) {
+        var pct = max ? (r.cnt / max * 100).toFixed(1) : 0;
+        var color = r[colorKey] || "#8fb4e0";
+        return '<div class="px-ai-rpt-bar-row">' +
+          '<div class="px-ai-rpt-bar-name">' + esc(r.name) + "</div>" +
+          '<div class="px-ai-rpt-bar-track"><div class="px-ai-rpt-bar-fill" style="width:' + pct + "%;background:" + color + '"></div></div>' +
+          '<div class="px-ai-rpt-bar-val">' + r.cnt.toLocaleString() + "건" + (r.pct != null ? " (" + r.pct + "%)" : "") + "</div></div>";
+      }).join("");
+    }
+    function renderReportTrendChart(trend) {
+      if (!trend || !trend.length) return "";
+      var max = Math.max.apply(null, trend.map(function (t) {
+        return Math.max(Number(String(t.pos).replace(/,/g, "")), Number(String(t.neg).replace(/,/g, "")));
+      }));
+      return '<div style="display:grid;grid-template-columns:repeat(' + trend.length + ',1fr);gap:6px;align-items:end;height:100px;margin-top:4px">' +
+        trend.map(function (t) {
+          var pos = Number(String(t.pos).replace(/,/g, ""));
+          var neg = Number(String(t.neg).replace(/,/g, ""));
+          var ph = max ? Math.round(pos / max * 88) : 0;
+          var nh = max ? Math.round(neg / max * 88) : 0;
+          return '<div style="text-align:center;font-size:9px;color:#9b99a8">' +
+            '<div style="display:flex;gap:2px;align-items:flex-end;justify-content:center;height:88px;margin-bottom:4px">' +
+            '<div style="width:10px;height:' + ph + 'px;background:#1baf7a;border-radius:2px 2px 0 0"></div>' +
+            '<div style="width:10px;height:' + nh + 'px;background:#e24b4a;border-radius:2px 2px 0 0"></div></div>' +
+            esc(t.month) + "</div>";
+        }).join("") + "</div>";
+    }
+    function renderDocInfoTableHtml() {
+      var info = (data.reportMeta || {}).docInfo;
+      if (!info) return "";
+      return '<table class="px-ai-rpt-doc-info"><tr>' +
+        '<td class="lbl">작성부서</td><td>' + esc(info.dept) + '</td>' +
+        '<td class="lbl">작성일자</td><td style="border-right:none">' + esc(info.date) + "</td></tr><tr>" +
+        '<td class="lbl">보고대상</td><td>' + esc(info.audience) + '</td>' +
+        '<td class="lbl">분석대상</td><td style="border-right:none">' + esc(info.subject) + "</td></tr></table>";
+    }
+    function renderOverviewSectionHtml() {
+      return '<div class="px-ai-rpt-kpi-strip">' + (data.stats || []).map(function (s) {
+        var good = s.k === "부서칭찬" || s.k === "직원칭찬";
+        return '<div class="px-ai-rpt-kpi-box"><div class="kl">' + esc(s.k) + '</div><div class="kv"' +
+          (good ? ' style="color:#7ea6ff"' : "") + ">" + esc(s.v) + '</div><div class="kd' +
+          (good ? " good" : "") + '">' + esc(s.d) + "</div></div>";
+      }).join("") + "</div>";
+    }
+    function renderStatusSectionHtml() {
+      var doc = reportDocData();
+      var typeRows = doc.typeRows || [];
+      var table = '<table class="px-ai-rpt-exec-tbl"><thead><tr>' +
+        ["유형", "건수", "비중", "전월대비 부정률"].map(function (h) { return "<th>" + h + "</th>"; }).join("") +
+        "</tr></thead><tbody>" + typeRows.map(function (r) {
+          return '<tr><td class="rowlabel">' + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) +
+            '</td><td class="' + esc(r[4] || "neu") + '">' + esc(r[3]) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+      var kwBlock = '<div class="px-ai-rpt-chart-block"><p class="px-ai-rpt-chart-title">가장 많이 언급된 키워드 TOP5 (전체 카테고리 합산)</p>' +
+        '<div class="px-ai-rpt-kw-grid"><div><p class="px-ai-rpt-kw-hd pos">긍정 키워드</p>' +
+        (doc.kwPos || []).map(function (r) {
+          var max = Math.max.apply(null, (doc.kwPos || []).map(function (x) { return x.cnt; }));
+          var pct = max ? (r.cnt / max * 100).toFixed(1) : 0;
+          return '<div class="px-ai-rpt-bar-row"><div class="px-ai-rpt-bar-name">' + esc(r.name) +
+            '</div><div class="px-ai-rpt-bar-track"><div class="px-ai-rpt-bar-fill" style="width:' + pct +
+            '%;background:#0C447C"></div></div><div class="px-ai-rpt-bar-val">' + r.cnt + "건</div></div>";
+        }).join("") +
+        '</div><div><p class="px-ai-rpt-kw-hd neg">부정 키워드</p>' +
+        (doc.kwNeg || []).map(function (r) {
+          var max = Math.max.apply(null, (doc.kwNeg || []).map(function (x) { return x.cnt; }));
+          var pct = max ? (r.cnt / max * 100).toFixed(1) : 0;
+          return '<div class="px-ai-rpt-bar-row"><div class="px-ai-rpt-bar-name">' + esc(r.name) +
+            '</div><div class="px-ai-rpt-bar-track"><div class="px-ai-rpt-bar-fill" style="width:' + pct +
+            '%;background:#791F1F"></div></div><div class="px-ai-rpt-bar-val">' + r.cnt + "건</div></div>";
+        }).join("") + "</div></div>" +
+        (doc.kwCaption ? '<p class="px-ai-rpt-cap" style="margin-top:10px">' + esc(doc.kwCaption) + "</p>" : "") + "</div>";
+      var chBlock = '<div class="px-ai-rpt-chart-block"><p class="px-ai-rpt-chart-title">채널별 접수 현황 (총 ' +
+        esc(doc.channelTotal || "") + ")</p>" + renderReportBarRows(doc.channels || [], "color") + "</div>";
+      var trendBlock = '<div class="px-ai-rpt-chart-block"><p class="px-ai-rpt-chart-title">월별 긍·부정 언급 추이 (1~6월)</p>' +
+        renderReportTrendChart(data.vocMonthlyTrend || []) +
+        '<div class="px-ai-rpt-trend-legend"><span><span class="px-ai-rpt-trend-dot" style="background:#1baf7a"></span>긍정</span>' +
+        '<span><span class="px-ai-rpt-trend-dot" style="background:#e24b4a"></span>부정</span></div></div>';
+      return table + (doc.typeCaption ? '<p class="px-ai-rpt-cap">' + esc(doc.typeCaption) + "</p>" : "") + kwBlock + chBlock + trendBlock;
+    }
+    function renderOrgTableSimple(headers, rows) {
+      return '<table class="px-ai-rpt-exec-tbl" style="margin-bottom:12px"><thead><tr>' +
+        headers.map(function (h) { return "<th>" + esc(h) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        rows.map(function (r) {
+          var tone = r[r.length - 1];
+          var change = r[r.length - 2];
+          var cells = r.slice(0, -2);
+          return "<tr>" + cells.map(function (cell, i) {
+            return '<td' + (i === 0 ? ' class="rowlabel"' : "") + ">" + esc(cell) + "</td>";
+          }).join("") + '<td class="' + esc(tone) + '">' + esc(change) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+    }
+    function renderAnalysisOrgSectionHtml() {
+      var doc = reportDocData();
+      return renderOrgTableSimple(["병동", "부정 비율", "부정률 변화"], doc.wardRows || []) +
+        renderOrgTableSimple(["진료과", "부정 건수", "부정률 변화"], doc.deptRows || []) +
+        renderOrgTableSimple(["의사", "진료과", "부정 건수", "부정률 변화"], doc.doctorRows || []) +
+        (doc.orgCaption ? '<p class="px-ai-rpt-cap">' + esc(doc.orgCaption) + "</p>" : "");
+    }
+    function renderIssuesEvalSectionHtml() {
+      var doc = reportDocData();
+      var flags = (doc.flags || []).map(function (f) {
+        return '<div class="px-ai-rpt-flag-card"><span class="px-ai-rpt-flag-tag' +
+          (f.cls ? " " + f.cls : "") + '">' + esc(f.tag) + '</span><div class="px-ai-rpt-flag-body"><span class="px-ai-rpt-flag-cnt">' +
+          esc(f.cnt) + "</span> (전월 대비 " + esc(f.delta) + ")" + esc(f.desc) + "</div></div>";
+      }).join("");
+      var quotes = (doc.quotes || []).map(function (q) {
+          return '<div class="px-ai-rpt-quote-box">"' + esc(q.text) + '" <span class="px-ai-rpt-quote-meta">' + esc(q.meta) + "</span></div>";
+        }).join("");
+      var risks = (doc.risks || []).map(function (r) {
+          return '<div class="px-ai-rpt-risk-badge-row"><div class="px-ai-rpt-risk-badge ' + esc(r.cls) + '">' +
+            esc(r.badge) + '</div><div class="px-ai-rpt-body-intro" style="margin:0;padding-top:4px">' + esc(r.desc) + "</div></div>";
+        }).join("");
+      return flags + quotes + risks;
+    }
+    function renderConclusionSectionHtml() {
+      var doc = reportDocData();
+      var rows = doc.optionRows || [];
+      var table = '<table class="px-ai-rpt-exec-tbl"><thead><tr>' +
+        ["옵션", "내용", "소요기간", "우선순위"].map(function (h) { return "<th>" + esc(h) + "</th>"; }).join("") +
+        "</tr></thead><tbody>" + rows.map(function (r) {
+          return "<tr><td class=\"rowlabel\">" + esc(r.id) + '</td><td style="text-align:left">' + esc(r.content) +
+            (r.recommend ? '<span class="px-ai-rpt-opt-rec">권고</span>' : "") + "</td><td>" + esc(r.duration) +
+            '</td><td' + (r.priorityCls ? ' class="' + r.priorityCls + '"' : "") + ">" + esc(r.priority) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+      return table;
+    }
+    function renderMonitorTableHtml() {
+      var doc = reportDocData();
+      var rows = doc.monitorRows || [];
+      return '<table class="px-ai-rpt-exec-tbl"><thead><tr><th style="width:110px">시기</th><th>내용</th></tr></thead><tbody>' +
+        rows.map(function (r) {
+          return '<tr><td class="px-ai-rpt-tl-week">' + esc(r.week) + '</td><td style="text-align:left">' + esc(r.content) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+    }
+    function reportFeaturedQuotesHtml() {
+      var quotes = data.reportFeaturedQuotes || [];
+      return quotes.map(function (q) {
+        return '<p class="px-ai-rpt-feature-quote">“' + esc(q) + "”</p>";
+      }).join("");
+    }
+    function reportRiskScenariosHtml() {
+      return (data.reportRiskScenarios || []).map(function (r) {
+        return '<div class="px-ai-rpt-risk-row"><span class="px-ai-rpt-risk-k ' + esc(r.tone || "neu") + '">' +
+          esc(r.label) + "  </span>" + esc(r.text) + "</div>";
+      }).join("");
+    }
+    function reportOptionsHtml() {
+      return (data.reportOptions || []).map(function (o) {
+        return '<div class="px-ai-rpt-opt-block">' +
+          '<p class="px-ai-rpt-opt-title"><span>옵션 ' + esc(o.id) + "</span>" + esc(o.title) + "</p>" +
+          '<p class="px-ai-rpt-opt-desc">' + esc(o.desc) + "</p></div>";
+      }).join("");
+    }
+    function getReportBlockEmbed(key) {
+      switch (key) {
+        case "overview":
+          return variant === "voc" && data.reportDoc ? renderOverviewSectionHtml() : "";
+        case "status": return variant === "voc" ? renderStatusSectionHtml() : "";
+        case "analysisOrg": return variant === "voc" ? renderAnalysisOrgSectionHtml() : "";
+        case "issuesEval": return variant === "voc" ? renderIssuesEvalSectionHtml() : "";
+        case "conclusionOpts": return variant === "voc" ? renderConclusionSectionHtml() : "";
+        case "monitorPlan": return variant === "voc" ? renderMonitorTableHtml() : "";
+        case "kpi": return variant === "survey" ? reportSurveyKpiTableHtml() : reportKpiTableHtml();
+        case "dist": return variant === "survey" ? reportAreaBarHtml() : reportTypeDistHtml();
+        case "matrix": return variant === "voc" ? renderCategoryMatrix() : renderSurveyAreaMatrix();
+        case "keywords": return renderKeywordTop();
+        case "quotes": return variant === "voc" && data.reportFeaturedQuotes ? reportFeaturedQuotesHtml() : reportQuoteListHtml();
+        case "issues": return reportIssuesEmbedHtml(false);
+        case "plan": return reportActionPlanHtml();
+        case "monitor": return renderMonitorCard();
+        case "areas": return renderSurveyTopAreas();
+        case "analysis":
+          return variant === "voc" && (data.reportAnalysisBullets || []).length
+            ? '<ul class="px-ai-rpt-bullet-list">' + (data.reportAnalysisBullets || []).map(function (b) {
+              return "<li>" + esc(b) + "</li>";
+            }).join("") + "</ul>"
+            : "";
+        case "riskScenarios": return reportRiskScenariosHtml();
+        case "options": return reportOptionsHtml();
+        case "recommendation":
+          return variant === "voc" && data.reportExecRecommendation
+            ? '<div class="px-ai-rpt-rec-box">' + esc(data.reportExecRecommendation) + "</div>"
+            : "";
+        case "conclusion": return "";
+        case "statusNarrative": return "";
+        default: return "";
+      }
+    }
+    function renderReportSubBlock(key, label) {
+      if (removedReportBlocks[key]) return "";
+      var draftText = getReportBlockDraft(key);
+      var embed = getReportBlockEmbed(key);
+      var draft = draftText ? esc(draftText).replace(/\n/g, "<br>") : "";
+      var titlePart = label ? '<p class="px-ai-rpt-sec-ttl">' + esc(label) + "</p>" : "";
+      var head = '<div class="px-ai-rpt-sec-hd"' + (label ? "" : ' style="justify-content:flex-end"') + ">" +
+        titlePart +
+        '<button type="button" class="px-ai-rpt-remove" data-remove-block="' + esc(key) + '">✕ 빼기</button></div>' +
+        (draft ? '<span class="px-ai-rpt-draft-tag">✎ 초안 · 클릭해서 수정</span>' : "");
+      return '<div class="px-ai-rpt-sec" data-rpt-block="' + esc(key) + '">' + head +
+        (draft ? '<div contenteditable="true" class="px-ai-editable-block">' + draft + "</div>" : "") +
+        (embed || "") +
+        "</div>";
+    }
+    function bindReportDocActions() {
+      if (!els.reportDoc) return;
+      Array.prototype.forEach.call(els.reportDoc.querySelectorAll("[data-remove-block]"), function (btn) {
+        btn.onclick = function () { removeReportSubBlock(btn.getAttribute("data-remove-block")); };
+      });
+      Array.prototype.forEach.call(els.reportDoc.querySelectorAll("[data-open-import]"), function (btn) {
+        btn.onclick = function () { openImportPicker(btn.getAttribute("data-open-import")); };
+      });
+      Array.prototype.forEach.call(els.reportDoc.querySelectorAll("[data-remove-import]"), function (btn) {
+        btn.onclick = function () {
+          removeImportedItem(btn.getAttribute("data-import-section"), Number(btn.getAttribute("data-import-idx")));
+        };
+      });
+      bindReportFmtButtons(els.reportDoc);
+    }
+    function renderFullReportDocument() {
+      if (!els.reportDoc) return;
+      if (analysisPhase !== "ready") {
+        els.reportDoc.innerHTML = '<p style="font-size:12px;color:#7a7887;padding:40px 0;text-align:center">AI 분석 결과를 먼저 생성해 주세요.</p>';
+        return;
+      }
+      var body = getReportDocumentStructure().map(function (sec) {
+        var blocks = sec.blocks.map(function (b) {
+          return renderReportSubBlock(b.key, b.label);
+        }).join("");
+        var imports = (importedItems[sec.importSection] || []).map(function (item, idx) {
+          return '<div class="px-ai-import-item">' +
+            '<span style="font-size:12px;color:#c7a6f2">📎 ' + esc(item.src) + " · " + esc(item.name) + "</span>" +
+            '<button type="button" class="px-ai-rpt-remove" data-import-section="' + esc(sec.importSection) +
+            '" data-import-idx="' + idx + '">✕ 빼기</button></div>';
+        }).join("");
+        if (!blocks && !imports) return "";
+        return '<div class="px-ai-rpt-doc-section">' +
+          '<div class="px-ai-rpt-section-hd">' +
+          '<p class="px-ai-rpt-section-ttl">' + sec.num + ". " + esc(sec.title) + "</p>" +
+          '<button type="button" class="px-ai-import-btn" data-open-import="' + esc(sec.importSection) + '">↩ 불러오기</button>' +
+          "</div>" + blocks + imports + "</div>";
+      }).join("");
+      var meta = data.reportMeta || {};
+      var headHtml = meta.title
+        ? '<div class="px-ai-rpt-doc-head px-ai-rpt-doc-head-exec">' +
+          (meta.badge ? '<p class="px-ai-rpt-doc-badge">' + esc(meta.badge) + "</p>" : "") +
+          '<p class="px-ai-rpt-doc-title" style="text-align:center">' + esc(meta.title) + "</p>" +
+          renderDocInfoTableHtml() +
+          "</div>"
+        : '<div class="px-ai-rpt-doc-head">' +
+          '<p class="px-ai-rpt-doc-title">AI Insight Report</p>' +
+          '<span class="px-ai-level-tag">' + esc(LV_NAMES[curLv]) + "</span></div>";
+      var footer = meta.footerNote
+        ? '<div class="px-ai-rpt-doc-footer"><span>' + esc(meta.footerNote) + '</span><span>1 / 1</span></div>'
+        : "";
+      els.reportDoc.innerHTML = headHtml + body + footer + appendReportFmtButtons("");
+      bindReportDocActions();
+    }
+    function removeReportSubBlock(key) {
+      removedReportBlocks[key] = true;
+      renderFullReportDocument();
+    }
+    function renderReportBuilderLeft() {
+      if (!els.reportLeft) return;
+      if (!reportSectionSel) reportSectionSel = defaultReportSectionSel();
+      var rows = getReportBuilderSections().map(function (s) {
+        var st = reportSectionSel[s.key] || { ai: false, stat: false };
+        var aiOpt = s.aiBlock
+          ? '<label class="px-ai-rpt-opt' + (st.ai ? " on" : "") + '">' +
+            '<input type="checkbox" data-section-key="' + esc(s.key) + '" data-section-type="ai"' + (st.ai ? " checked" : "") + "> AI 상세분석</label>"
+          : "";
+        var statOpt = s.statBlock
+          ? '<label class="px-ai-rpt-opt' + (st.stat ? " on" : "") + '">' +
+            '<input type="checkbox" data-section-key="' + esc(s.key) + '" data-section-type="stat"' + (st.stat ? " checked" : "") + "> 통계</label>"
+          : "";
+        return '<div class="px-ai-rpt-row">' +
+          '<p class="px-ai-rpt-row-title">' + esc(s.title) + "</p>" +
+          (s.desc ? '<p class="px-ai-rpt-row-desc">' + esc(s.desc) + "</p>" : "") +
+          '<div class="px-ai-rpt-row-opts">' + aiOpt + statOpt + "</div></div>";
+      }).join("");
+      els.reportLeft.innerHTML =
+        '<div class="px-ai-rpt-builder-head">' +
+          '<p class="px-ai-rpt-builder-title">보고서 구성</p>' +
+          '<span class="px-ai-level-tag">' + esc(LV_NAMES[curLv]) + "</span>" +
+        "</div>" +
+        '<p class="px-ai-rpt-builder-note">각 항목마다 AI 상세분석과 통계를 선택해 보고서에 포함할 수 있습니다. 우측에서 실시간 미리보기를 확인하세요.</p>' +
+        rows +
+        '<div class="px-ai-rpt-builder-actions">' +
+          '<button type="button" class="px-ai-gen" data-role="gen">보고서 작성 ↗</button>' +
+        "</div>";
+    }
+    function renderReportPane() {
+      if (useDarkModal) {
+        renderFullReportDocument();
+        return;
+      }
+      if (!els.reportSetup) return;
+      if (!activeBlocks) activeBlocks = defaultReportBlocks();
+      var header = '<div class="px-ai-rpt-level">현재 분석 강도 <span class="px-ai-level-tag">' + esc(LV_NAMES[curLv]) + "</span>" +
+        '<span class="px-ai-rpt-level-note">— 아래 블록을 눌러 보고서에 넣거나 뺄 수 있습니다.</span></div>';
+      var aiBlocks = data.reportBlockDefs || [];
+      var statsBlocks = data.reportStatsBlockDefs || [];
       els.reportSetup.innerHTML = header +
-        '<p class="px-ai-rpt-blocks-lbl">포함할 블록</p>' +
-        '<div class="px-ai-rpt-chips">' + chips + "</div>" +
+        '<p class="px-ai-rpt-group-lbl" style="margin-top:0">AI 상세 분석</p>' +
+        '<div class="px-ai-rpt-chips">' + reportBlockChipsHtml(aiBlocks) + "</div>" +
+        (statsBlocks.length
+          ? '<p class="px-ai-rpt-group-lbl">통계</p>' +
+            '<div class="px-ai-rpt-chips">' + reportBlockChipsHtml(statsBlocks) + "</div>"
+          : "") +
         '<button type="button" class="px-ai-gen" data-role="gen">보고서 생성 ↗</button>';
+    }
+    function setReportSection(key, type, on) {
+      if (!reportSectionSel) reportSectionSel = defaultReportSectionSel();
+      if (!reportSectionSel[key]) reportSectionSel[key] = { ai: false, stat: false };
+      reportSectionSel[key][type] = !!on;
+      syncActiveBlocksFromSelection();
+      renderReportBuilderLeft();
+      renderReportPreview();
+      if (els.reportOut) els.reportOut.style.display = "none";
+      generated = false;
+    }
+    function toggleReportSection(key, type) {
+      if (!reportSectionSel) reportSectionSel = defaultReportSectionSel();
+      var cur = !!(reportSectionSel[key] && reportSectionSel[key][type]);
+      setReportSection(key, type, !cur);
+    }
+    function applyReportPreset(key) {
+      var presets = data.reportPresets || {};
+      if (!presets[key]) return;
+      reportSectionSel = defaultReportSectionSel();
+      getReportBuilderSections().forEach(function (s) {
+        if (presets[key].blocks.indexOf(s.aiBlock) > -1 && s.aiBlock) reportSectionSel[s.key].ai = true;
+        if (presets[key].blocks.indexOf(s.statBlock) > -1 && s.statBlock) reportSectionSel[s.key].stat = true;
+      });
+      syncActiveBlocksFromSelection();
+      renderReportPane();
+      if (els.reportOut) els.reportOut.style.display = "none";
+      generated = false;
+    }
+    function selectAllReportBlocks() {
+      reportSectionSel = defaultReportSectionSel();
+      getReportBuilderSections().forEach(function (s) {
+        reportSectionSel[s.key].ai = !!s.aiBlock;
+        reportSectionSel[s.key].stat = !!s.statBlock;
+      });
+      syncActiveBlocksFromSelection();
+      renderReportPane();
+      if (els.reportOut) els.reportOut.style.display = "none";
+      generated = false;
+    }
+    function clearAllReportBlocks() {
+      reportSectionSel = defaultReportSectionSel();
+      getReportBuilderSections().forEach(function (s) {
+        reportSectionSel[s.key] = { ai: s.key === "overview", stat: false };
+      });
+      syncActiveBlocksFromSelection();
+      renderReportPane();
+      if (els.reportOut) els.reportOut.style.display = "none";
+      generated = false;
     }
     function toggleReportBlock(key) {
       if (!activeBlocks) activeBlocks = defaultReportBlocks();
@@ -1479,9 +2664,12 @@
       renderReportPane();
       els.reportOut.style.display = "none";
       generated = false;
-      renderPanelActions();
     }
     function removeReportBlock(key) {
+      if (useDarkModal) {
+        removeReportSubBlock(key);
+        return;
+      }
       var idx = activeBlocks.indexOf(key);
       if (idx > -1) activeBlocks.splice(idx, 1);
       renderReportPane();
@@ -1535,16 +2723,16 @@
         '<div><p style="font-size:11px;font-weight:700;color:#7ea6ff;margin:0 0 6px">긍정 원문 (10건)</p>' + pos + "</div>" +
         '<div style="border-left:1px solid #2d2c36;padding-left:14px"><p style="font-size:11px;font-weight:700;color:#f2949c;margin:0 0 6px">개선 제안 원문 (10건)</p>' + neg + "</div></div>";
     }
-    function reportIssuesEmbedHtml() {
+    function reportIssuesEmbedHtml(includeMonitorFooter) {
       var posLabel = variant === "survey" ? "상승 영역 · 권장 조치" : "긍정 이슈 · 권장 조치";
       var negLabel = variant === "survey" ? "하락 영역 · 권장 조치" : "부정 이슈 · 권장 조치";
-      return '<div style="margin-top:10px">' +
+      var html = '<div style="margin-top:10px">' +
         '<p style="font-size:11px;font-weight:700;color:#7ea6ff;margin:0 0 8px">' + posLabel + "</p>" +
         '<div class="px-ai-ia-list">' + renderIssueActionList(data.positiveIssueActions || []) + "</div>" +
         '<p style="font-size:11px;font-weight:700;color:#f2949c;margin:14px 0 8px">' + negLabel + "</p>" +
-        '<div class="px-ai-ia-list">' + renderIssueActionList(data.negativeIssueActions || []) + "</div>" +
-        renderDetailMonitorsFooter() +
-        "</div>";
+        '<div class="px-ai-ia-list">' + renderIssueActionList(data.negativeIssueActions || []) + "</div>";
+      if (includeMonitorFooter !== false) html += renderDetailMonitorsFooter();
+      return html + "</div>";
     }
     function overviewReportText() {
       if (useDarkModal) return deepSummaryText();
@@ -1555,29 +2743,21 @@
       var texts = data.reportOverview || {};
       return texts[lv] || texts.basic || (data.sum.basic || "").replace(/\\n/g, "\n");
     }
-    function bindReportActions() {
-      if (els.reportOut) {
-        Array.prototype.forEach.call(els.reportOut.querySelectorAll("[data-remove-block]"), function (btn) {
-          btn.onclick = function () { removeReportBlock(btn.getAttribute("data-remove-block")); };
-        });
-      }
-      renderPanelActions();
+    function appendReportFmtButtons(html) {
+      return html +
+        '<div class="px-ai-rpt-actions">' +
+        '<button type="button" class="px-ai-rpt-action-btn" data-role="copy">📋 복사</button>' +
+        '<button type="button" class="px-ai-rpt-action-btn" data-role="word">＋ Word 저장</button>' +
+        "</div>";
     }
-    function bindPanelActions() {
-      if (!els.panelActions) return;
-      var gotoReport = els.panelActions.querySelector('[data-role="goto-report"]');
-      var gotoAnalysis = els.panelActions.querySelector('[data-role="goto-analysis"]');
-      if (gotoReport) {
-        gotoReport.onclick = function () { switchToTab("report"); };
-      }
-      if (gotoAnalysis) {
-        gotoAnalysis.onclick = function () { switchToTab("analysis"); };
-      }
-      var copyBtn = els.panelActions.querySelector('[data-role="copy"]');
-      var wordBtn = els.panelActions.querySelector('[data-role="word"]');
+    function bindReportFmtButtons(container) {
+      var root = container || (els.reportOut && els.reportOut.style.display !== "none" ? els.reportOut : els.reportDoc);
+      if (!root) return;
+      var copyBtn = root.querySelector('[data-role="copy"]');
+      var wordBtn = root.querySelector('[data-role="word"]');
       if (copyBtn) {
         copyBtn.onclick = function () {
-          var text = els.reportOut ? (els.reportOut.innerText || "") : "";
+          var text = root.innerText || "";
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(function () {
               if (options.showToast) options.showToast("보고서 내용이 복사되었습니다.");
@@ -1591,31 +2771,99 @@
         };
       }
     }
-    function renderPanelActions() {
-      if (!els.panelActions) return;
-      if (curTab === "analysis") {
-        els.panelActions.innerHTML =
-          '<button type="button" class="px-ai-rpt-action-btn px-ai-rpt-action-primary" data-role="goto-report">보고서 작성</button>';
-      } else {
-        var html = '<button type="button" class="px-ai-rpt-action-btn" data-role="goto-analysis">← 분석</button>';
-        if (generated && els.reportOut && els.reportOut.style.display !== "none") {
-          html += '<button type="button" class="px-ai-rpt-action-btn" data-role="copy">📋 복사</button>';
-          html += '<button type="button" class="px-ai-rpt-action-btn" data-role="word">＋ Word 저장</button>';
-        }
-        els.panelActions.innerHTML = html;
+    function bindReportActions() {
+      if (els.reportOut) {
+        Array.prototype.forEach.call(els.reportOut.querySelectorAll("[data-remove-block]"), function (btn) {
+          btn.onclick = function () { removeReportBlock(btn.getAttribute("data-remove-block")); };
+        });
+        Array.prototype.forEach.call(els.reportOut.querySelectorAll("[data-open-import]"), function (btn) {
+          btn.onclick = function () { openImportPicker(btn.getAttribute("data-open-import")); };
+        });
+        Array.prototype.forEach.call(els.reportOut.querySelectorAll("[data-remove-import]"), function (btn) {
+          btn.onclick = function () {
+            removeImportedItem(btn.getAttribute("data-import-section"), Number(btn.getAttribute("data-import-idx")));
+          };
+        });
       }
-      bindPanelActions();
+      bindReportFmtButtons();
+    }
+    function openImportPicker(sectionName) {
+      if (!els.importOverlay || !els.importBody) return;
+      var items = (data.reportImportableItems || {})[sectionName] || [];
+      var list = items.map(function (item, idx) {
+        return '<div class="px-ai-import-pick" data-import-section="' + esc(sectionName) + '" data-import-idx="' + idx + '">' +
+          '<div><p style="font-size:12px;font-weight:700;color:#fff;margin:0 0 2px">' + esc(item.name) + '</p>' +
+          '<p style="font-size:10px;color:#7a7887;margin:0">' + esc(item.src) + "</p></div>" +
+          '<span style="font-size:11px;color:#8fb4e0">추가</span></div>';
+      }).join("");
+      els.importBody.innerHTML =
+        '<p style="font-size:15px;font-weight:700;color:#fff;margin:0 0 4px">' + esc(sectionName) + " — 불러오기</p>" +
+        '<p style="font-size:11px;color:#7a7887;margin:0 0 14px">통계 페이지·상세분석 페이지의 표/차트를 이 섹션에 추가합니다.</p>' +
+        (list || '<p style="font-size:12px;color:#7a7887">불러올 수 있는 항목이 없습니다.</p>');
+      els.importOverlay.style.display = "flex";
+    }
+    function closeImportPicker() {
+      if (els.importOverlay) els.importOverlay.style.display = "none";
+    }
+    function importItem(sectionName, idx) {
+      var pool = (data.reportImportableItems || {})[sectionName] || [];
+      if (!pool[idx]) return;
+      if (!importedItems[sectionName]) importedItems[sectionName] = [];
+      importedItems[sectionName].push(pool[idx]);
+      closeImportPicker();
+      if (useDarkModal) renderFullReportDocument();
+      else generateReport();
+    }
+    function removeImportedItem(sectionName, idx) {
+      if (!importedItems[sectionName]) return;
+      importedItems[sectionName].splice(idx, 1);
+      if (useDarkModal) renderFullReportDocument();
+      else generateReport();
     }
     function switchToTab(tab) {
+      if (useDarkModal) {
+        if (analysisPhase === "strength") {
+          curTab = "analysis";
+          if (els.innerTabs) els.innerTabs.style.display = "none";
+          if (els.analysisPane) els.analysisPane.style.display = "";
+          if (els.reportPane) els.reportPane.style.display = "none";
+          return;
+        }
+        if (panelOpenMode === "reportDirect") tab = "report";
+        else if (tab === "report" && analysisPhase !== "ready") tab = "analysis";
+        curTab = tab;
+        if (els.innerTabs) {
+          els.innerTabs.style.display = "flex";
+          syncInnerTabVisibility();
+        }
+        if (els.innerTabBtns) {
+          Array.prototype.forEach.call(els.innerTabBtns, function (btn) {
+            if (btn.getAttribute("data-role") === "analysis-tab" && panelOpenMode === "reportDirect") return;
+            btn.classList.toggle("on", btn.getAttribute("data-tab") === curTab);
+          });
+        }
+        if (els.analysisPane) els.analysisPane.style.display = curTab === "analysis" ? "" : "none";
+        if (els.reportPane) els.reportPane.style.display = curTab === "report" ? "" : "none";
+        if (curTab === "report") renderReportPane();
+        return;
+      }
       curTab = tab;
+      if (curTab === "report" && analysisPhase !== "ready") {
+        curTab = "analysis";
+      }
+      if (els.innerTabBtns) {
+        Array.prototype.forEach.call(els.innerTabBtns, function (btn) {
+          btn.classList.toggle("on", btn.getAttribute("data-tab") === curTab);
+        });
+      }
       if (els.analysisPane) els.analysisPane.style.display = curTab === "analysis" ? "" : "none";
       if (els.reportPane) els.reportPane.style.display = curTab === "report" ? "" : "none";
-      renderPanelActions();
+      if (curTab === "report" && analysisPhase === "ready") renderReportPane();
     }
-    function generateVocReport() {
-      if (!activeBlocks) activeBlocks = defaultReportBlocks();
+    function vocReportBlockContent() {
       var drafts = data.reportDrafts || {};
-      var blockContent = {
+      var statsDrafts = data.reportStatsDrafts || {};
+      return {
         overview: ["개요", reportDraftHtml(overviewReportText()), ""],
         kpi: ["핵심 지표", reportDraftHtml(drafts.kpi), reportKpiTableHtml()],
         dist: ["유형별 분포", reportDraftHtml(drafts.dist), reportTypeDistHtml()],
@@ -1623,21 +2871,58 @@
         keywords: ["변화 키워드 TOP3", reportDraftHtml(drafts.keywords), renderKeywordTop()],
         issues: ["주요 이슈 및 권장 조치", reportDraftHtml(drafts.issues), reportIssuesEmbedHtml()],
         plan: ["개선 액션 플랜", reportDraftHtml(drafts.plan), reportActionPlanHtml()],
-        quotes: ["원문 및 인사이트", reportDraftHtml(drafts.quotes), reportQuoteListHtml()]
+        monitor: ["모니터링", reportDraftHtml(drafts.monitor || ""), renderMonitorCard()],
+        quotes: ["원문 및 인사이트", reportDraftHtml(drafts.quotes), reportQuoteListHtml()],
+        stat_overview: ["전체 VOC 현황", reportDraftHtml(statsDrafts.stat_overview), reportKpiTableHtml()],
+        stat_type: ["유형별 접수 현황", reportDraftHtml(statsDrafts.stat_type), reportTypeDistHtml()],
+        stat_trend: ["VOC 월별 추이", reportDraftHtml(statsDrafts.stat_trend), reportVocStatTrendHtml()],
+        stat_channel: ["채널별 접수", reportDraftHtml(statsDrafts.stat_channel), reportVocStatChannelHtml()],
+        stat_praise: ["칭찬 현황", reportDraftHtml(statsDrafts.stat_praise), reportVocStatPraiseHtml()],
+        stat_demographic: ["응답자 구성", reportDraftHtml(statsDrafts.stat_demographic), reportVocStatDemographicHtml()],
+        stat_category: ["카테고리·키워드", reportDraftHtml(statsDrafts.stat_category), reportVocStatCategoryHtml()],
+        stat_group: ["그룹별 VOC", reportDraftHtml(statsDrafts.stat_group), reportVocStatGroupHtml()]
       };
+    }
+    function generateVocReport() {
+      if (!activeBlocks) activeBlocks = defaultReportBlocks();
+      if (activeBlocks.indexOf("overview") === -1) activeBlocks.unshift("overview");
+      var blockContent = vocReportBlockContent();
       var html = '<div class="px-ai-rpt-out-card">';
-      var n = 1;
       if (!activeBlocks.length) {
         html += '<p style="font-size:12px;color:#7a7887;text-align:center;padding:20px 0">포함할 블록을 1개 이상 선택해 주세요.</p>';
+      } else if (useDarkModal) {
+        var nRef = { n: 1 };
+        html = appendSelectedReportBlocks(html, nRef, data.reportBlockDefs, blockContent);
+        html = appendSelectedReportBlocks(html, nRef, data.reportStatsBlockDefs, blockContent);
       } else {
-        (data.reportBlockDefs || []).forEach(function (b) {
-          if (activeBlocks.indexOf(b.key) > -1) {
+        var sectionOrder = data.reportSectionOrder || [];
+        var sectionMap = data.reportSectionMap || {};
+        var n = 1;
+        sectionOrder.forEach(function (sectionName) {
+          var keysInSection = (data.reportBlockDefs || []).filter(function (b) {
+            return sectionMap[b.key] === sectionName && activeBlocks.indexOf(b.key) > -1;
+          });
+          var imports = importedItems[sectionName] || [];
+          if (!keysInSection.length && !imports.length) return;
+          html += '<div style="margin-bottom:22px">' +
+            '<div class="px-ai-rpt-section-hd">' +
+            '<p class="px-ai-rpt-section-ttl">' + n++ + ". " + esc(sectionName) + "</p>" +
+            '<button type="button" class="px-ai-import-btn" data-open-import="' + esc(sectionName) + '">⤵ 불러오기</button>' +
+            "</div>";
+          keysInSection.forEach(function (b) {
             var c = blockContent[b.key];
-            if (c) html += reportSection(b.key, n++ + ". " + c[0], c[1], c[2]);
-          }
+            if (c) html += reportSection(b.key, c[0], c[1], c[2]);
+          });
+          imports.forEach(function (item, idx) {
+            html += '<div class="px-ai-import-item">' +
+              '<span style="font-size:12px;color:#c7a6f2">📎 ' + esc(item.src) + " · " + esc(item.name) + "</span>" +
+              '<button type="button" class="px-ai-rpt-remove" data-import-section="' +
+              esc(sectionName) + '" data-import-idx="' + idx + '">✕ 빼기</button></div>';
+          });
+          html += "</div>";
         });
       }
-      html += "</div>";
+      html = appendReportFmtButtons(html) + "</div>";
       els.reportOut.innerHTML = html;
       els.reportOut.style.display = "block";
       generated = true;
@@ -1708,6 +2993,7 @@
     function generateSurveyReport() {
       if (!activeBlocks) activeBlocks = defaultReportBlocks();
       var drafts = data.reportDrafts || {};
+      var statsDrafts = data.reportStatsDrafts || {};
       var blockContent = {
         overview: ["개요", reportDraftHtml(overviewReportText()), ""],
         kpi: ["핵심 지표", reportDraftHtml(drafts.kpi), reportSurveyKpiTableHtml()],
@@ -1715,21 +3001,21 @@
         matrix: ["영역 진단 매트릭스", reportDraftHtml(drafts.matrix), renderSurveyAreaMatrix()],
         areas: ["변화 영역 및 문항 TOP3", reportDraftHtml(drafts.areas), renderSurveyTopAreas()],
         issues: ["주요 이슈 및 권장 조치", reportDraftHtml(drafts.issues), renderVocDetailJudgement(true)],
-        plan: ["개선 액션 플랜", reportDraftHtml(drafts.plan), reportActionPlanHtml()]
+        plan: ["개선 액션 플랜", reportDraftHtml(drafts.plan), reportActionPlanHtml()],
+        stat_overview: ["전체 현황", reportDraftHtml(statsDrafts.stat_overview), reportSurveyStatOverviewHtml()],
+        stat_area: ["영역·문항 분석", reportDraftHtml(statsDrafts.stat_area), reportSurveyStatAreaHtml()],
+        stat_org: ["조직별 분석", reportDraftHtml(statsDrafts.stat_org), reportSurveyStatOrgHtml()],
+        stat_priority: ["개선 우선순위", reportDraftHtml(statsDrafts.stat_priority), reportSurveyStatPriorityHtml()]
       };
       var html = '<div class="px-ai-rpt-out-card">';
-      var n = 1;
+      var nRef = { n: 1 };
       if (!activeBlocks.length) {
         html += '<p style="font-size:12px;color:#7a7887;text-align:center;padding:20px 0">포함할 블록을 1개 이상 선택해 주세요.</p>';
       } else {
-        (data.reportBlockDefs || []).forEach(function (b) {
-          if (activeBlocks.indexOf(b.key) > -1) {
-            var c = blockContent[b.key];
-            if (c) html += reportSection(b.key, n++ + ". " + c[0], c[1], c[2]);
-          }
-        });
+        html = appendSelectedReportBlocks(html, nRef, data.reportBlockDefs, blockContent);
+        html = appendSelectedReportBlocks(html, nRef, data.reportStatsBlockDefs, blockContent);
       }
-      html += "</div>";
+      html = appendReportFmtButtons(html) + "</div>";
       els.reportOut.innerHTML = html;
       els.reportOut.style.display = "block";
       generated = true;
@@ -1737,6 +3023,7 @@
     }
 
     function generateReport() {
+      if (useDarkModal) syncActiveBlocksFromSelection();
       if (variant === "voc") {
         generateVocReport();
         return;
@@ -1801,17 +3088,62 @@
       global.__pxAiAnalysisLevel = LV_KEYS[i];
       renderAnalysis();
       if (variant === "voc" || variant === "survey") {
+        reportSectionSel = null;
         activeBlocks = defaultReportBlocks();
         renderReportPane();
         if (generated) {
           els.reportOut.style.display = "none";
           generated = false;
         }
-        renderPanelActions();
       }
     }
 
+    function beginReportDirect() {
+      if (useDarkModal) {
+        appliedAnalysisBlocks = blocksForLevel("deep");
+        activeAnalysisBlocks = appliedAnalysisBlocks.slice();
+        reportSectionSel = null;
+        importedItems = {};
+        removedReportBlocks = {};
+        if (els.period) els.period.textContent = data.periodText;
+        if (els.breadcrumb) els.breadcrumb.style.display = "none";
+        updateInnerTabs(true);
+        analysisPhase = "loading";
+        switchToTab("report");
+        var directLoadingText = variant === "voc"
+          ? "VOC 데이터를 분석하고 있습니다…"
+          : "환자경험평가 데이터를 분석하고 있습니다…";
+        if (els.body) els.body.innerHTML = '<p class="px-ai-voc-loading">' + directLoadingText + "</p>";
+        renderReportPane();
+        window.setTimeout(function () {
+          if (disposed) return;
+          analysisPhase = "ready";
+          renderChipBasedAnalysis();
+          renderReportPane();
+          switchToTab("report");
+        }, 700);
+        return;
+      }
+      if (els.reportSetup || els.reportDoc) renderReportPane();
+      analysisPhase = "ready";
+      renderAnalysis();
+      switchToTab("report");
+    }
     function beginAnalysis() {
+      if (useDarkModal) {
+        if (els.breadcrumb) els.breadcrumb.style.display = "";
+        analysisPhase = "strength";
+        appliedAnalysisBlocks = null;
+        reportSectionSel = null;
+        importedItems = {};
+        removedReportBlocks = {};
+        if (els.period) els.period.textContent = data.periodText;
+        renderStep2Strength();
+        if (els.reportDoc) renderReportPane();
+        updateInnerTabs(false);
+        switchToTab("analysis");
+        return;
+      }
       if (options.showLoading && (variant === "voc" || variant === "survey")) {
         var loadingText = variant === "voc"
           ? "VOC 데이터를 분석하고 있습니다…"
@@ -1819,20 +3151,22 @@
         els.body.innerHTML = '<p class="px-ai-voc-loading">' + loadingText + "</p>";
         window.setTimeout(function () {
           if (disposed) return;
-          if (useDarkModal) renderAnalysisSetup();
           renderAnalysis();
-          if (els.reportSetup) renderReportPane();
+          if (els.reportSetup || els.reportDoc) renderReportPane();
         }, 700);
         return;
       }
-      if (useDarkModal) renderAnalysisSetup();
       renderAnalysis();
       if (els.reportSetup) renderReportPane();
     }
 
-    if (useDarkModal) {
-      renderPanelActions();
-    } else {
+    if (useDarkModal && els.innerTabBtns) {
+      Array.prototype.forEach.call(els.innerTabBtns, function (tab) {
+        tab.addEventListener("click", function () {
+          switchToTab(tab.getAttribute("data-tab"));
+        });
+      });
+    } else if (!useDarkModal) {
       Array.prototype.forEach.call(els.tabs, function (tab) {
         tab.addEventListener("click", function () {
           curTab = tab.getAttribute("data-tab");
@@ -1855,7 +3189,10 @@
       }
     }
     if (els.gen) els.gen.addEventListener("click", generateReport);
-    if (els.reportSetup) {
+    if (els.reportDoc && useDarkModal) {
+      renderReportPane();
+    }
+    if (els.reportSetup && !useDarkModal) {
       renderReportPane();
       els.reportSetup.addEventListener("click", function (e) {
         var chip = e.target.closest("[data-block-key]");
@@ -1866,11 +3203,30 @@
         if (e.target.closest('[data-role="gen"]')) generateReport();
       });
     }
-    if (els.analysisSetup) {
-      renderAnalysisSetup();
-      els.analysisSetup.addEventListener("click", function (e) {
-        var chip = e.target.closest("[data-analysis-block-key]");
-        if (chip) toggleAnalysisBlock(chip.getAttribute("data-analysis-block-key"));
+    if (els.body && useDarkModal) {
+      els.body.addEventListener("click", function (e) {
+        var strengthCard = e.target.closest("[data-strength]");
+        if (strengthCard) {
+          pickStrength(strengthCard.getAttribute("data-strength"));
+          return;
+        }
+        if (e.target.closest('[data-role="request-analysis"]')) requestAnalysis();
+      });
+    }
+    if (els.importClose) {
+      els.importClose.addEventListener("click", closeImportPicker);
+    }
+    if (els.importBody) {
+      els.importBody.addEventListener("click", function (e) {
+        var pick = e.target.closest(".px-ai-import-pick");
+        if (pick) {
+          importItem(pick.getAttribute("data-import-section"), Number(pick.getAttribute("data-import-idx")));
+        }
+      });
+    }
+    if (els.importOverlay) {
+      els.importOverlay.addEventListener("click", function (e) {
+        if (e.target === els.importOverlay) closeImportPicker();
       });
     }
     if (els.track) {
@@ -1916,7 +3272,8 @@
 
     requestAnimationFrame(function () {
       if (hideSlider) {
-        beginAnalysis();
+        if (options.openMode === "reportDirect") beginReportDirect();
+        else beginAnalysis();
       } else {
         setLevel(curLv, false);
         requestAnimationFrame(function () {
@@ -1956,7 +3313,7 @@
       }, [props && props.variant]);
       return React.createElement("div", {
         ref: hostRef,
-        style: { height: "100%", width: "100%", overflow: "hidden" }
+        style: { width: "100%" }
       });
     };
   }
@@ -1967,17 +3324,31 @@
     var useRef = deps.useRef || React.useRef;
     var useEffect = deps.useEffect || React.useEffect;
     var ReactDOM = deps.ReactDOM;
+    var SURVEY_REPORT_URL = "px-survey-analysis-report.html";
+    var SURVEY_REPORT_STORAGE_KEY = "pix_survey_report_2026_06";
     return function PxSurveyAnalyticsWithAiModal(props) {
       var _open = useState(false);
       var open = _open[0];
       var setOpen = _open[1];
+      var _reportOpen = useState(false);
+      var reportOpen = _reportOpen[0];
+      var setReportOpen = _reportOpen[1];
       var panelRef = useRef(null);
+      var reportFrameRef = useRef(null);
+      var openModeRef = useRef("analysis");
       useEffect(function () {
         window.openPxSurveyAiModal = function () {
+          openModeRef.current = "analysis";
+          setReportOpen(false);
           setOpen(true);
+        };
+        window.openPxSurveyAiReportModal = function () {
+          setOpen(false);
+          setReportOpen(true);
         };
         return function () {
           try { if (window.openPxSurveyAiModal) delete window.openPxSurveyAiModal; } catch (_e) {}
+          try { if (window.openPxSurveyAiReportModal) delete window.openPxSurveyAiReportModal; } catch (_e) {}
         };
       }, []);
       useEffect(function () {
@@ -1987,10 +3358,21 @@
           level: "basic",
           hideLevelSlider: true,
           showLoading: true,
+          openMode: openModeRef.current,
           showToast: props.showToast,
           onClose: function () { setOpen(false); }
         });
       }, [open, props.showToast]);
+      var actions = global.pixReportDocActions || {};
+      var reportFooter = typeof global.createPixReportModalFooter === "function"
+        ? global.createPixReportModalFooter(React, {
+          onDraft: function () { actions.draft && actions.draft(SURVEY_REPORT_STORAGE_KEY, reportFrameRef.current, "환자경험평가 보고서", props.showToast); },
+          onSave: function () { actions.save && actions.save(SURVEY_REPORT_STORAGE_KEY, reportFrameRef.current, "환자경험평가 보고서", props.showToast); },
+          onWord: function () { actions.word && actions.word("환자경험평가_분석보고서_2026-06.doc", reportFrameRef.current, props.showToast); },
+          onPdf: function () { actions.pdf && actions.pdf(reportFrameRef.current, props.showToast); },
+          onPrint: function () { actions.print && actions.print(reportFrameRef.current, props.showToast); }
+        })
+        : null;
       var modal = open
         ? React.createElement(
             "div",
@@ -2001,24 +3383,590 @@
             React.createElement(
               "div",
               {
-                className: "relative w-full max-w-[1080px] max-h-[90vh] overflow-hidden rounded-[14px] shadow-2xl",
-                style: { background: "#17171c", color: "#e7e6ee" },
+                className: "relative w-full max-w-[1200px] max-h-[90vh] overflow-y-auto rounded-[14px] shadow-2xl",
+                style: { background: "#17171c", color: "#e7e6ee", padding: "22px 26px", boxSizing: "border-box" },
                 onClick: function (e) { e.stopPropagation(); }
               },
-              React.createElement("div", { ref: panelRef, style: { height: "min(90vh, 860px)", padding: "22px 26px", boxSizing: "border-box" } })
+              React.createElement("div", { ref: panelRef, style: { width: "100%" } })
             )
           )
         : null;
+      var reportDrawer = createPixReportIframeDrawer(React, {
+        open: reportOpen,
+        onClose: function () { setReportOpen(false); },
+        title: "2026\uB144 6\uC6D4 \uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
+        subtitle: "\uB0B4\uBD80 \uBCF4\uACE0 \u00B7 \uC784\uC6D0 \uBCF4\uACE0\uC6A9 \u00B7 PIX AI \uD658\uC790\uACBD\uD5D8\uAD00\uB9AC",
+        reportUrl: SURVEY_REPORT_URL,
+        iframeTitle: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
+        iframeRef: reportFrameRef,
+        footer: reportFooter
+      });
+      function portalize(node) {
+        if (!node) return null;
+        return typeof ReactDOM !== "undefined" && ReactDOM.createPortal
+          ? ReactDOM.createPortal(node, document.body)
+          : node;
+      }
       return React.createElement(
         React.Fragment,
         null,
         props.children,
-        typeof ReactDOM !== "undefined" && ReactDOM.createPortal
-          ? (modal ? ReactDOM.createPortal(modal, document.body) : null)
-          : modal
+        portalize(modal),
+        portalize(reportDrawer)
       );
     };
   }
+
+  function collectReportIframeHtml(iframe) {
+    try {
+      var doc = iframe && (iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document));
+      if (!doc || !doc.documentElement) return "";
+      return "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+    } catch (_error) {
+      return "";
+    }
+  }
+
+  function collectReportExportHtml(iframe) {
+    try {
+      var doc = iframe && (iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document));
+      if (!doc || !doc.documentElement) return "";
+      var clone = doc.documentElement.cloneNode(true);
+      var removeSelectors = [
+        ".rpt-block-toolbar", ".rpt-sec-delete", ".rpt-sec-add-row",
+        ".rpt-sec-add-row", "[data-rpt-add-menu]", ".rpt-stats-dialog-backdrop"
+      ];
+      removeSelectors.forEach(function (sel) {
+        Array.prototype.forEach.call(clone.querySelectorAll(sel), function (el) {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        });
+      });
+      Array.prototype.forEach.call(clone.querySelectorAll(".rpt-layout-block"), function (wrap) {
+        var parent = wrap.parentNode;
+        if (!parent) return;
+        while (wrap.firstChild) parent.insertBefore(wrap.firstChild, wrap);
+        parent.removeChild(wrap);
+      });
+      Array.prototype.forEach.call(clone.querySelectorAll("[contenteditable]"), function (el) {
+        el.removeAttribute("contenteditable");
+        el.removeAttribute("spellcheck");
+      });
+      Array.prototype.forEach.call(clone.querySelectorAll(".rpt-gap"), function (el) {
+        if (!String(el.textContent || "").trim()) {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        }
+      });
+      return "<!DOCTYPE html>\n" + clone.outerHTML;
+    } catch (_error) {
+      return collectReportIframeHtml(iframe);
+    }
+  }
+
+  function openReportPrintWindow(html, showToast, pdfHint) {
+    if (!html) {
+      notifyReportAction("보고서 내용을 불러오지 못했습니다.", showToast);
+      return false;
+    }
+    try {
+      var printWin = global.open("", "_blank", "noopener,noreferrer");
+      if (!printWin) throw new Error("popup blocked");
+      printWin.document.open();
+      printWin.document.write(html);
+      printWin.document.close();
+      printWin.focus();
+      setTimeout(function () {
+        printWin.print();
+        if (pdfHint) notifyReportAction("인쇄 창에서 'PDF로 저장'을 선택해 주세요.", showToast);
+      }, 350);
+      return true;
+    } catch (_error) {
+      notifyReportAction("인쇄/PDF 창을 열 수 없습니다.", showToast);
+      return false;
+    }
+  }
+
+  function notifyReportAction(message, showToast) {
+    if (typeof showToast === "function") showToast(message);
+    else if (typeof global.alert === "function") global.alert(message);
+  }
+
+  function downloadReportBlob(filename, blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 0);
+  }
+
+  global.pixReportDocActions = {
+    collectHtml: collectReportIframeHtml,
+    collectExportHtml: collectReportExportHtml,
+    save: function (storageKey, iframe, label, showToast) {
+      var html = collectReportIframeHtml(iframe);
+      if (!html) {
+        notifyReportAction("보고서 내용을 불러오지 못했습니다.", showToast);
+        return false;
+      }
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({
+          savedAt: new Date().toISOString(),
+          status: "saved",
+          html: html
+        }));
+        notifyReportAction((label || "보고서") + "를 저장했습니다.", showToast);
+        return true;
+      } catch (_error) {
+        notifyReportAction("저장에 실패했습니다.", showToast);
+        return false;
+      }
+    },
+    draft: function (storageKey, iframe, label, showToast) {
+      var html = collectReportIframeHtml(iframe);
+      if (!html) {
+        notifyReportAction("보고서 내용을 불러오지 못했습니다.", showToast);
+        return false;
+      }
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({
+          savedAt: new Date().toISOString(),
+          status: "draft",
+          html: html
+        }));
+        notifyReportAction((label || "보고서") + "를 임시저장했습니다.", showToast);
+        return true;
+      } catch (_error) {
+        notifyReportAction("임시저장에 실패했습니다.", showToast);
+        return false;
+      }
+    },
+    word: function (filename, iframe, showToast) {
+      var html = collectReportExportHtml(iframe);
+      if (!html) {
+        notifyReportAction("보고서 내용을 불러오지 못했습니다.", showToast);
+        return false;
+      }
+      var source = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>" +
+        html.replace(/^<!DOCTYPE html>\s*/i, "") + "</html>";
+      downloadReportBlob(filename || "report.doc", new Blob(["\ufeff", source], { type: "application/msword" }));
+      notifyReportAction("워드 파일 다운로드를 시작했습니다.", showToast);
+      return true;
+    },
+    pdf: function (iframe, showToast) {
+      var html = collectReportExportHtml(iframe);
+      return openReportPrintWindow(html, showToast, true);
+    },
+    print: function (iframe, showToast) {
+      var html = collectReportExportHtml(iframe);
+      if (openReportPrintWindow(html, showToast, false)) {
+        notifyReportAction("인쇄 미리보기를 엽니다.", showToast);
+        return true;
+      }
+      return false;
+    }
+  };
+
+  var PIX_REPORT_GEN_MS = 2800;
+
+  function ensurePixReportDrawerCss() {
+    if (document.getElementById("pix-report-drawer-css")) return;
+    var drawerStyle = document.createElement("style");
+    drawerStyle.id = "pix-report-drawer-css";
+    drawerStyle.textContent = "@keyframes pixReportSpin{to{transform:rotate(360deg)}}";
+    document.head.appendChild(drawerStyle);
+  }
+
+  function enablePixReportIframeEdit(iframe) {
+    if (!iframe) return;
+    var attempts = 0;
+    function tryEnable() {
+      attempts += 1;
+      var enabled = false;
+      try {
+        var win = iframe.contentWindow;
+        if (win && win.PixReportLayoutEdit && typeof win.PixReportLayoutEdit.enable === "function") {
+          if (!win.PixReportLayoutEdit.isEditMode()) win.PixReportLayoutEdit.enable();
+          enabled = win.PixReportLayoutEdit.isEditMode();
+        }
+      } catch (_directErr) {}
+      if (!enabled) {
+        try {
+          if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: "pix-report-enable-edit" }, "*");
+          }
+        } catch (_postErr) {}
+        try {
+          var winAfter = iframe.contentWindow;
+          enabled = !!(winAfter && winAfter.PixReportLayoutEdit && winAfter.PixReportLayoutEdit.isEditMode());
+        } catch (_checkErr) {}
+      }
+      if (!enabled && attempts < 50) setTimeout(tryEnable, 100);
+    }
+    tryEnable();
+  }
+
+  function PixReportDrawerView(props) {
+    var React = props.React;
+    var opts = props.opts;
+    var useState = React.useState;
+    var useEffect = React.useEffect;
+    var useRef = React.useRef;
+    var drawerBodyRef = useRef(null);
+    var phaseState = useState("generating");
+    var phase = phaseState[0];
+    var setPhase = phaseState[1];
+    var editState = useState(false);
+    var editing = editState[0];
+    var setEditing = editState[1];
+
+    function resolveReportIframe() {
+      if (drawerBodyRef.current) {
+        var localFrame = drawerBodyRef.current.querySelector("iframe[data-pix-report-frame]");
+        if (localFrame) return localFrame;
+      }
+      return opts.iframeRef && opts.iframeRef.current ? opts.iframeRef.current : null;
+    }
+
+    function handleEditClick() {
+      setEditing(true);
+      enablePixReportIframeEdit(resolveReportIframe());
+    }
+
+    useEffect(function () {
+      setPhase("generating");
+      setEditing(false);
+      var timer = setTimeout(function () { setPhase("ready"); }, PIX_REPORT_GEN_MS);
+      return function () { clearTimeout(timer); };
+    }, [opts.open, opts.reportUrl]);
+
+    useEffect(function () {
+      if (phase !== "ready" || !editing) return undefined;
+      enablePixReportIframeEdit(resolveReportIframe());
+      return undefined;
+    }, [phase, editing]);
+
+    var closeBtnStyle = {
+      border: "1px solid #cfcdc5",
+      background: "#fff",
+      borderRadius: "8px",
+      width: "34px",
+      height: "34px",
+      cursor: "pointer",
+      fontSize: "16px",
+      color: "#5f5e5a",
+      lineHeight: 1
+    };
+
+    var showSplash = phase === "generating";
+
+    return React.createElement(
+      "div",
+      { className: "fixed inset-0 z-[120]" },
+      React.createElement("div", {
+        className: "absolute inset-0 bg-black/40",
+        onClick: opts.onClose
+      }),
+      React.createElement(
+        "div",
+        {
+          className: "absolute top-0 right-0 h-full w-full max-w-[900px] shadow-2xl animate-drawerSlideIn overflow-hidden border-l border-[#cfcdc5]",
+          style: {
+            background: "#eae8e2",
+            display: "flex",
+            flexDirection: "column",
+            boxSizing: "border-box"
+          },
+          onClick: function (e) { e.stopPropagation(); }
+        },
+        React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              padding: "12px 16px",
+              borderBottom: "1px solid #cfcdc5",
+              background: "#f5f4f0",
+              flexShrink: 0
+            }
+          },
+          React.createElement(
+            "div",
+            null,
+            React.createElement("p", {
+              style: { margin: 0, fontSize: "14px", fontWeight: 800, color: "#1f1e1c" }
+            }, opts.title),
+            opts.subtitle
+              ? React.createElement("p", {
+                style: { margin: "2px 0 0", fontSize: "11px", color: "#898781" }
+              }, opts.subtitle)
+              : null
+          ),
+          React.createElement(
+            "div",
+            { style: { display: "flex", alignItems: "center", gap: "8px" } },
+            phase === "ready" && !editing
+              ? React.createElement(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: handleEditClick,
+                    style: {
+                      border: "1px solid #0C447C",
+                      background: "#fff",
+                      color: "#0C447C",
+                      borderRadius: "8px",
+                      padding: "7px 12px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      fontFamily: "inherit"
+                    }
+                  },
+                  "\u270E \uC218\uC815"
+                )
+              : null,
+            editing
+              ? React.createElement("span", {
+                style: {
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  color: "#0C447C",
+                  padding: "5px 10px",
+                  background: "rgba(12,68,124,.08)",
+                  borderRadius: "6px"
+                }
+              }, "\uD3B8\uC9D1 \uC911")
+              : null,
+            React.createElement(
+              "button",
+              {
+                type: "button",
+                "aria-label": "\uB2EB\uAE30",
+                onClick: opts.onClose,
+                style: closeBtnStyle
+              },
+              "\u2715"
+            )
+          )
+        ),
+        React.createElement(
+          "div",
+          {
+            ref: drawerBodyRef,
+            style: {
+              position: "relative",
+              flex: "1 1 auto",
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column"
+            }
+          },
+          React.createElement("iframe", {
+            ref: opts.iframeRef,
+            "data-pix-report-frame": "1",
+            src: opts.reportUrl,
+            title: opts.iframeTitle || opts.title,
+            style: {
+              width: "100%",
+              flex: "1 1 auto",
+              minHeight: 0,
+              border: 0,
+              background: "#eae8e2",
+              display: "block",
+              visibility: showSplash ? "hidden" : "visible"
+            }
+          }),
+          showSplash
+            ? React.createElement(
+                "div",
+                {
+                  style: {
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "#eae8e2",
+                    zIndex: 2
+                  }
+                },
+                React.createElement(
+                  "div",
+                  { style: { textAlign: "center", padding: "24px", maxWidth: "320px" } },
+                  React.createElement("div", {
+                    style: {
+                      width: "44px",
+                      height: "44px",
+                      border: "3px solid #cfcdc5",
+                      borderTopColor: "#0C447C",
+                      borderRadius: "50%",
+                      margin: "0 auto 16px",
+                      animation: "pixReportSpin 0.9s linear infinite"
+                    }
+                  }),
+                  React.createElement("p", {
+                    style: { margin: 0, fontSize: "15px", fontWeight: 800, color: "#1f1e1c" }
+                  }, "AI\uAC00 \uBCF4\uACE0\uC11C\uB97C \uC0DD\uC131 \uC911\uC785\uB2C8\uB2E4"),
+                  React.createElement("p", {
+                    style: { margin: "8px 0 0", fontSize: "12px", lineHeight: 1.6, color: "#898781" }
+                  }, "\uD1B5\uACC4 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD574 \uBCF4\uACE0\uC11C \uCD08\uC548\uC744 \uC791\uC131\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4.")
+                )
+              )
+            : null
+        ),
+        phase === "ready" ? opts.footer || null : null
+      )
+    );
+  }
+
+  function createPixReportIframeDrawer(React, opts) {
+    if (!opts || !opts.open) return null;
+    ensurePixReportDrawerCss();
+    return React.createElement(PixReportDrawerView, { React: React, opts: opts });
+  }
+
+  function createReportModalFooter(React, opts) {
+    opts = opts || {};
+    var useState = React.useState;
+    var useEffect = React.useEffect;
+
+    function btn(label, onClick, primary, extraStyle) {
+      return React.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: onClick,
+          style: Object.assign({
+            border: primary ? "1px solid #0C447C" : "1px solid #cfcdc5",
+            background: primary ? "#0C447C" : "#fff",
+            color: primary ? "#fff" : "#1f1e1c",
+            borderRadius: "8px",
+            padding: "8px 14px",
+            fontSize: "12px",
+            fontWeight: 700,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            lineHeight: 1.2
+          }, extraStyle || {})
+        },
+        label
+      );
+    }
+
+    function ReportFooter() {
+      var menuState = useState(false);
+      var menuOpen = menuState[0];
+      var setMenuOpen = menuState[1];
+
+      useEffect(function () {
+        if (!menuOpen) return undefined;
+        function onDocClick() { setMenuOpen(false); }
+        document.addEventListener("click", onDocClick);
+        return function () { document.removeEventListener("click", onDocClick); };
+      }, [menuOpen]);
+
+      function menuItem(label, onClick) {
+        return React.createElement(
+          "button",
+          {
+            type: "button",
+            onClick: function (e) {
+              e.stopPropagation();
+              setMenuOpen(false);
+              if (onClick) onClick();
+            },
+            style: {
+              display: "block",
+              width: "100%",
+              border: 0,
+              background: "transparent",
+              textAlign: "left",
+              padding: "8px 12px",
+              fontSize: "12px",
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              color: "#1f1e1c"
+            },
+            onMouseEnter: function (e) { e.currentTarget.style.background = "rgba(12,68,124,.08)"; },
+            onMouseLeave: function (e) { e.currentTarget.style.background = "transparent"; }
+          },
+          label
+        );
+      }
+
+      return React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "10px",
+            flexWrap: "wrap",
+            padding: "12px 16px",
+            borderTop: "1px solid #cfcdc5",
+            background: "#f5f4f0",
+            flexShrink: 0
+          }
+        },
+        React.createElement(
+          "div",
+          { style: { display: "flex", gap: "8px", flexWrap: "wrap" } },
+          btn("임시저장", opts.onDraft),
+          btn("저장", opts.onSave, true)
+        ),
+        React.createElement(
+          "div",
+          { style: { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" } },
+          React.createElement(
+            "div",
+            { style: { position: "relative" } },
+            btn("다운로드 ▾", function (e) {
+              e.stopPropagation();
+              setMenuOpen(function (v) { return !v; });
+            }),
+            menuOpen
+              ? React.createElement(
+                  "div",
+                  {
+                    style: {
+                      position: "absolute",
+                      right: 0,
+                      bottom: "calc(100% + 6px)",
+                      minWidth: "132px",
+                      background: "#fff",
+                      border: "1px solid #cfcdc5",
+                      borderRadius: "8px",
+                      boxShadow: "0 8px 20px rgba(0,0,0,.12)",
+                      overflow: "hidden",
+                      zIndex: 40
+                    },
+                    onClick: function (e) { e.stopPropagation(); }
+                  },
+                  menuItem("워드 (.doc)", opts.onWord),
+                  menuItem("PDF (.pdf)", opts.onPdf)
+                )
+              : null
+          ),
+          btn("인쇄", opts.onPrint)
+        )
+      );
+    }
+
+    return React.createElement(ReportFooter);
+  }
+
+  global.createPixReportIframeDrawer = createPixReportIframeDrawer;
+  global.createPixReportModalFooter = createReportModalFooter;
+  global.enablePixReportIframeEdit = enablePixReportIframeEdit;
 
   global.mountPxAiAnalysisPanel = mountPxAiAnalysisPanel;
   global.mountPxAiStrengthPicker = mountPxAiStrengthPicker;
