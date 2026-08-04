@@ -241,7 +241,7 @@ $loaderScript = @'
     var useEffect = deps.useEffect || React.useEffect;
     var ReactDOM = deps.ReactDOM;
     var Base = createVocLightDomPage(deps, { title: "VOC \uD1B5\uACC4", templateKey: "statistics" });
-    var VOC_REPORT_URL = "voc-analysis-report.html";
+    var VOC_REPORT_URL = "voc-analysis-report.html?v=20260804-v2";
     var VOC_REPORT_STORAGE_KEY = "pix_voc_report_2026_06";
     return function VocPixStatisticsWithAiModal() {
       var _open = useState(false);

@@ -4693,7 +4693,7 @@
     return registerPixAiStatisticsShell(deps, {
       variant: "survey",
       storageKey: "pix_survey_report_2026_06",
-      reportUrl: "px-survey-analysis-report.html",
+      reportUrl: "px-survey-analysis-report.html?v=20260804-v2",
       reportTitle: "2026\uB144 6\uC6D4 \uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
       reportSubtitle: "\uB0B4\uBD80 \uBCF4\uACE0 \u00B7 \uC784\uC6D0 \uBCF4\uACE0\uC6A9 \u00B7 PIX AI \uD658\uC790\uACBD\uD5D8\uAD00\uB9AC",
       iframeTitle: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
