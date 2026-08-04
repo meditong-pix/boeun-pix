@@ -3,22 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>환자경험평가 분석보고서 (6월)</title>
+<title>환자경험평가 분석보고서</title>
 <style>
   :root {
     --ink: #1f1e1c; --ink-sub: #5f5e5a; --ink-muted: #898781;
     --line: #cfcdc5; --line-soft: #e1e0d9; --paper: #ffffff; --shell: #eae8e2;
     --blue: #0C447C; --blue-bg: #E6F1FB;
     --red: #791F1F; --red-bg: #FCEBEB;
+    --amber: #A67A1E; --amber-bg: #FAEEDA;
     --gray-bg: #F1F0EC;
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--shell); color: var(--ink);
-    font-family: "Malgun Gothic", "Apple SD Gothic Neo", -apple-system, sans-serif;
-    padding: 24px 0 48px;
-  }
   html, body { min-height: 100%; }
+  body { margin: 0; background: var(--shell); color: var(--ink); font-family: "Malgun Gothic","Apple SD Gothic Neo",-apple-system,sans-serif; padding: 36px 0 80px; }
   .doc { width: 800px; margin: 0 auto; background: var(--paper); box-shadow: 0 2px 14px rgba(0,0,0,.08); padding: 46px 52px 60px; }
 
   .approval-wrap { display: flex; justify-content: flex-end; margin-bottom: 18px; }
@@ -28,73 +25,59 @@
   .approval td.sign { width: 62px; height: 42px; }
 
   .doc-meta { font-size: 11px; color: var(--ink-muted); margin-bottom: 6px; }
-  .doc-title { font-size: 25px; font-weight: 800; letter-spacing: -0.3px; margin: 0 0 14px; text-align: center; }
-  .doc-info-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 12px; }
+  .doc-title { font-size: 24px; font-weight: 800; margin: 0 0 14px; text-align: center; }
+  .doc-info-table { width: 100%; border-collapse: collapse; margin-bottom: 26px; font-size: 12px; }
   .doc-info-table td { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 7px 12px; }
   .doc-info-table td.lbl { width: 90px; background: var(--gray-bg); font-weight: 700; color: var(--ink-sub); border-right: 1px solid var(--line-soft); }
   .doc-info-table td.val { border-right: 1px solid var(--line-soft); }
 
-  .sec { margin-top: 28px; }
-  .sec-title { font-size: 15.5px; font-weight: 800; border-bottom: 2px solid var(--ink); padding-bottom: 6px; margin-bottom: 13px; }
+  .sec { margin-top: 26px; }
+  .sec-title { font-size: 15px; font-weight: 800; border-bottom: 2px solid var(--ink); padding-bottom: 6px; margin-bottom: 12px; }
   .sec-title .num { color: var(--blue); margin-right: 6px; }
-  p.body { font-size: 12.5px; line-height: 1.75; margin: 0 0 10px; }
-  ul.plain { margin: 0 0 10px; padding-left: 18px; font-size: 12.5px; line-height: 1.7; }
-  ul.plain li { margin-bottom: 4px; }
+  .sub-title { font-size: 13px; font-weight: 800; margin: 16px 0 8px; padding-left: 8px; border-left: 3px solid var(--blue); }
+  p.body { font-size: 12px; line-height: 1.75; margin: 0 0 9px; }
 
-  .headline { background: var(--gray-bg); border-left: 5px solid var(--blue); padding: 13px 15px; font-size: 13px; font-weight: 700; line-height: 1.7; margin-bottom: 16px; }
+  .kpi-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 7px; margin-bottom: 12px; }
+  .kpi-box { border: 1px solid var(--line-soft); border-radius: 6px; padding: 8px 6px; }
+  .kpi-box .kl { font-size: 9px; color: var(--ink-muted); }
+  .kpi-box .kv { font-size: 13px; font-weight: 800; margin-top: 2px; }
+  .kpi-box .kd { font-size: 9px; font-weight: 700; margin-top: 2px; }
 
-  .kpi-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
-  .kpi-box { border: 1px solid var(--line-soft); border-radius: 6px; padding: 9px 8px; }
-  .kpi-box .kpi-label { font-size: 10px; color: var(--ink-muted); margin-bottom: 3px; }
-  .kpi-box .kpi-val { font-size: 15px; font-weight: 800; }
-  .kpi-box .kpi-delta { font-size: 10.5px; font-weight: 700; margin-top: 2px; color: var(--ink-sub); }
-
-  table.report-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 14px; }
-  table.report-table th { background: var(--ink); color: #fff; font-size: 10.5px; font-weight: 700; padding: 7px 5px; text-align: center; border: 1px solid var(--ink); }
-  table.report-table td { border: 1px solid var(--line-soft); padding: 6px 7px; text-align: center; }
-  table.report-table td.rowlabel { text-align: left; font-weight: 700; background: var(--gray-bg); }
-  .tag-good { color: var(--blue); font-weight: 700; }
-  .tag-bad { color: var(--red); font-weight: 700; }
-  .cap { font-size: 10.5px; color: var(--ink-muted); margin: -6px 0 14px; }
-
-  .chart-block { border: 1px solid var(--line-soft); border-radius: 6px; padding: 13px 15px 9px; margin-bottom: 14px; }
-  .chart-title { font-size: 11.5px; font-weight: 700; margin: 0 0 11px; }
+  .chart-block { border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px 14px 10px; margin-bottom: 10px; background: var(--paper); }
+  .chart-title { font-size: 11px; font-weight: 800; margin: 0 0 10px; }
   .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .bar-row .bar-name { width: 150px; font-size: 10.5px; color: var(--ink-sub); flex-shrink: 0; }
-  .bar-track { flex: 1; background: var(--gray-bg); border-radius: 3px; height: 13px; position: relative; overflow: hidden; }
+  .bar-row .bl { width: 150px; flex-shrink: 0; font-size: 10.5px; color: var(--ink-sub); }
+  .bar-track { flex: 1; background: var(--gray-bg); border-radius: 3px; height: 12px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 3px; }
-  .bar-row .bar-val { width: 100px; font-size: 10.5px; text-align: right; font-weight: 700; flex-shrink: 0; }
+  .bar-row .bv { width: 66px; text-align: right; font-size: 10.5px; font-weight: 700; flex-shrink: 0; }
 
-  .risk-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
-  .risk-badge { flex-shrink: 0; width: 92px; text-align: center; font-size: 10.5px; font-weight: 800; padding: 6px 0; border-radius: 4px; color: #fff; }
-  .risk-badge.low { background: var(--blue); }
-  .risk-badge.mid { background: #A67A1E; }
-  .risk-badge.high { background: var(--red); }
-  .risk-desc { font-size: 12px; line-height: 1.6; padding-top: 4px; }
+  .grade-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-bottom: 4px; }
+  .grade-box { border-radius: 8px; padding: 8px 4px; text-align: center; border: 1px solid var(--line-soft); background: var(--gray-bg); }
+  .grade-box.current { border: 1.5px solid var(--red); background: var(--red-bg); }
+  .grade-box .gl { font-size: 10px; font-weight: 800; color: var(--ink-sub); }
+  .grade-box.current .gl { color: var(--red); }
+  .grade-box .gv { font-size: 10.5px; margin-top: 3px; color: var(--ink-sub); }
+  .grade-box.current .gv { color: var(--red); font-weight: 700; }
 
-  .flag-card { display: flex; gap: 10px; margin-bottom: 10px; }
-  .flag-tag { flex-shrink: 0; font-size: 11px; font-weight: 800; background: var(--red-bg); color: var(--red); padding: 5px 10px; border-radius: 999px; height: fit-content; }
-  .flag-body { font-size: 12px; }
-  .flag-body .flag-cnt { font-weight: 800; }
+  .quart-track { position: relative; height: 24px; border-radius: 6px; overflow: hidden; display: flex; margin-bottom: 4px; }
+  .quart-track > div { flex: 1; }
 
-  .quote-box { border-left: 3px solid var(--line); padding: 4px 0 4px 12px; margin-bottom: 8px; font-size: 12px; font-style: italic; color: var(--ink-sub); }
-  .quote-meta { font-size: 10.5px; color: var(--ink-muted); font-style: normal; margin-left: 6px; }
+  .plain-list { margin: 0 0 10px; padding-left: 20px; font-size: 11.5px; line-height: 1.8; }
+  .plain-list li { margin-bottom: 4px; }
 
-  .opt-recommend { display: inline-block; font-size: 10px; font-weight: 800; color: #fff; background: var(--blue); padding: 2px 7px; border-radius: 3px; margin-left: 6px; }
-  .tl-week { font-weight: 800; color: var(--blue); white-space: nowrap; }
+  .opt-card-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .opt-card { flex: 1; border: 1px solid var(--line-soft); border-radius: 8px; padding: 9px 10px; }
+  .opt-card .oc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .opt-card .oc-name { font-size: 11px; font-weight: 800; }
+  .opt-card .oc-prio { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 999px; }
+  .opt-card .oc-desc { font-size: 10.5px; color: var(--ink-sub); line-height: 1.5; }
 
-  .footer-note { margin-top: 34px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 9.5px; color: var(--ink-muted); display: flex; justify-content: space-between; }
+  .tl-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .tl-dot { width: 68px; flex-shrink: 0; text-align: center; font-size: 10.5px; font-weight: 800; color: #fff; background: var(--blue); border-radius: 999px; padding: 4px 0; }
+  .tl-text { font-size: 11.5px; line-height: 1.6; padding-top: 3px; }
 
-  [contenteditable="true"] { cursor: text; }
-  [contenteditable="true"]:hover { background: rgba(12, 68, 124, 0.04); }
-  [contenteditable="true"]:focus {
-    outline: 1px dashed rgba(12, 68, 124, 0.45);
-    outline-offset: 2px;
-    background: rgba(12, 68, 124, 0.06);
-  }
-  .bar-track, .bar-fill, .line-chart-wrap, .legend-dot, svg {
-    -webkit-user-select: none; user-select: none;
-  }
+  .cap { font-size: 10px; color: var(--ink-muted); margin: 4px 0 12px; }
+  .footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 9.5px; color: var(--ink-muted); display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
@@ -103,122 +86,118 @@
 
   <h1 class="doc-title">2026년 6월 환자경험평가 분석보고서</h1>
 
-  <table class="doc-info-table">
-    <tr>
-      <td class="lbl">작성자</td><td class="val">진보은 주임</td>
-      <td class="lbl">작성일</td><td class="val" style="border-right:none">2026. 07. 03.</td>
-    </tr>
-    <tr>
-      <td class="lbl">분석 기간</td><td class="val">2026년 6월</td>
-      <td class="lbl">분석대상</td><td class="val" style="border-right:none">2026년(6차) 환자경험평가 · 6월 조회</td>
-    </tr>
-  </table>
-
-  <!-- 1. 개요 -->
+  <!-- Ⅰ. 개요 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅰ.</span>개요</p>
     <div class="kpi-strip">
-      <div class="kpi-box"><div class="kpi-label">종합점수</div><div class="kpi-val" style="color:var(--blue)">82.42점</div><div class="kpi-delta tag-good">▲1.20점 (1.48%)</div></div>
-      <div class="kpi-box"><div class="kpi-label">응답률</div><div class="kpi-val">38.60%</div><div class="kpi-delta tag-good">▲4.50%p (전월 34.10%)</div></div>
-      <div class="kpi-box"><div class="kpi-label">타인 추천 의향</div><div class="kpi-val">81.80점</div><div class="kpi-delta tag-good">▲0.40점 (0.49%)</div></div>
+      <div class="kpi-box"><div class="kl">종합점수</div><div class="kv" style="color:var(--blue)">82.42점</div><div class="kd" style="color:var(--blue)">▲1.20점</div></div>
+      <div class="kpi-box"><div class="kl">응답률</div><div class="kv">38.60%</div><div class="kd">▲4.5%p</div></div>
+      <div class="kpi-box"><div class="kl">타인추천의향</div><div class="kv">81.80점</div><div class="kd">▲0.4점</div></div>
+      <div class="kpi-box"><div class="kl">의사 영역</div><div class="kv">80.40점</div><div class="kd" style="color:var(--red)">▼0.6점</div></div>
+      <div class="kpi-box"><div class="kl">환자권리보장</div><div class="kv" style="color:var(--red)">76.90점</div><div class="kd" style="color:var(--red)">▼1.1점</div></div>
     </div>
-    <div class="kpi-strip" style="margin-bottom:16px">
-      <div class="kpi-box"><div class="kpi-label">의사 영역</div><div class="kpi-val">80.40점</div><div class="kpi-delta tag-bad">▼0.60점 (0.74%)</div></div>
-      <div class="kpi-box"><div class="kpi-label">정서적 지지</div><div class="kpi-val">74.20점</div><div class="kpi-delta tag-bad">▼1.30점 (1.72%)</div></div>
-      <div class="kpi-box"><div class="kpi-label">환자권리보장</div><div class="kpi-val" style="color:var(--red)">76.90점</div><div class="kpi-delta tag-bad">▼1.10점 (1.41%)</div></div>
-    </div>
-    <p class="body">본 보고서는 2026년 6월 환자경험평가 응답 결과를 대상으로 영역별·진료과별·담당자별 점수 현황을 분석하고, 전월 대비 유의미한 변화가 확인된 영역에 대해 개선 방안을 건의하기 위하여 작성됨.</p>
-    <p class="body">6월 종합점수 82.42점으로 전월(81.22점) 대비 1.20점(1.48%) 상승함. 다만 <b>환자권리보장(76.90점, 1.10점↓)</b> · <b>의사 영역(80.40점, 0.60점↓)</b> · <b>정서적 지지(74.20점, 1.30점↓)</b> 3개 영역이 동시에 하락함. 특히 <b>문19(불만 제기 용이성, 68.4점)</b>가 전체 문항 중 최저 점수이며 5개월 연속 하락 추세로 확인되어 별도 확인이 필요함.</p>
-    <p class="body">종합점수와 응답률이 함께 상승한 것은 긍정적인 신호이나, 이는 상승 폭이 큰 영역에 가려 일부 영역의 하락이 상쇄되어 보이는 결과일 수 있음. 아래 현황·분석 섹션에서 영역별 세부 내용을 다룸.</p>
+    <p class="body">6월 종합점수(23문항 단순평균)는 82.42점으로 전월(81.22점) 대비 1.20점 상승함. 영역별로는 정서적 지지(74.20점, 1.30점↓)가 가장 크게 하락함. 문19(불만 제기 용이성, 68.4점)는 전체 23개 문항 중 최저 점수이자 5개월 연속 하락 추세로 확인되어, 하락폭 순위와 무관하게 별도로 명시함.</p>
+    <p class="body">종합점수와 응답률이 함께 상승한 것은 긍정적인 신호이나, 상승 폭이 큰 영역에 가려 일부 영역의 하락이 상쇄되어 보이는 결과일 수 있음. 아래 현황·분석에서 영역별 세부 내용을 다룸.</p>
   </div>
 
-  <!-- 2. 현황 -->
+  <!-- Ⅱ. 현황 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅱ.</span>현황</p>
-    <table class="report-table">
-      <tr><th style="width:30%">영역</th><th>이번 달</th><th>전월</th><th>변화</th></tr>
-      <tr><td class="rowlabel">의사 영역 (Ⅱ)</td><td>80.40점</td><td>81.00점</td><td class="tag-bad">▼0.60점</td></tr>
-      <tr><td class="rowlabel">정서적 지지 (Ⅳ)</td><td>74.20점</td><td>75.50점</td><td class="tag-bad">▼1.30점</td></tr>
-      <tr><td class="rowlabel">환자권리보장 (Ⅵ)</td><td>76.90점</td><td>78.00점</td><td class="tag-bad">▼1.10점</td></tr>
-      <tr><td class="rowlabel">전반적 평가 · 타인 추천 의향 (Ⅶ)</td><td>81.80점</td><td>81.40점</td><td class="tag-good">▲0.40점</td></tr>
-    </table>
-    <p class="cap">※ 간호사 영역(Ⅰ) · 투약 및 치료과정(Ⅲ)은 이번 달 전월 대비 유의미한 변화가 없어 표에서 생략함. 전체 7개 영역 상세 점수는 통계 화면에서 확인 가능함.</p>
 
     <div class="chart-block">
-      <p class="chart-title">고점 · 저점 영역 (이번 달 기준)</p>
-      <div id="hilBars"></div>
-      <p class="cap" style="margin-top:8px">※ 환자 안전과 병원 환경(85.1%)이 가장 높고, 환자권리보장(74.7%)이 가장 낮음. 저점 영역 수치는 영역 평균 산출 방식 차이로 위 표의 76.90점과 소폭 차이가 있을 수 있음.</p>
+      <p class="chart-title">7개 영역 점수 (이번 달)</p>
+      <div class="bar-row"><span class="bl">환자 안전과 병원 환경</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--blue)"></div></div><span class="bv">85.10점</span></div>
+      <div class="bar-row"><span class="bl">간호사 영역</span><div class="bar-track"><div class="bar-fill" style="width:98%;background:var(--blue)"></div></div><span class="bv">83.50점</span></div>
+      <div class="bar-row"><span class="bl">전반적 평가</span><div class="bar-track"><div class="bar-fill" style="width:96%;background:var(--blue)"></div></div><span class="bv">81.50점</span></div>
+      <div class="bar-row"><span class="bl">의사 영역</span><div class="bar-track"><div class="bar-fill" style="width:94%;background:var(--red)"></div></div><span class="bv">80.40점</span></div>
+      <div class="bar-row"><span class="bl">투약 및 치료과정</span><div class="bar-track"><div class="bar-fill" style="width:94%;background:var(--blue)"></div></div><span class="bv">79.80점</span></div>
+      <div class="bar-row"><span class="bl">환자권리보장</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--red)"></div></div><span class="bv">76.90점</span></div>
+      <div class="bar-row"><span class="bl">정서적 지지</span><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--red)"></div></div><span class="bv">74.20점</span></div>
     </div>
-
-    <p class="body">환자경험평가는 7개 영역(간호사 영역, 의사 영역, 투약 및 치료과정, 정서적 지지, 환자 안전과 병원 환경, 환자권리보장, 전반적 평가) 23개 문항으로 구성됨. 이 중 전월 대비 점수 변화가 확인된 영역은 위 표와 같음.</p>
-    <p class="body">문항 단위로 보면, <b>문19(불만 제기 용이성)</b>가 68.4점으로 23개 문항 중 최저 점수이며, 5개월 연속 하락 추세를 보이고 있어 환자권리보장 영역 하락의 핵심 원인으로 판단됨.</p>
+    <p class="body">환자경험평가는 간호사 영역·의사 영역·투약 및 치료과정·정서적 지지·환자 안전과 병원 환경·환자권리보장·전반적 평가 7개 영역, 23개 문항으로 구성됨. 환자 안전과 병원 환경이 85.10점으로 가장 높았고, 정서적 지지(74.20점)가 가장 낮음. 전월 대비로는 의사 영역(80.40점, ▼0.60점)·정서적 지지(74.20점, ▼1.30점)·환자권리보장(76.90점, ▼1.10점) 3개 영역만 ±0.5점 이상 변화해 표에 표시했으며, 나머지 4개 영역은 변화가 크지 않음.</p>
+    <p class="body">고점 영역은 환자 안전과 병원 환경(85.1%), 저점 영역은 환자권리보장(74.7%)임. 문항 단위로 보면 문19(불만 제기 용이성)가 68.4점으로 23개 문항 중 최저이며, 5개월 연속 하락 추세를 보이고 있어 환자권리보장 영역 하락의 핵심 원인으로 판단됨.</p>
   </div>
 
-  <!-- 3. 분석 -->
+  <!-- Ⅲ. 분석 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅲ.</span>분석</p>
 
-    <table class="report-table">
-      <tr><th>진료과</th><th>종합점수</th><th>전월 대비</th></tr>
-      <tr><td class="rowlabel">재활의학과</td><td>87.1점</td><td class="tag-good">▲2.1점</td></tr>
-      <tr><td class="rowlabel">내과</td><td>84.2점</td><td class="tag-good">▲1.2점</td></tr>
-      <tr><td class="rowlabel">신경과</td><td>81.0점</td><td class="tag-good">▲0.5점</td></tr>
-      <tr><td class="rowlabel">정형외과</td><td>79.5점</td><td class="tag-bad">▼0.8점</td></tr>
-      <tr><td class="rowlabel">한방과</td><td>76.4점</td><td class="tag-bad">▼1.4점</td></tr>
-      <tr><td class="rowlabel">호흡기내과</td><td>74.6점</td><td class="tag-bad">▼0.9점</td></tr>
-    </table>
-
-    <table class="report-table">
-      <tr><th>담당의</th><th>진료과</th><th>종합점수</th><th>전월 대비</th></tr>
-      <tr><td class="rowlabel">한우진 교수</td><td>재활의학과</td><td>88.2점</td><td class="tag-good">▲2.0점</td></tr>
-      <tr><td class="rowlabel">김민수 교수</td><td>내과</td><td>86.4점</td><td class="tag-good">▲1.4점</td></tr>
-      <tr><td class="rowlabel">이정훈 교수</td><td>정형외과</td><td>82.1점</td><td class="tag-good">▲0.6점</td></tr>
-      <tr><td class="rowlabel">장서윤 교수</td><td>호흡기내과</td><td>79.5점</td><td class="tag-bad">▼0.7점</td></tr>
-      <tr><td class="rowlabel">박도현 교수</td><td>신경과</td><td>74.8점</td><td class="tag-bad">▼1.8점</td></tr>
-    </table>
-
-    <table class="report-table">
-      <tr><th>간호사</th><th>담당 병동</th><th>종합점수</th><th>전월 대비</th></tr>
-      <tr><td class="rowlabel">박나호 간호사</td><td>7A</td><td>87.5점</td><td class="tag-good">▲1.6점</td></tr>
-      <tr><td class="rowlabel">김연주 간호사</td><td>8B</td><td>84.3점</td><td class="tag-good">▲0.9점</td></tr>
-      <tr><td class="rowlabel">최서연 간호사</td><td>5병동</td><td>81.8점</td><td class="tag-good">▲0.3점</td></tr>
-      <tr><td class="rowlabel">오지민 간호사</td><td>6병동</td><td>78.6점</td><td class="tag-bad">▼0.5점</td></tr>
-      <tr><td class="rowlabel">한지우 간호사</td><td>ICU</td><td>73.9점</td><td class="tag-bad">▼2.1점</td></tr>
-    </table>
-    <p class="cap">※ 담당의·간호사 표는 종합점수 상위·하위 그룹을 함께 제시한 것으로, 상위 그룹은 우수 사례 참고용, 하위 그룹은 확인이 필요한 대상임.</p>
+    <p class="sub-title">등급 분석 (5차 실제 결과 기준 · 360개 기관)</p>
+    <div class="grade-strip">
+      <div class="grade-box"><div class="gl">1등급</div><div class="gv">90점 이상</div></div>
+      <div class="grade-box"><div class="gl">2등급</div><div class="gv">85~90점</div></div>
+      <div class="grade-box current"><div class="gl">3등급 · 우리</div><div class="gv">80.20점</div></div>
+      <div class="grade-box"><div class="gl">4등급</div><div class="gv">75~80점</div></div>
+      <div class="grade-box"><div class="gl">5등급</div><div class="gv">75점 미만</div></div>
+    </div>
+    <p class="cap">※ 영역평균(÷7) 기준 종합점수 80.20점으로 산정. 개요의 82.42점(23문항 단순평균)과 산출 방식이 달라 차이가 있음. 등급 제외 기준: 응답 표본 수 미충족 기관은 제외.</p>
 
     <div class="chart-block">
-      <p class="chart-title">진료과별 종합점수 비교</p>
-      <div id="deptBars"></div>
+      <p class="chart-title">3등급(127개 기관) 내 분포</p>
+      <div class="quart-track">
+        <div style="background:rgba(121,31,31,.28)"></div>
+        <div style="background:rgba(166,122,30,.22)"></div>
+        <div style="background:rgba(12,68,124,.16)"></div>
+        <div style="background:rgba(52,150,120,.16)"></div>
+      </div>
+      <div style="display:flex;font-size:9.5px;color:var(--ink-muted);justify-content:space-between">
+        <span>최소 80.01</span><span>Q1 81.10</span><span>중앙값 82.39</span><span>Q3 83.51</span><span>최대 84.99</span>
+      </div>
     </div>
+    <p class="body">영역평균 기준 종합점수는 80.20점으로 3등급(80~85점 미만)에 해당하나, 3등급 127개 기관 중 하위 9위(백분위 하위 6.3%)로 Q1(81.10점)에도 못 미치는 4사분위 위치임. 다만 하위 8개 기관이 80.01~80.18점(폭 0.17점)에 밀집돼 있어 순위 변동성이 크며, 실무적으로는 Q1까지 0.90점·2등급 최저(85.16점)까지 4.96점을 추적 지표로 삼는 것이 적절함. 4등급 강등까지는 0.21점만 남아 있어 하락 리스크도 함께 관리해야 함.</p>
 
-    <p class="body">영역별 변화가 어느 진료과·담당의·간호사에게서 나타나는지 확인하기 위해, 종합점수를 그룹별로 비교함. 위는 전월 대비 변화가 확인된 그룹을 종합점수 순으로 정리한 결과임.</p>
-    <p class="body">박도현 교수(신경과, ▼1.8점)와 한지우 간호사(ICU, ▼2.1점)의 하락폭이 그룹 내에서 가장 크며, 두 사례 모두 중환자 성격이 강한 진료 환경(신경과 중증 환자, ICU)에서 발생했다는 공통점이 있어 병동 환경 요인을 함께 확인할 필요가 있음.</p>
+    <div class="chart-block">
+      <p class="chart-title">영역별 격차 (3등급 평균 대비)</p>
+      <div class="bar-row"><span class="bl">환자권리보장</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▼5.25</span></div>
+      <div class="bar-row"><span class="bl">전반적 평가</span><div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▼3.57</span></div>
+      <div class="bar-row"><span class="bl">정서적 지지</span><div class="bar-track"><div class="bar-fill" style="width:53%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▼2.78</span></div>
+      <div class="bar-row"><span class="bl">의사 영역</span><div class="bar-track"><div class="bar-fill" style="width:44%;background:var(--amber)"></div></div><span class="bv" style="color:var(--amber)">▼2.30</span></div>
+      <div class="bar-row"><span class="bl">투약 및 치료과정</span><div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--amber)"></div></div><span class="bv" style="color:var(--amber)">▼1.32</span></div>
+      <div class="bar-row"><span class="bl">간호사 영역</span><div class="bar-track"><div class="bar-fill" style="width:19%;background:var(--amber)"></div></div><span class="bv" style="color:var(--amber)">▼1.02</span></div>
+      <div class="bar-row"><span class="bl">환자안전·환경</span><div class="bar-track"><div class="bar-fill" style="width:26%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▲1.35</span></div>
+    </div>
+    <p class="body">환자권리보장이 3등급 평균 대비 5.25점, 2등급 평균 대비 10.20점 뒤처져 전 영역 중 격차가 가장 크며, 문항 단위로는 문19(68.4점)가 원인으로 확인됨. 의사 영역(문8, 회진시간 정보제공, 74.5점) 역시 VOC의 "회진시간 안내 부족" 언급 급증과 시점상 일치해 동일한 현장 이슈로 판단됨. 유일하게 3등급 평균을 웃도는 영역은 환자 안전과 병원 환경(▲1.35)으로, 강점으로 유지·활용할 만함.</p>
+
+    <ul class="plain-list">
+      <li><b style="color:var(--red)">즉시 개입</b> — 정서적 지지(74.20점)는 7개 영역 중 유일한 단일 문항 구성으로, 이 문항 하나의 등락이 곧 영역 점수 변화로 직결됨.</li>
+      <li><b style="color:var(--amber)">집중 관리</b> — 전반적 평가(81.50점)는 문22·문23 두 문항이 고르게 낮아, 특정 항목보다 전반적 만족도 자체를 끌어올려야 하는 영역임.</li>
+      <li><b style="color:var(--blue)">우수 사례</b> — 환자 안전과 병원 환경은 VOC의 입원 중 간호사 항목과 함께 양쪽 지표에서 모두 강점으로 확인됨.</li>
+    </ul>
   </div>
 
-  <!-- 4. 이슈 및 평가 -->
+  <!-- Ⅳ. 주요 이슈 및 평가 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅳ.</span>주요 이슈 및 평가</p>
 
-    <p class="body">문19(불만 제기 용이성)는 <b>68.4점</b>으로 23개 문항 중 최저이며, 5개월 연속 하락 추세를 보이고 있음. VOC 채널에서도 <b>"회진시간 안내 부족"</b> 관련 언급이 급증한 것이 확인되어, 환자경험평가와 VOC 지표가 동시에 같은 방향의 신호를 보내고 있음.</p>
+    <ul class="plain-list">
+      <li><b style="color:var(--blue)">관찰 유지</b> — 종합점수는 전월 대비 상승했으며, 하락한 3개 영역도 각각 1~2점 내외로 급격한 악화는 아님.</li>
+      <li><b style="color:var(--amber)">집중 관리</b> — 문19가 5개월 연속 하락 추세인 점, VOC의 회진시간 관련 언급 급증과 의사 영역 하락이 맞물린 점은 지속적인 모니터링이 필요함.</li>
+      <li><b style="color:var(--red)">즉시 개입</b> — 환자권리보장 영역의 지속 하락이 방치될 경우 환자경험평가 관련 문항 점수 하락 및 수가 가감산에 부정적 영향 가능.</li>
+    </ul>
 
-    <p class="body">종합점수는 전월 대비 상승했고, 하락한 3개 영역도 각각 1~2점 내외로 급격한 악화는 아닌 수준임. 전반적인 변화는 경미한 편이나, 문19의 5개월 연속 하락과 VOC 회진시간 관련 언급 급증·의사 영역 하락이 맞물린 점은 주의가 필요한 사안으로, 지속적인 모니터링이 요구됨. 특히 환자권리보장 영역의 지속 하락이 방치될 경우 환자경험평가 관련 문항 점수 하락 및 수가 가감산에 부정적 영향을 줄 수 있어 중대한 리스크로 평가됨.</p>
-
-    <p class="body">영역별 하락 항목 중 개선이 시급한 사안을 위 내용과 같이 정리함. VOC 분석 결과와 교차 확인한 결과, 문8("담당 의사의 회진시간 또는 회진시간 변경에 대한 정보를 제공받으셨습니까?")이 속한 <b>의사 영역의 하락</b>과 VOC의 "회진시간 안내 부족" 언급 급증이 시점상 맞물려 있어, 동일한 원인에서 비롯된 것으로 추정됨.</p>
+    <p class="body" style="margin-top:12px">Ⅲ. 분석에서 확인한 VOC 교차 신호를 이슈로 공식화함 — 의사 영역 하락(문8 관련)과 VOC의 "회진시간 안내 부족" 언급 급증이 시점상 맞물려 있어, 두 지표가 동일한 현장 이슈를 가리키고 있는 것으로 판단됨.</p>
   </div>
 
-  <!-- 5. 종합 의견 및 건의 -->
+  <!-- Ⅴ. 종합 의견 및 건의 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅴ.</span>종합 의견 및 건의</p>
-    <p class="body">Ⅳ. 주요 이슈 및 평가에서 확인된 사안별 대응 방안은 다음과 같음. 첫째, 문19(불만 제기 용이성) 원인 조사 및 환자권리보장 영역 개선안 수립(추진 기한 2주 이내, 우선순위 상). 둘째, 회진시간 안내 프로세스 개선(의사 영역 · VOC 연계 대응)(추진 기한 2주 이내, 우선순위 중). 셋째, 신경과(박도현 교수) · ICU(한지우 간호사) 대상 하락 원인 모니터링 강화(추진 기한 2~3주 이내, 우선순위 중).</p>
-    <p class="body">환자권리보장 영역 하락과 직결된 <b>안 1</b>은 최우선 과제로 추진할 것을 건의함. 안 2는 VOC·환자경험평가 두 지표에 동시에 영향을 미치는 사안으로, 안 1과의 병행 추진을 검토할 것을 권고함.</p>
+    <ul class="plain-list">
+      <li><b>안 1</b> (<span style="color:var(--red)">높음 · 건의</span>) — 문19(불만 제기 용이성) 원인 조사 및 환자권리보장 영역 개선안 수립 · 2주</li>
+      <li><b>안 2</b> (<span style="color:var(--amber)">중간</span>) — 회진시간 안내 프로세스 개선(의사 영역 · VOC 연계 대응) · 2주</li>
+      <li><b>안 3</b> (<span style="color:var(--amber)">중간</span>) — 신경과(박도현 교수) · ICU(한지우 간호사) 대상 하락 원인 모니터링 강화 · 2~3주</li>
+    </ul>
+    <p class="body">환자권리보장 영역 하락과 직결된 안 1의 최우선 추진을 건의드리며, 안 2는 VOC·환자경험평가 두 지표에 동시에 영향을 미치는 사안인 만큼 안 1과 병행 추진을 권장함. 최종 시행 여부는 경영진 판단에 따름.</p>
   </div>
 
-  <!-- 6. 향후 계획 -->
+  <!-- Ⅵ. 향후 계획 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅵ.</span>향후 계획</p>
-    <p class="body">Ⅴ. 종합 의견 및 건의에서 제시한 건의안의 이행 여부를 확인하기 위한 점검 일정은 다음과 같음. 7월 1주차에는 문19 관련 환자 의견 추가 확인 및 원인 분석을, 7월 2주차에는 회진시간 안내 프로세스 개선안 적용 및 VOC 반응 확인을, 7월 말에는 신경과 · ICU 점수 재평가를 실시함.</p>
-    <p class="body" style="margin-top:16px;margin-bottom:0">붙임 1. 환자경험평가 문항별 상세 점수 1부.<br>붙임 2. 진료과 · 담당자별 종합점수 원본 데이터 1부.&nbsp;&nbsp;끝.</p>
+    <ul class="plain-list">
+      <li><b>7월 1주차</b> — 문19 관련 환자 의견을 추가 확인하고 원인을 분석함.</li>
+      <li><b>7월 2주차</b> — 회진시간 안내 프로세스 개선안을 적용하고 VOC 반응을 확인함.</li>
+      <li><b>7월 말</b> — 신경과·ICU 점수를 재평가하여 차기 임원 보고에 반영함.</li>
+    </ul>
+    <p class="body" style="margin-top:14px;margin-bottom:0">붙임 1. 환자경험평가 문항별 상세 점수 1부.<br>붙임 2. 진료과 · 담당자별 종합점수 원본 데이터 1부.&nbsp;&nbsp;끝.</p>
   </div>
 
   <div class="footer-note">
@@ -228,42 +207,6 @@
 
 </div>
 
-<script>
-// ---- 고점/저점 영역 ----
-var hilData = [
-  { name: "환자 안전과 병원 환경 (고점)", val: 85.1, color: "#0C447C" },
-  { name: "환자권리보장 (저점)", val: 74.7, color: "#791F1F" }
-];
-document.getElementById("hilBars").innerHTML = hilData.map(function (d) {
-  var pct = d.val;
-  return '<div class="bar-row">' +
-    '<div class="bar-name">' + d.name + '</div>' +
-    '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + d.color + '"></div></div>' +
-    '<div class="bar-val">' + d.val + '%</div>' +
-  '</div>';
-}).join('');
-
-// ---- 진료과별 종합점수 막대 ----
-var deptData = [
-  { name: "재활의학과", val: 87.1, delta: 2.1 },
-  { name: "내과", val: 84.2, delta: 1.2 },
-  { name: "신경과", val: 81.0, delta: 0.5 },
-  { name: "정형외과", val: 79.5, delta: -0.8 },
-  { name: "한방과", val: 76.4, delta: -1.4 },
-  { name: "호흡기내과", val: 74.6, delta: -0.9 }
-];
-var maxDept = Math.max.apply(null, deptData.map(function (d) { return d.val; }));
-document.getElementById("deptBars").innerHTML = deptData.map(function (d) {
-  var pct = (d.val / maxDept * 100).toFixed(1);
-  var good = d.delta >= 0;
-  return '<div class="bar-row">' +
-    '<div class="bar-name">' + d.name + '</div>' +
-    '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + (good ? '#0C447C' : '#791F1F') + '"></div></div>' +
-    '<div class="bar-val">' + d.val + '점 <span style="color:' + (good ? '#0C447C' : '#791F1F') + '">(' + (good ? '+' : '') + d.delta + ')</span></div>' +
-  '</div>';
-}).join('');
-
-</script>
 <script src="pix-report-stats-query.js"></script>
 <script src="pix-report-layout-edit.js"></script>
 <script>
@@ -273,15 +216,16 @@ document.getElementById("deptBars").innerHTML = deptData.map(function (d) {
     if (!root) return;
     var selector = [
       ".doc-title", ".doc-info-table td",
-      ".sec-title", "p", "ul.plain li", ".headline",
-      ".kpi-label", ".kpi-val", ".kpi-delta",
-      "table.report-table th", "table.report-table td",
-      ".cap", ".chart-title", ".bar-name", ".bar-val",
-      ".risk-badge", ".risk-desc", ".flag-tag", ".flag-body",
-      ".quote-box", ".quote-meta", ".footer-note span"
+      ".sec-title", ".sub-title", "p", "li", ".headline",
+      ".kl", ".kv", ".kd",
+      ".cap", ".chart-title", ".bl", ".bv",
+      ".gl", ".gv",
+      ".flag-tag", ".flag-body", ".quote-box", ".quote-meta",
+      ".oc-name", ".oc-desc", ".oc-prio", ".tl-dot", ".tl-text",
+      ".footer-note span"
     ].join(",");
     Array.prototype.forEach.call(root.querySelectorAll(selector), function (el) {
-      if (el.closest(".line-chart-wrap") || el.closest("svg") || el.closest(".bar-track")) return;
+      if (el.closest(".spark-wrap") || el.closest("svg") || el.closest(".bar-track") || el.closest(".quart-track")) return;
       if (el.closest(".rpt-block-toolbar") || el.closest(".rpt-sec-add-row")) return;
       if (el.getAttribute("contenteditable") === "true") return;
       el.setAttribute("contenteditable", "true");

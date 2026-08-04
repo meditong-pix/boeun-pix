@@ -1,4 +1,6 @@
 (function enablePixReportLayoutEdit(global) {
+  var root = document.querySelector(".doc");
+  if (!root) return;
   if (global.__pixReportLayoutEditInit) return;
   global.__pixReportLayoutEditInit = true;
   global.__pixReportDeferTextEdit = true;
@@ -98,9 +100,6 @@
     document.head.appendChild(style);
   }
 
-  var root = document.querySelector(".doc");
-  if (!root) return;
-
   var dragBlock = null;
   var dropLine = null;
   var openMenu = null;
@@ -132,18 +131,21 @@
 
   var TEXT_EDIT_SELECTOR = [
     ".doc-title", ".doc-info-table td",
-    ".sec-title", "p", "ul.plain li", ".headline",
-    ".kpi-label", ".kpi-val", ".kpi-delta",
+    ".sec-title", ".sub-title", "p", "li", ".headline",
+    ".kl", ".kv", ".kd", ".kpi-label", ".kpi-val", ".kpi-delta",
     "table.report-table th", "table.report-table td",
-    ".cap", ".chart-title", ".bar-name", ".bar-val",
+    ".cap", ".chart-title", ".bl", ".bv", ".bar-name", ".bar-val",
+    ".gl", ".gv",
     ".risk-badge", ".risk-desc", ".flag-tag", ".flag-body",
-    ".quote-box", ".quote-meta", ".footer-note span"
+    ".quote-box", ".quote-meta",
+    ".oc-name", ".oc-desc", ".oc-prio", ".tl-dot", ".tl-text",
+    ".footer-note span"
   ].join(",");
 
   function applyTextEdit(scope) {
     var base = scope || root;
     Array.prototype.forEach.call(base.querySelectorAll(TEXT_EDIT_SELECTOR), function (el) {
-      if (el.closest(".line-chart-wrap") || el.closest("svg") || el.closest(".bar-track")) return;
+      if (el.closest(".line-chart-wrap") || el.closest(".spark-wrap") || el.closest("svg") || el.closest(".bar-track") || el.closest(".quart-track")) return;
       if (el.closest(".rpt-block-toolbar") || el.closest(".rpt-add-menu") || el.closest(".rpt-sec-add-row")) return;
       if (el.closest(".rpt-stat-remove")) return;
       if (el.closest(".rpt-stat-remove")) return;

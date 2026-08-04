@@ -3,22 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VOC 분석보고서 (6월)</title>
+<title>VOC 분석보고서</title>
 <style>
   :root {
     --ink: #1f1e1c; --ink-sub: #5f5e5a; --ink-muted: #898781;
     --line: #cfcdc5; --line-soft: #e1e0d9; --paper: #ffffff; --shell: #eae8e2;
     --blue: #0C447C; --blue-bg: #E6F1FB;
     --red: #791F1F; --red-bg: #FCEBEB;
+    --amber: #A67A1E; --amber-bg: #FAEEDA;
     --gray-bg: #F1F0EC;
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--shell); color: var(--ink);
-    font-family: "Malgun Gothic", "Apple SD Gothic Neo", -apple-system, sans-serif;
-    padding: 24px 0 48px;
-  }
   html, body { min-height: 100%; }
+  body { margin: 0; background: var(--shell); color: var(--ink); font-family: "Malgun Gothic","Apple SD Gothic Neo",-apple-system,sans-serif; padding: 36px 0 80px; }
   .doc { width: 800px; margin: 0 auto; background: var(--paper); box-shadow: 0 2px 14px rgba(0,0,0,.08); padding: 46px 52px 60px; }
 
   .approval-wrap { display: flex; justify-content: flex-end; margin-bottom: 18px; }
@@ -28,78 +25,60 @@
   .approval td.sign { width: 62px; height: 42px; }
 
   .doc-meta { font-size: 11px; color: var(--ink-muted); margin-bottom: 6px; }
-  .doc-title { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; margin: 0 0 14px; text-align: center; }
-  .doc-info-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 12px; }
+  .doc-title { font-size: 25px; font-weight: 800; margin: 0 0 14px; text-align: center; }
+  .doc-info-table { width: 100%; border-collapse: collapse; margin-bottom: 26px; font-size: 12px; }
   .doc-info-table td { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 7px 12px; }
   .doc-info-table td.lbl { width: 90px; background: var(--gray-bg); font-weight: 700; color: var(--ink-sub); border-right: 1px solid var(--line-soft); }
   .doc-info-table td.val { border-right: 1px solid var(--line-soft); }
 
-  .sec { margin-top: 28px; }
-  .sec-title { font-size: 15.5px; font-weight: 800; border-bottom: 2px solid var(--ink); padding-bottom: 6px; margin-bottom: 13px; }
+  .sec { margin-top: 26px; }
+  .sec-title { font-size: 15px; font-weight: 800; border-bottom: 2px solid var(--ink); padding-bottom: 6px; margin-bottom: 12px; }
   .sec-title .num { color: var(--blue); margin-right: 6px; }
-  p.body { font-size: 12.5px; line-height: 1.75; margin: 0 0 10px; }
-  ul.plain { margin: 0 0 10px; padding-left: 18px; font-size: 12.5px; line-height: 1.7; }
-  ul.plain li { margin-bottom: 4px; }
+  .sub-title { font-size: 13px; font-weight: 800; margin: 16px 0 8px; padding-left: 8px; border-left: 3px solid var(--blue); }
+  p.body { font-size: 12px; line-height: 1.75; margin: 0 0 9px; }
 
-  .headline { background: var(--gray-bg); border-left: 5px solid var(--blue); padding: 13px 15px; font-size: 13px; font-weight: 700; line-height: 1.7; margin-bottom: 16px; }
+  .headline { background: var(--gray-bg); border-left: 5px solid var(--blue); padding: 12px 14px; font-size: 12.5px; font-weight: 700; line-height: 1.65; margin: 12px 0 14px; }
 
-  .kpi-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 18px; }
-  .kpi-box { border: 1px solid var(--line-soft); border-radius: 6px; padding: 9px 8px; }
-  .kpi-box .kpi-label { font-size: 10px; color: var(--ink-muted); margin-bottom: 3px; }
-  .kpi-box .kpi-val { font-size: 15px; font-weight: 800; }
-  .kpi-box .kpi-delta { font-size: 10.5px; font-weight: 700; margin-top: 2px; color: var(--ink-sub); }
+  .kpi-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 7px; margin-bottom: 12px; }
+  .kpi-box { border: 1px solid var(--line-soft); border-radius: 6px; padding: 8px 6px; }
+  .kpi-box .kl { font-size: 9px; color: var(--ink-muted); }
+  .kpi-box .kv { font-size: 13px; font-weight: 800; margin-top: 2px; }
+  .kpi-box .kd { font-size: 9px; font-weight: 700; margin-top: 2px; }
 
-  table.report-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 14px; }
-  table.report-table th { background: var(--ink); color: #fff; font-size: 10.5px; font-weight: 700; padding: 7px 5px; text-align: center; border: 1px solid var(--ink); }
-  table.report-table td { border: 1px solid var(--line-soft); padding: 6px 7px; text-align: center; }
-  table.report-table td.rowlabel { text-align: left; font-weight: 700; background: var(--gray-bg); }
-  .tag-good { color: var(--blue); font-weight: 700; }
-  .tag-bad { color: var(--red); font-weight: 700; }
-  .cap { font-size: 10.5px; color: var(--ink-muted); margin: -6px 0 14px; }
-
-  .chart-block { border: 1px solid var(--line-soft); border-radius: 6px; padding: 13px 15px 9px; margin-bottom: 14px; }
-  .chart-title { font-size: 11.5px; font-weight: 700; margin: 0 0 11px; }
+  .chart-block { border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px 14px 10px; margin-bottom: 10px; background: var(--paper); }
+  .chart-title { font-size: 11px; font-weight: 800; margin: 0 0 10px; }
   .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .bar-row .bar-name { width: 138px; font-size: 10.5px; color: var(--ink-sub); flex-shrink: 0; }
-  .bar-track { flex: 1; background: var(--gray-bg); border-radius: 3px; height: 13px; position: relative; overflow: hidden; }
+  .bar-row .bl { width: 140px; flex-shrink: 0; font-size: 10.5px; color: var(--ink-sub); }
+  .bar-track { flex: 1; background: var(--gray-bg); border-radius: 3px; height: 12px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 3px; }
-  .bar-row .bar-val { width: 90px; font-size: 10.5px; text-align: right; font-weight: 700; flex-shrink: 0; }
-  .legend-row { display: flex; gap: 16px; font-size: 10px; color: var(--ink-muted); margin-top: 4px; }
-  .legend-row span { display: inline-flex; align-items: center; gap: 5px; }
-  .legend-dot { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .bar-row .bv { width: 74px; text-align: right; font-size: 10.5px; font-weight: 700; flex-shrink: 0; }
 
-  .line-chart-wrap svg { width: 100%; height: auto; display: block; }
+  .spark-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .spark-box svg { width: 100%; height: auto; display: block; }
 
-  .risk-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
-  .risk-badge { flex-shrink: 0; width: 92px; text-align: center; font-size: 10.5px; font-weight: 800; padding: 6px 0; border-radius: 4px; color: #fff; }
-  .risk-badge.low { background: var(--blue); }
-  .risk-badge.mid { background: #A67A1E; }
-  .risk-badge.high { background: var(--red); }
-  .risk-desc { font-size: 12px; line-height: 1.6; padding-top: 4px; }
+  .flag-card { display: flex; gap: 10px; margin-bottom: 8px; }
+  .flag-tag { flex-shrink: 0; font-size: 10.5px; font-weight: 800; background: var(--red-bg); color: var(--red); padding: 4px 9px; border-radius: 999px; height: fit-content; }
+  .flag-body { font-size: 11.5px; padding-top: 2px; }
 
-  .flag-card { display: flex; gap: 10px; margin-bottom: 10px; }
-  .flag-tag { flex-shrink: 0; font-size: 11px; font-weight: 800; background: var(--red-bg); color: var(--red); padding: 5px 10px; border-radius: 999px; height: fit-content; }
-  .flag-body { font-size: 12px; }
-  .flag-body .flag-cnt { font-weight: 800; }
+  .quote-box { border-left: 3px solid var(--line); padding: 4px 0 4px 12px; margin-bottom: 7px; font-size: 11.5px; font-style: italic; color: var(--ink-sub); }
+  .quote-meta { font-size: 10px; color: var(--ink-muted); font-style: normal; margin-left: 6px; }
 
-  .quote-box { border-left: 3px solid var(--line); padding: 4px 0 4px 12px; margin-bottom: 8px; font-size: 12px; font-style: italic; color: var(--ink-sub); }
-  .quote-meta { font-size: 10.5px; color: var(--ink-muted); font-style: normal; margin-left: 6px; }
+  .plain-list { margin: 0 0 10px; padding-left: 20px; font-size: 11.5px; line-height: 1.8; }
+  .plain-list li { margin-bottom: 4px; }
 
-  .opt-recommend { display: inline-block; font-size: 10px; font-weight: 800; color: #fff; background: var(--blue); padding: 2px 7px; border-radius: 3px; margin-left: 6px; }
-  .tl-week { font-weight: 800; color: var(--blue); white-space: nowrap; }
+  .opt-card-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .opt-card { flex: 1; border: 1px solid var(--line-soft); border-radius: 8px; padding: 9px 10px; }
+  .opt-card .oc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .opt-card .oc-name { font-size: 11px; font-weight: 800; }
+  .opt-card .oc-prio { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 999px; }
+  .opt-card .oc-desc { font-size: 10.5px; color: var(--ink-sub); line-height: 1.5; }
 
-  .footer-note { margin-top: 34px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 9.5px; color: var(--ink-muted); display: flex; justify-content: space-between; }
+  .tl-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .tl-dot { width: 68px; flex-shrink: 0; text-align: center; font-size: 10.5px; font-weight: 800; color: #fff; background: var(--blue); border-radius: 999px; padding: 4px 0; }
+  .tl-text { font-size: 11.5px; line-height: 1.6; padding-top: 3px; }
 
-  [contenteditable="true"] { cursor: text; }
-  [contenteditable="true"]:hover { background: rgba(12, 68, 124, 0.04); }
-  [contenteditable="true"]:focus {
-    outline: 1px dashed rgba(12, 68, 124, 0.45);
-    outline-offset: 2px;
-    background: rgba(12, 68, 124, 0.06);
-  }
-  .bar-track, .bar-fill, .line-chart-wrap, .legend-dot, svg {
-    -webkit-user-select: none; user-select: none;
-  }
+  .cap { font-size: 10px; color: var(--ink-muted); margin: 4px 0 12px; }
+  .footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 9.5px; color: var(--ink-muted); display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
@@ -108,79 +87,127 @@
 
   <h1 class="doc-title">2026년 6월 VOC 분석보고서</h1>
 
-  <table class="doc-info-table">
-    <tr>
-      <td class="lbl">작성자</td><td class="val">진보은 주임</td>
-      <td class="lbl">작성일</td><td class="val" style="border-right:none">2026. 07. 03.</td>
-    </tr>
-    <tr>
-      <td class="lbl">분석 기간</td><td class="val">2026년 6월</td>
-      <td class="lbl">분석대상</td><td class="val" style="border-right:none">2026년 6월 접수 VOC (8,323건)</td>
-    </tr>
-  </table>
 
-  <!-- 1. 개요 -->
+  <!-- Ⅰ. 개요 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅰ.</span>개요</p>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_kpi"></div>
-    <p class="body">본 보고서는 2026년 6월 한 달간 PIX AI를 통해 접수된 VOC(Voice of Customer) 8,323건을 대상으로 유형별·채널별·부서별 현황을 분석하고, 전월 대비 유의미한 변화가 확인된 사안에 대해 개선 방안을 건의하기 위하여 작성됨.</p>
-    <p class="body">접수 건수와 언급 건수가 함께 증가한 것은 환자의 병원 이용 경험에 대한 표현이 전반적으로 늘었다는 의미이며, 이는 VOC 채널 접근성 개선의 결과로도 해석될 수 있음. 다만 건수 증가 자체보다 유형별 부정률의 방향성이 더 중요한 지표이므로, 이하 현황 및 분석 섹션에서 세부 내용을 다룸.</p>
+    <div class="kpi-strip">
+      <div class="kpi-box"><div class="kl">접수 VOC</div><div class="kv">8,323건</div><div class="kd">▲214건</div></div>
+      <div class="kpi-box"><div class="kl">언급 VOC</div><div class="kv">9,120건</div><div class="kd">▲340건</div></div>
+      <div class="kpi-box"><div class="kl">평균 태그 수</div><div class="kv">1.10개</div><div class="kd">▲0.02개</div></div>
+      <div class="kpi-box"><div class="kl">부서칭찬</div><div class="kv" style="color:var(--blue)">420건</div><div class="kd" style="color:var(--blue)">▲18건</div></div>
+      <div class="kpi-box"><div class="kl">직원칭찬</div><div class="kv" style="color:var(--blue)">820건</div><div class="kd" style="color:var(--blue)">▲32건</div></div>
+    </div>
+    <p class="body">6월 VOC는 8,323건 접수되어 전월 대비 214건 증가함. 유형 중 진료 및 치료·검사관련이 1.2%p 개선되어 가장 크게 좋아졌고, 시스템 및 서비스는 2.1%p 악화되어 가장 크게 나빠짐. 환자안전 관련 VOC도 12건으로 전월 대비 3건 늘어 별도 확인이 필요함.</p>
+    <p class="body">접수·언급 건수가 함께 늘어난 것은 환자의 병원 이용 경험에 대한 표현이 전반적으로 늘었다는 뜻이며, VOC 채널 접근성 개선의 결과로도 볼 수 있음. 다만 건수 자체보다 유형별 부정률의 방향성이 더 중요한 지표이므로 이하 현황·분석에서 세부 내용을 다룸.</p>
   </div>
 
-  <!-- 2. 현황 -->
+  <!-- Ⅱ. 현황 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅱ.</span>현황</p>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_type"></div>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_keywords"></div>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_channel"></div>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_trend"></div>
-    <p class="body">6월 접수된 VOC를 8종 유형으로 분류한 결과는 위 표와 같음. 하나의 VOC에 여러 유형이 동시에 태깅될 수 있어, 유형별 건수의 합은 전체 접수 건수보다 크게 나타남. 비중 기준으로는 진료 및 치료·검사관련이 29.0%로 가장 높은 비중을 차지하였고, 이어 인적응대관련(16.2%), 서비스제공관련(11.3%) 순으로 확인됨.</p>
-    <p class="body">전월대비 부정률 변화를 기준으로 보면, 8종 유형 중 6종에서 부정률이 개선되었으며 시스템 및 서비스, 환경관련 2종에서만 부정률이 악화됨. 개선된 유형이 다수를 차지한다는 점에서 전반적인 환자경험은 안정적으로 관리되고 있는 것으로 판단되나, 악화된 2종 유형은 Ⅲ. 분석 섹션에서 원인을 별도로 짚음.</p>
-    <p class="body">긍정 키워드는 "친절함"(320건)이 가장 많이 언급되어 인적응대 측면의 만족도가 높게 유지되고 있음을 보여줌. 반면 부정 키워드는 "비용 부담"(210건)과 "예약 절차 복잡"(180건)이 상위를 차지하여, 진료 외적인 절차·비용 안내 측면에서 개선 여지가 있는 것으로 확인됨.</p>
-    <p class="body">채널별로는 메디통 픽스 앱(38.1%)과 고객의견카드(23.9%)를 통한 접수가 전체의 과반을 차지하며, 두 채널을 합산하면 62.0%에 달함. 앱을 통한 접수 비중이 높다는 점은 환자의 디지털 채널 이용도가 높아지고 있음을 시사하며, 이는 시스템 및 서비스 유형의 부정률 악화(예약 절차, 앱 오류 관련)와 함께 검토할 필요가 있음.</p>
-    <p class="body">1월부터 6월까지 긍정·부정 언급 추이를 보면, 2월을 제외한 전 기간에서 긍정과 부정 건수가 비교적 유사한 수준을 유지하였음. 2월은 긍정 건수가 11,520건으로 급증하고 부정 건수는 2,880건으로 급감한 유일한 달로, 3월 이후 다시 평년 수준으로 회귀한 점으로 미루어 일시적 이벤트(예: 서비스 개선 캠페인, 시즌 요인 등)의 영향으로 추정됨. 6월은 부정 건수가 7,056건으로 5월(6,504건) 대비 다소 증가하였으나, 전체 추세상 관리 가능한 범위로 판단됨.</p>
+
+    <div class="chart-block">
+      <p class="chart-title">유형별 부정률 변화 (전월 대비)</p>
+      <div class="bar-row"><span class="bl">시스템 및 서비스</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▲2.1%p</span></div>
+      <div class="bar-row"><span class="bl">환경관련</span><div class="bar-track"><div class="bar-fill" style="width:48%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▲1.0%p</span></div>
+      <div class="bar-row"><span class="bl">비용관련</span><div class="bar-track"><div class="bar-fill" style="width:29%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▲0.6%p</span></div>
+      <div class="bar-row"><span class="bl">서비스제공관련</span><div class="bar-track"><div class="bar-fill" style="width:19%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▲0.4%p</span></div>
+      <div class="bar-row"><span class="bl">인적응대관련</span><div class="bar-track"><div class="bar-fill" style="width:43%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼0.9%p</span></div>
+      <div class="bar-row"><span class="bl">진료 및 치료·검사관련</span><div class="bar-track"><div class="bar-fill" style="width:57%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼1.2%p</span></div>
+      <div class="bar-row"><span class="bl">기타문의</span><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼0.2%p</span></div>
+    </div>
+    <p class="body">유형별로는 진료 및 치료·검사관련이 2,410건(비중 29.0%)으로 가장 큰 비중을 차지했으며 부정률은 1.2%p 개선됨. 인적응대관련은 1,350건(16.2%)으로 0.9%p 개선됐고, 서비스제공관련(940건, 11.3%)·시스템 및 서비스(780건, 9.4%)·환경관련(705건, 8.5%)·비용관련(612건, 7.4%)은 각각 0.4%p, 2.1%p, 1.0%p, 0.6%p 악화됨. 기타문의(286건, 3.4%)는 0.2%p 개선됐고, 미분류는 42건으로 전월 대비 3건 감소함.</p>
+
+    <div class="chart-block">
+      <p class="chart-title">채널별 접수 현황 (총 9,065건)</p>
+      <div class="bar-row"><span class="bl">메디통 픽스(앱)</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#378ADD"></div></div><span class="bv">3,450건</span></div>
+      <div class="bar-row"><span class="bl">고객의견카드</span><div class="bar-track"><div class="bar-fill" style="width:63%;background:#1baf7a"></div></div><span class="bv">2,166건</span></div>
+      <div class="bar-row"><span class="bl">직접 전화</span><div class="bar-track"><div class="bar-fill" style="width:37%;background:#e8a33d"></div></div><span class="bv">1,289건</span></div>
+      <div class="bar-row"><span class="bl">카카오톡·채널톡</span><div class="bar-track"><div class="bar-fill" style="width:29%;background:#e0559a"></div></div><span class="bv">988건</span></div>
+      <div class="bar-row"><span class="bl">홈페이지</span><div class="bar-track"><div class="bar-fill" style="width:18%;background:#8f7fe0"></div></div><span class="bv">626건</span></div>
+    </div>
+    <p class="body">채널별로는 메디통 픽스 앱(38.1%)과 고객의견카드(23.9%)를 통한 접수가 전체의 62.0%를 차지함. 앱 접수 비중이 높다는 점은 시스템 및 서비스 유형의 부정률 악화(예약 절차, 앱 오류 관련)와 함께 검토할 필요가 있음.</p>
+
+    <div class="chart-block">
+      <p class="chart-title">주요 언급 키워드 TOP5</p>
+      <div class="bar-row"><span class="bl" style="color:var(--blue)">친절함</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--blue)"></div></div><span class="bv">320건</span></div>
+      <div class="bar-row"><span class="bl" style="color:var(--blue)">세심함 · 시설 만족</span><div class="bar-track"><div class="bar-fill" style="width:66%;background:var(--blue)"></div></div><span class="bv">210건</span></div>
+      <div class="bar-row"><span class="bl" style="color:var(--red)">비용 부담</span><div class="bar-track"><div class="bar-fill" style="width:66%;background:var(--red)"></div></div><span class="bv">210건</span></div>
+      <div class="bar-row"><span class="bl" style="color:var(--red)">예약 절차 복잡</span><div class="bar-track"><div class="bar-fill" style="width:56%;background:var(--red)"></div></div><span class="bv">180건</span></div>
+      <div class="bar-row"><span class="bl" style="color:var(--red)">응대 지연</span><div class="bar-track"><div class="bar-fill" style="width:44%;background:var(--red)"></div></div><span class="bv">140건</span></div>
+    </div>
+    <p class="body">긍정 키워드는 친절함(320건)이 가장 많이 언급되어 인적응대 측면의 만족도가 높게 유지되고 있음을 보여줌. 부정 키워드는 비용 부담(210건)·예약 절차 복잡(180건)이 상위를 차지해, 진료 외적인 절차·비용 안내 측면에서 개선 여지가 있는 것으로 확인됨. 월별 추이(1~6월)를 보면 2월은 긍정 11,520건·부정 2,880건으로 급증·급감한 이례적인 달이며, 3월 이후 평년 수준으로 회귀함. 6월 부정 건수는 7,056건으로 5월(6,504건) 대비 다소 늘었으나 관리 가능한 범위로 판단됨.</p>
   </div>
 
-  <!-- 3. 분석 -->
+  <!-- Ⅲ. 분석 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅲ.</span>분석</p>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_group_ward"></div>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_group_dept"></div>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_group_doctor"></div>
-    <div class="rpt-stat-slot" data-rpt-seed="stat_type_trend"></div>
-    <p class="cap">※ 병동·진료과 표는 부정률 변화 ±1%p 미만 그룹을 노이즈로 간주하여 제외함(내과 중환자실 0.5%p, 내과 0.6%p 등). 의사 표는 진료과 전체 지표와 별개로 개별 변화폭이 큰 사례를 보여주기 위해 임계값과 무관하게 노출함. 부정률 변화는 전월 대비 긍정 비율 변화(%p)의 부호를 반전한 값임.</p>
 
-    <p class="body">현황 섹션에서 확인된 유형별 변화가 병원 내 어느 조직 단위에서 발생하고 있는지 파악하기 위해, 병동·진료과·의사 그룹별로 부정률 변화를 전월 대비 비교함. 변화폭이 ±1%p 미만인 그룹은 통계적으로 유의미하지 않은 노이즈로 간주하여 위 표에서는 제외하였으며, 이를 통해 실제 대응이 필요한 그룹만 선별하여 제시함.</p>
-    <p class="body">분석 결과, 정형외과 및 정형외과 원장의 개선폭이 가장 크게 나타나 우수 사례로 참고할 만하며, 7병동·재활의학과·내과 김의사는 부정률이 악화되어 별도 확인이 필요함.</p>
-    <p class="body">특히 내과의 경우 진료과 전체 부정률 변화는 0.6%p로 노이즈 기준에 미달하여 표에서 제외되었으나, 내과 소속 김의사 개인의 부정률은 2.8%p 악화되어 유의미한 수준으로 확인됨. 이는 진료과 단위 지표만으로는 드러나지 않는 개별 이슈가 존재할 수 있음을 시사하며, 그룹 단위와 개인 단위 지표를 함께 확인하는 것이 중요함을 보여주는 사례임.</p>
-    <p class="body">부정률이 오른 두 유형은 최근 3개 시점 모두 연속 상승 중이며, 특히 이번 달 상승폭이 가장 컸음. 단월 수치만으로는 악화 여부만 확인되나, 추이를 확인하면 확산 속도와 시작 시점을 파악할 수 있음.</p>
-    <p class="body">키워드 흐름과 대조 시, 시스템 및 서비스 부정률 상승은 <b>"예약 절차 복잡"(180건)</b> 및 <b>"앱 오류"(130건)</b> 키워드 증가와 연관된 것으로 판단됨. 2월은 유일하게 부정 건수 급감(2,880건) 및 긍정 급증(11,520건)이 발생한 이례적 시점으로, 해당 전후 응대 매뉴얼 등 원인이 될 만한 변경사항 확인이 필요함.</p>
+    <div class="chart-block">
+      <p class="chart-title">병동 · 진료과 · 의사별 부정률 변화 (전월 대비, ±1%p 이상만 표시)</p>
+      <div class="bar-row"><span class="bl">12병동</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼3.1%p</span></div>
+      <div class="bar-row"><span class="bl">정형외과 원장</span><div class="bar-track"><div class="bar-fill" style="width:81%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼4.2%p</span></div>
+      <div class="bar-row"><span class="bl">외과 (진료과)</span><div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼2.1%p</span></div>
+      <div class="bar-row"><span class="bl">3병동</span><div class="bar-track"><div class="bar-fill" style="width:65%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼2.0%p</span></div>
+      <div class="bar-row"><span class="bl">신경외과 (진료과)</span><div class="bar-track"><div class="bar-fill" style="width:48%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼1.5%p</span></div>
+      <div class="bar-row"><span class="bl">5병동</span><div class="bar-track"><div class="bar-fill" style="width:35%;background:var(--blue)"></div></div><span class="bv" style="color:var(--blue)">▼1.1%p</span></div>
+      <div class="bar-row"><span class="bl">7병동</span><div class="bar-track"><div class="bar-fill" style="width:39%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▲1.2%p</span></div>
+      <div class="bar-row"><span class="bl">재활의학과 (진료과)</span><div class="bar-track"><div class="bar-fill" style="width:35%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▲1.1%p</span></div>
+      <div class="bar-row"><span class="bl">내과 김의사</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--red)"></div></div><span class="bv" style="color:var(--red)">▲2.8%p</span></div>
+    </div>
+    <p class="body">정형외과 및 정형외과 원장의 개선폭이 가장 크고, 12병동·3병동·5병동은 부정률이 개선됨. 반면 7병동(▲1.2%p)·재활의학과(▲1.1%p)는 악화됐으며, 내과 진료과 전체는 변화 0.6%p로 노이즈 기준 미달이나 소속 내과 김의사 개인은 2.8%p 악화되어 유의미한 수준으로 확인됨. 이는 진료과 단위 지표만으로는 드러나지 않는 개별 이슈가 존재할 수 있음을 보여줌.</p>
+
+    <div class="spark-wrap">
+      <div class="spark-box">
+        <p class="chart-title">시스템 및 서비스 (언급 건수, 최근 3개월)</p>
+        <svg viewBox="0 0 300 70"><polyline points="20,50 150,40 280,15" fill="none" stroke="#791F1F" stroke-width="2.2"/><circle cx="20" cy="50" r="3.2" fill="#791F1F"/><circle cx="150" cy="40" r="3.2" fill="#791F1F"/><circle cx="280" cy="15" r="3.2" fill="#791F1F"/><text x="20" y="64" font-size="9" text-anchor="middle" fill="#898781">720</text><text x="150" y="64" font-size="9" text-anchor="middle" fill="#898781">745</text><text x="280" y="64" font-size="9" text-anchor="middle" fill="#898781">780</text></svg>
+      </div>
+      <div class="spark-box">
+        <p class="chart-title">환경관련 (언급 건수, 최근 3개월)</p>
+        <svg viewBox="0 0 300 70"><polyline points="20,52 150,42 280,28" fill="none" stroke="#791F1F" stroke-width="2.2"/><circle cx="20" cy="52" r="3.2" fill="#791F1F"/><circle cx="150" cy="42" r="3.2" fill="#791F1F"/><circle cx="280" cy="28" r="3.2" fill="#791F1F"/><text x="20" y="66" font-size="9" text-anchor="middle" fill="#898781">680</text><text x="150" y="66" font-size="9" text-anchor="middle" fill="#898781">690</text><text x="280" y="66" font-size="9" text-anchor="middle" fill="#898781">705</text></svg>
+      </div>
+    </div>
+    <p class="body">부정률이 오른 두 유형은 최근 3개 시점 모두 연속 상승 중이며, 이번 달 상승폭이 가장 컸음. 시스템 및 서비스 상승은 "예약 절차 복잡"(180건)·"앱 오류"(130건) 키워드 증가와 연관된 것으로 판단됨. 1~2개월 변동은 트렌드로 보지 않으나, 3개월 이상 연속이므로 추세로 판단해 원인 점검이 필요함.</p>
   </div>
 
-  <!-- 4. 이슈 및 평가 -->
+  <!-- Ⅳ. 주요 이슈 및 평가 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅳ.</span>주요 이슈 및 평가</p>
-    <div class="rpt-stat-slot" data-rpt-seed="ai_flags"></div>
-    <div class="rpt-stat-slot" data-rpt-seed="ai_quotes"></div>
 
-    <p class="body">본 섹션은 건수 증감과 무관하게 환자 안전과 직결되는 항목을 매월 고정적으로 점검하기 위한 목적으로 작성됨. AI가 VOC 자유 텍스트에서 자동으로 감지한 결과를 바탕으로, 별도의 태깅 없이도 위험 신호를 조기에 포착할 수 있도록 정리함.</p>
-    <p class="body">리스크 진단 결과, 현재는 7병동·재활의학과 등 일부 그룹에 한정된 부정률 악화이며 전체 8종 유형 중 6종은 개선 추세로 경미한 수준임. 다만 시스템 및 서비스(2.1%p↑), 환경관련(1.0%p↑) 유형 부정률 상승이 지속될 경우 다른 병동·진료과로 확산될 가능성이 있어 주의가 필요함. 환자안전 플래그가 3건 증가한 만큼, 방치 시 환자경험평가 환자안전 관련 문항 점수 및 수가 가감산에 부정적 영향을 줄 수 있어 중대한 리스크로 평가됨.</p>
-    <p class="body">종합하면, 전체 유형 대부분이 개선 추세를 유지하고 있어 즉각적인 위기 상황으로 보기는 어려우나, 환자안전 플래그 증가와 시스템·환경관련 부정률 악화는 서로 독립적인 사안인 만큼 각각에 대한 개별 대응이 필요함. 두 사안 모두 다음 Ⅴ. 종합 의견 및 건의 섹션에서 구체적인 실행 방안으로 연결함.</p>
+    <div class="flag-card"><span class="flag-tag">환자안전</span><div class="flag-body">12건 (전월 대비 3건 증가) — AI가 자유 텍스트에서 감지한 플래그임.</div></div>
+    <div class="flag-card"><span class="flag-tag" style="background:#EEEDFE;color:#4A3F9E">감염관리</span><div class="flag-body">5건 (전월 대비 1건 감소)</div></div>
+
+    <div class="quote-box">"환자가 침대에서 낙상할 뻔했습니다. 안전바가 없었어요." <span class="quote-meta">3병동 · 환자안전</span></div>
+    <div class="quote-box">"손 소독제가 비치되어 있지 않았습니다." <span class="quote-meta">7병동 · 감염관리</span></div>
+    <div class="quote-box">"회진 설명이 친절했습니다." <span class="quote-meta">내과 · 직원칭찬(김의사)</span></div>
+
+    <ul class="plain-list">
+      <li><b style="color:var(--blue)">관찰 유지</b> — 7병동·재활의학과 등 일부 그룹에 한정된 부정률 악화이며, 전체 8종 유형 중 6종은 개선 추세임.</li>
+      <li><b style="color:var(--amber)">집중 관리</b> — 시스템 및 서비스(2.1%p↑)·환경관련(1.0%p↑) 유형 부정률 상승이 지속되면 다른 병동·진료과로 확산될 가능성이 있음.</li>
+      <li><b style="color:var(--red)">즉시 개입</b> — 환자안전 플래그가 3건 증가한 만큼, 방치 시 환자경험평가 환자안전 관련 문항 점수 및 수가 가감산에 부정적 영향을 줄 수 있음.</li>
+    </ul>
   </div>
 
-  <!-- 5. 결론 및 제언 -->
+  <!-- Ⅴ. 종합 의견 및 건의 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅴ.</span>종합 의견 및 건의</p>
-    <div class="rpt-stat-slot" data-rpt-seed="ai_plan"></div>
-    <p class="body">Ⅳ. 주요 이슈 및 평가에서 확인된 사안별 대응 방안은 다음과 같음. 건의안은 이슈 개수와 동일하게 3건으로 구성하였으며, 환자안전 관련 사안을 최우선 순위로 배정함. 첫째, 환자안전 플래그 12건 전수 검토 및 재발방지 대책 수립(추진 기한 1주 이내, 우선순위 상). 둘째, 시스템 및 서비스 · 환경관련 유형 원인 점검(관련 부서 합동)(추진 기한 2주 이내, 우선순위 중). 셋째, 7병동 · 재활의학과 대상 부정률 악화 원인 모니터링 강화(추진 기한 2~3주 이내, 우선순위 중).</p>
-    <p class="body">환자안전과 직결된 <b>안 1(전수 검토 및 재발방지 대책 수립)</b>은 최우선 과제로 추진할 것을 건의함. 안 2·안 3은 안 1 시행 이후 순차적으로 진행하되, 필요 시 병행 추진도 가능할 것으로 판단됨.</p>
+    <ul class="plain-list">
+      <li><b>안 1</b> (<span style="color:var(--red)">높음 · 건의</span>) — 환자안전 플래그 12건 전수 검토 및 재발방지 대책 수립 · 1주 내</li>
+      <li><b>안 2</b> (<span style="color:var(--amber)">중간</span>) — 시스템 및 서비스 · 환경관련 유형 원인 점검(관련 부서 합동) · 2주</li>
+      <li><b>안 3</b> (<span style="color:var(--amber)">중간</span>) — 7병동 · 재활의학과 대상 부정률 악화 원인 모니터링 강화 · 2~3주</li>
+    </ul>
+    <p class="body">환자안전과 직결된 안 1의 최우선 추진을 건의드리며, 안 2·안 3은 안 1 시행 이후 순차 진행하되 필요 시 병행도 가능함. 최종 시행 여부는 경영진 판단에 따름.</p>
   </div>
 
-  <!-- 6. 모니터링 계획 -->
+  <!-- Ⅵ. 향후 계획 -->
   <div class="sec">
     <p class="sec-title"><span class="num">Ⅵ.</span>향후 계획</p>
-    <p class="body">Ⅴ. 종합 의견 및 건의에서 제시한 건의안의 이행 여부를 확인하기 위한 점검 일정은 다음과 같음. 7월 1주차에는 환자안전 플래그 12건 재발방지 조치 이행 여부를, 7월 2주차에는 시스템·환경관련 유형 부정률 재점검을, 7월 말에는 7병동 · 재활의학과 부정률 재평가를 실시함.</p>
-    <p class="body" style="margin-top:16px;margin-bottom:0">붙임 1. VOC 접수 목록 원본 데이터 1부.<br>붙임 2. 카테고리별 키워드 상세 목록 1부.&nbsp;&nbsp;끝.</p>
+    <ul class="plain-list">
+      <li><b>7월 1주차</b> — 환자안전 플래그 12건 재발방지 조치 이행 여부를 확인함.</li>
+      <li><b>7월 2주차</b> — 시스템·환경관련 유형 부정률을 재점검함.</li>
+      <li><b>7월 말</b> — 7병동·재활의학과 부정률을 재평가하여 차기 임원 보고에 반영함.</li>
+    </ul>
+    <p class="body" style="margin-top:14px;margin-bottom:0">붙임 1. VOC 접수 목록 원본 데이터 1부.<br>붙임 2. 카테고리별 키워드 상세 목록 1부.&nbsp;&nbsp;끝.</p>
   </div>
 
   <div class="footer-note">
@@ -199,15 +226,16 @@
     if (!root) return;
     var selector = [
       ".doc-title", ".doc-info-table td",
-      ".sec-title", "p", "ul.plain li", ".headline",
-      ".kpi-label", ".kpi-val", ".kpi-delta",
-      "table.report-table th", "table.report-table td",
-      ".cap", ".chart-title", ".bar-name", ".bar-val",
-      ".risk-badge", ".risk-desc", ".flag-tag", ".flag-body",
-      ".quote-box", ".quote-meta", ".footer-note span"
+      ".sec-title", ".sub-title", "p", "li", ".headline",
+      ".kl", ".kv", ".kd",
+      ".cap", ".chart-title", ".bl", ".bv",
+      ".gl", ".gv",
+      ".flag-tag", ".flag-body", ".quote-box", ".quote-meta",
+      ".oc-name", ".oc-desc", ".oc-prio", ".tl-dot", ".tl-text",
+      ".footer-note span"
     ].join(",");
     Array.prototype.forEach.call(root.querySelectorAll(selector), function (el) {
-      if (el.closest(".line-chart-wrap") || el.closest("svg") || el.closest(".bar-track")) return;
+      if (el.closest(".spark-wrap") || el.closest("svg") || el.closest(".bar-track") || el.closest(".quart-track")) return;
       if (el.closest(".rpt-block-toolbar") || el.closest(".rpt-sec-add-row")) return;
       if (el.getAttribute("contenteditable") === "true") return;
       el.setAttribute("contenteditable", "true");

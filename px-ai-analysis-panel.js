@@ -103,6 +103,17 @@
     ".px-ai-editable-block:focus{border-color:#8b5cf6;background:#1c1a24;}",
     ".px-ai-quote-pos{border-left:2px solid #4ade80;padding:6px 0 6px 10px;font-size:11.5px;color:#cfcdda;margin-bottom:4px;}",
     ".px-ai-quote-neg{border-left:2px solid #f87171;padding:6px 0 6px 10px;font-size:11.5px;color:#cfcdda;margin-bottom:4px;}",
+    ".px-ai-voc-quotes-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}",
+    ".px-ai-voc-quotes-col-hd{font-size:11px;font-weight:700;margin:0 0 8px;}",
+    ".px-ai-voc-quotes-col-hd.pos{color:#7ea6ff;}",
+    ".px-ai-voc-quotes-col-hd.neg{color:#f2949c;}",
+    ".px-ai-voc-quotes-scroll{max-height:360px;overflow:auto;padding-right:4px;}",
+    ".px-ai-voc-quote-item{border:1px solid #2d2c36;border-radius:8px;padding:10px 12px;background:#17161d;margin-bottom:8px;}",
+    ".px-ai-voc-quote-item:last-child{margin-bottom:0;}",
+    ".px-ai-voc-quote-item.pos{border-left:3px solid #7ea6ff;}",
+    ".px-ai-voc-quote-item.neg{border-left:3px solid #f2949c;}",
+    ".px-ai-voc-quote-text{font-size:12px;line-height:1.65;color:#e7e6ee;margin:0;}",
+    ".px-ai-voc-quote-meta{font-size:10px;color:#7a7887;margin:6px 0 0;line-height:1.45;}",
     ".px-ai-type-bar-row{margin-bottom:8px;}",
     ".px-ai-type-bar-meta{display:flex;justify-content:space-between;font-size:11px;color:#cfcdda;margin-bottom:3px;}",
     ".px-ai-type-bar-track{display:flex;height:6px;border-radius:3px;overflow:hidden;}",
@@ -190,7 +201,14 @@
     ".px-ai-mon-item:last-child{border-bottom:none;}",
     ".px-ai-mon-name{font-size:13px;font-weight:700;color:#f8fafc;margin-bottom:6px;}",
     ".px-ai-mon-line{font-size:12px;color:var(--text-secondary);line-height:1.55;}",
-        ".px-ai-mon-line.dim{color:var(--text-muted);}",
+    ".px-ai-mon-line.dim{color:var(--text-muted);}",
+    ".px-ai-mon-stats{font-size:12px;color:var(--text-secondary);line-height:1.55;margin-bottom:4px;}",
+    ".px-ai-mon-reason{font-size:12px;color:var(--text-muted);line-height:1.55;}",
+    ".px-ai-mon-quotes{margin-top:10px;padding-top:8px;border-top:1px dashed rgba(148,163,184,0.18);}",
+    ".px-ai-mon-quotes-hd{font-size:10px;font-weight:700;color:#7a7887;margin:0 0 6px;}",
+    ".px-ai-mon-quotes .px-ai-voc-quote-item{padding:8px 10px;margin-bottom:6px;}",
+    ".px-ai-mon-quotes .px-ai-voc-quote-item:last-child{margin-bottom:0;}",
+    ".px-ai-mon-quotes .px-ai-voc-quote-text{font-size:11px;}",
     ".px-ai-catkw{display:grid;grid-template-columns:1fr 1fr;gap:0;}",
     ".px-ai-catkw-col{padding:0 14px;min-width:0;}",
     ".px-ai-catkw-col:first-child{padding-left:0;border-right:0.5px solid rgba(148,163,184,0.12);}",
@@ -247,6 +265,32 @@
     ".px-ai-voc-ia-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;}",
     ".px-ai-voc-ia-name{font-size:12px;font-weight:700;color:#fff;}",
     ".px-ai-voc-ia-desc{font-size:11px;color:#a9a7b6;margin:0;line-height:1.6;}",
+    ".px-ai-ia-matrix{border:1px solid #2d2c36;border-radius:12px;padding:14px 14px 12px;background:#12151c;}",
+    ".px-ai-ia-matrix-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;}",
+    ".px-ai-ia-matrix-title{font-size:13px;font-weight:800;color:#fff;line-height:1.35;}",
+    ".px-ai-ia-matrix-desc{font-size:10px;color:#7a7887;margin-top:4px;line-height:1.5;}",
+    ".px-ai-ia-matrix-meta{font-size:10px;color:#7a7887;white-space:nowrap;flex-shrink:0;padding-top:2px;}",
+    ".px-ai-ia-matrix-cols{display:grid;grid-template-columns:46px 1fr 1fr;gap:8px;margin-bottom:8px;}",
+    ".px-ai-ia-matrix-col-hd{text-align:center;font-size:11px;font-weight:800;border-radius:8px;padding:7px 8px;line-height:1.2;}",
+    ".px-ai-ia-matrix-col-hd.pos{background:rgba(126,166,255,.12);color:#7ea6ff;border:1px solid rgba(126,166,255,.22);}",
+    ".px-ai-ia-matrix-col-hd.neg{background:rgba(242,148,156,.1);color:#f2949c;border:1px solid rgba(242,148,156,.22);}",
+    ".px-ai-ia-matrix-row{display:grid;grid-template-columns:46px 1fr 1fr;gap:8px;align-items:stretch;margin-bottom:8px;}",
+    ".px-ai-ia-matrix-row:last-child{margin-bottom:0;}",
+    ".px-ai-ia-matrix-row-label{display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:10px;font-weight:800;line-height:1.25;text-align:center;padding:6px 4px;min-height:100%;}",
+    ".px-ai-ia-matrix-row-label.h{background:#3d375e;color:#c7b8ff;}",
+    ".px-ai-ia-matrix-row-label.m{background:#3a341a;color:#e8c46a;}",
+    ".px-ai-ia-matrix-row-label.l{background:#2a2d34;color:#9b99a8;}",
+    ".px-ai-ia-matrix-cell{display:flex;flex-direction:column;gap:6px;min-height:100%;}",
+    ".px-ai-ia-matrix-chip{display:block;width:100%;border:1px solid #2d2c36;border-radius:8px;background:#17161d;padding:9px 10px;text-align:left;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s;}",
+    ".px-ai-ia-matrix-chip:hover{border-color:#4a4560;background:#1c1a24;}",
+    ".px-ai-ia-matrix-chip:focus{outline:2px solid rgba(126,166,255,.35);outline-offset:1px;}",
+    ".px-ai-ia-matrix-chip-issue{display:block;font-size:11px;font-weight:800;color:#fff;line-height:1.45;margin-bottom:4px;}",
+    ".px-ai-ia-matrix-chip-act{display:block;font-size:10px;font-weight:700;line-height:1.45;}",
+    ".px-ai-ia-matrix-chip.pos .px-ai-ia-matrix-chip-act{color:#7ea6ff;}",
+    ".px-ai-ia-matrix-chip.neg .px-ai-ia-matrix-chip-act{color:#f2949c;}",
+    ".px-ai-ia-matrix-empty{font-size:10px;color:#5f5e66;padding:10px 8px;border:1px dashed #2d2c36;border-radius:8px;background:rgba(23,22,29,.55);text-align:center;line-height:1.45;}",
+    ".px-ai-ia-matrix-foot{margin-top:12px;padding-top:10px;border-top:1px dashed #2d2c36;font-size:9.5px;color:#7a7887;line-height:1.55;}",
+    ".px-ai-ia-matrix-monitor{margin-top:14px;padding-top:12px;border-top:1px dashed #2d2c36;}",
     ".px-ai-vbadge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;}",
     ".px-ai-vbadge-high{background:#3a1f24;color:#f2a6ad;}",
     ".px-ai-vbadge-mid{background:#3a341a;color:#e8c46a;}",
@@ -258,6 +302,8 @@
     ".px-ai-root.px-ai-voc .px-ai-mon-name{font-size:12px;color:#fff;}",
     ".px-ai-root.px-ai-voc .px-ai-mon-line{font-size:11px;color:#a9a7b6;}",
     ".px-ai-root.px-ai-voc .px-ai-mon-line.dim{font-size:10px;color:#7a7887;}",
+    ".px-ai-root.px-ai-voc .px-ai-mon-stats{font-size:11px;color:#a9a7b6;}",
+    ".px-ai-root.px-ai-voc .px-ai-mon-reason{font-size:10px;color:#7a7887;}",
     ".px-ai-root.px-ai-voc .px-ai-mon-item{border-top:1px solid #2d2c36;padding:8px 0;}",
     ".px-ai-root.px-ai-voc .px-ai-body-stack{gap:0;padding-top:0;}",
     ".px-ai-matrix-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}",
@@ -281,6 +327,110 @@
     ".px-ai-area-bar-meta{display:flex;justify-content:space-between;font-size:11px;color:#cfcdda;margin-bottom:3px;}",
     ".px-ai-area-bar-track{height:6px;border-radius:3px;background:#2d2c36;overflow:hidden;}",
     ".px-ai-area-bar-fill{height:100%;}",
+    ".px-ai-survey-grade-strip{display:grid;grid-template-columns:0.82fr 0.82fr 1.38fr 0.82fr 0.82fr;gap:6px;margin:8px 0 10px;align-items:stretch;}",
+    ".px-ai-survey-grade-box{border:1px solid #2d2c36;border-radius:10px;padding:8px 4px;text-align:center;background:#17161d;min-height:52px;display:flex;flex-direction:column;justify-content:center;}",
+    ".px-ai-survey-grade-box.on{border:1.5px solid #f2949c;background:#3a1f24;min-height:64px;padding:10px 6px;}",
+    ".px-ai-survey-grade-lbl{font-size:9.5px;font-weight:800;color:#7a7887;}",
+    ".px-ai-survey-grade-box.on .px-ai-survey-grade-lbl{color:#f2949c;font-size:10.5px;}",
+    ".px-ai-survey-grade-range{font-size:10px;font-weight:800;color:#cfcdda;margin-top:3px;}",
+    ".px-ai-survey-grade-box.on .px-ai-survey-grade-range{color:#f2949c;font-size:11px;font-weight:800;margin-top:4px;}",
+    ".px-ai-survey-upper-grade{border:1px solid rgba(126,166,255,.42);background:rgba(126,166,255,.07);border-radius:10px;padding:8px 10px;margin-bottom:8px;}",
+    ".px-ai-survey-upper-grade-title{font-size:10px;font-weight:700;color:#7ea6ff;margin-bottom:8px;}",
+    ".px-ai-survey-upper-grade-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}",
+    ".px-ai-survey-upper-grade-item{background:rgba(23,22,29,.55);border:1px solid rgba(126,166,255,.22);border-radius:8px;padding:8px 9px;}",
+    ".px-ai-survey-upper-grade-item-k{font-size:10px;font-weight:800;color:#a9a7b6;margin-bottom:3px;}",
+    ".px-ai-survey-upper-grade-item-v{font-size:17px;font-weight:800;color:#7ea6ff;line-height:1.1;letter-spacing:-0.02em;}",
+    ".px-ai-survey-upper-grade-item-v .unit{font-size:11px;font-weight:800;margin-left:1px;}",
+    ".px-ai-survey-upper-grade-item-d{font-size:9px;font-weight:700;color:#7a7887;margin-top:4px;line-height:1.35;}",
+    ".px-ai-survey-upper-grade-track-wrap{margin-top:8px;padding-bottom:14px;}",
+    ".px-ai-survey-next-grade-track{position:relative;height:5px;border-radius:999px;background:#2d2c36;overflow:visible;}",
+    ".px-ai-survey-next-grade-fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,rgba(242,148,156,.55),rgba(126,166,255,.45));}",
+    ".px-ai-survey-next-grade-thumb{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:#f2949c;border:2px solid #17161d;transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(242,148,156,.35);}",
+    ".px-ai-survey-next-grade-labels{display:flex;justify-content:space-between;font-size:9px;font-weight:800;margin-top:5px;}",
+    ".px-ai-survey-next-grade-labels .cur{color:#f2949c;}",
+    ".px-ai-survey-next-grade-labels .tgt{color:#7ea6ff;}",
+    ".px-ai-survey-demotion-warn{border:1px solid rgba(242,148,156,.45);background:rgba(58,31,36,.55);border-radius:8px;padding:7px 10px;font-size:10px;font-weight:700;color:#e8b4b8;line-height:1.45;margin-bottom:10px;}",
+    ".px-ai-survey-demotion-warn .hot{color:#f2949c;font-weight:800;}",
+    ".px-ai-grade-sum{font-size:11px;color:#a9a7b6;line-height:1.65;margin-top:8px;}",
+    ".px-ai-grade-sum .hl{color:#f2949c;font-weight:800;}",
+    ".px-ai-survey-footnote{font-size:9.5px;color:#7a7887;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px dashed #2d2c36;}",
+    ".px-ai-survey-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 10px;}",
+    ".px-ai-survey-mini-card{background:#17161d;border:1px solid #2d2c36;border-radius:10px;padding:12px 11px;}",
+    ".px-ai-survey-mini-k{font-size:10.5px;font-weight:700;color:#a9a7b6;margin-bottom:6px;}",
+    ".px-ai-survey-mini-v{font-size:18px;font-weight:800;color:#fff;line-height:1.2;letter-spacing:-0.02em;}",
+    ".px-ai-survey-mini-v .is-accent{color:#7ea6ff;}",
+    ".px-ai-survey-mini-v.is-accent{color:#7ea6ff;}",
+    ".px-ai-survey-mini-d{font-size:10px;font-weight:700;margin-top:5px;color:#7a7887;}",
+    ".px-ai-survey-bed-row{display:flex;gap:6px;margin-bottom:10px;}",
+    ".px-ai-survey-bed-chip{flex:1;text-align:center;border:1px solid #2d2c36;border-radius:8px;padding:7px 3px;background:#17161d;}",
+    ".px-ai-survey-bed-chip.on{border:1.5px solid #f2949c;background:#3a1f24;}",
+    ".px-ai-survey-bed-chip-lbl{font-size:9.5px;color:#7a7887;}",
+    ".px-ai-survey-bed-chip.on .px-ai-survey-bed-chip-lbl{color:#f2949c;font-weight:700;}",
+    ".px-ai-survey-bed-chip-v{font-size:11px;font-weight:800;color:#fff;margin-top:3px;}",
+    ".px-ai-survey-bed-chip.on .px-ai-survey-bed-chip-v{color:#f2949c;}",
+    ".px-ai-survey-bed-chip-n{font-size:8.5px;color:#7a7887;margin-top:1px;}",
+    ".px-ai-survey-gap-tbl{width:100%;border-collapse:collapse;font-size:10.5px;}",
+    ".px-ai-survey-gap-tbl th,.px-ai-survey-gap-tbl td{padding:6px 3px;border-bottom:1px solid #1c2338;}",
+    ".px-ai-survey-gap-tbl th{text-align:right;color:#7a7887;font-weight:800;}",
+    ".px-ai-survey-gap-tbl th:first-child,.px-ai-survey-gap-tbl td:first-child{text-align:left;}",
+    ".px-ai-survey-gap-tbl td{color:#cfcdda;}",
+    ".px-ai-survey-priority-card{background:#17161d;border:1px solid #2d2c36;border-radius:10px;padding:10px;margin-bottom:8px;}",
+    ".px-ai-survey-priority-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}",
+    ".px-ai-survey-priority-title{font-size:12px;font-weight:800;color:#fff;}",
+    ".px-ai-survey-rank-row{display:flex;align-items:center;gap:8px;font-size:11.5px;margin-bottom:4px;}",
+    ".px-ai-survey-rank-lbl{flex:1;color:#a9a7b6;font-weight:700;}",
+    ".px-ai-survey-rank-val{font-weight:800;color:#fff;}",
+    ".px-ai-survey-rank-val.hot{color:#f2949c;}",
+    ".px-ai-survey-quartile-wrap{margin-top:12px;padding-top:10px;border-top:1px dashed #2d2c36;}",
+    ".px-ai-grade-pos-card{background:#17161d;border:1px solid #2d2c36;border-radius:12px;padding:12px;margin-top:10px;}",
+    ".px-ai-grade-pos-card-hd{font-size:11px;font-weight:800;color:#a9a7b6;margin-bottom:10px;}",
+    ".px-ai-grade-pos-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;align-items:stretch;}",
+    ".px-ai-grade-pos-block{border-radius:10px;padding:10px 11px;border:1px solid #2d2c36;background:#201f27;min-width:0;height:100%;}",
+    ".px-ai-grade-pos-block.is-primary{border-color:rgba(242,148,156,.45);background:rgba(58,31,36,.35);}",
+    ".px-ai-grade-pos-block.is-secondary{border-color:rgba(126,166,255,.35);background:rgba(30,36,58,.45);}",
+    ".px-ai-grade-pos-tag{display:inline-block;font-size:9px;font-weight:800;color:#7a7887;background:#2a2933;border-radius:999px;padding:2px 7px;margin-bottom:6px;letter-spacing:.02em;}",
+    ".px-ai-grade-pos-block.is-primary .px-ai-grade-pos-tag{color:#f2949c;background:rgba(242,148,156,.15);}",
+    ".px-ai-grade-pos-block.is-secondary .px-ai-grade-pos-tag{color:#7ea6ff;background:rgba(126,166,255,.12);}",
+    ".px-ai-grade-pos-headline{font-size:14px;font-weight:800;color:#fff;line-height:1.35;letter-spacing:-0.02em;}",
+    ".px-ai-grade-pos-block.is-primary .px-ai-grade-pos-headline{color:#ffd0d4;}",
+    ".px-ai-grade-pos-sub{font-size:10.5px;font-weight:700;color:#a9a7b6;margin-top:4px;line-height:1.45;}",
+    ".px-ai-grade-pos-dir{font-size:10px;font-weight:700;color:#9b99a8;margin-top:5px;line-height:1.45;padding-top:5px;border-top:1px dashed rgba(242,148,156,.25);}",
+    ".px-ai-quartile-bar-wrap{position:relative;padding-top:42px;padding-bottom:4px;}",
+    ".px-ai-survey-quartile-bar{position:relative;height:28px;border-radius:8px;overflow:visible;display:flex;margin-top:0;border:1px solid rgba(45,44,54,.9);}",
+    ".px-ai-survey-quartile-seg{flex:1;border-radius:0;position:relative;min-width:0;}",
+    ".px-ai-survey-quartile-seg:first-child{border-radius:7px 0 0 7px;}",
+    ".px-ai-survey-quartile-seg:last-child{border-radius:0 7px 7px 0;}",
+    ".px-ai-survey-quartile-marker{position:absolute;top:-4px;bottom:-4px;width:3px;background:#f2949c;z-index:3;box-shadow:0 0 8px rgba(242,148,156,.55);}",
+    ".px-ai-survey-quartile-marker-dot{position:absolute;top:50%;left:50%;width:12px;height:12px;border-radius:50%;background:#f2949c;border:2px solid #17161d;transform:translate(-50%,-50%);z-index:4;box-shadow:0 0 0 2px rgba(242,148,156,.35);}",
+    ".px-ai-survey-quartile-marker-lbl{position:absolute;top:-38px;font-size:10px;font-weight:800;color:#f2949c;white-space:nowrap;line-height:1.3;z-index:5;background:rgba(58,31,36,.92);border:1px solid rgba(242,148,156,.45);border-radius:6px;padding:3px 6px;}",
+    ".px-ai-survey-quartile-marker-lbl.is-edge-left{transform:none;text-align:left;}",
+    ".px-ai-survey-quartile-marker-lbl.is-edge-right{transform:none;text-align:right;}",
+    ".px-ai-survey-quartile-marker-lbl.is-center{transform:translateX(-50%);}",
+    ".px-ai-survey-quartile-marker-lbl .sub{display:block;font-size:8.5px;font-weight:700;color:#e8b4b8;margin-top:1px;text-align:center;}",
+    ".px-ai-survey-quartile-ticks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:10px;}",
+    ".px-ai-survey-quartile-tick{text-align:center;font-size:9px;line-height:1.35;min-width:0;padding:0 1px;}",
+    ".px-ai-survey-quartile-tick .lbl{display:block;font-weight:800;color:#cfcdda;word-break:keep-all;overflow-wrap:break-word;}",
+    ".px-ai-survey-quartile-tick .score{display:block;font-weight:800;color:#f2949c;margin-top:2px;font-size:9.5px;}",
+    ".px-ai-survey-quartile-tick .stat{display:block;font-weight:700;color:#7a7887;margin-top:1px;font-size:8px;}",
+    ".px-ai-grade-current-only{margin-top:12px;}",
+    ".px-ai-grade-metric.is-single{width:100%;}",
+    ".px-ai-grade-metric{background:#201f27;border:1px solid #2d2c36;border-radius:10px;padding:9px 10px;min-width:0;}",
+    ".px-ai-grade-metric.is-status{border-color:rgba(242,148,156,.38);background:rgba(58,31,36,.28);}",
+    ".px-ai-grade-metric.is-goal{border-color:#2d2c36;background:#201f27;}",
+    ".px-ai-grade-metric-k{font-size:10px;font-weight:700;color:#a9a7b6;line-height:1.4;margin-bottom:5px;}",
+    ".px-ai-grade-metric-v{font-size:16px;font-weight:800;color:#fff;line-height:1.2;letter-spacing:-0.02em;}",
+    ".px-ai-grade-metric.is-status .px-ai-grade-metric-v{color:#f2949c;}",
+    ".px-ai-grade-metric.is-goal .px-ai-grade-metric-v{color:#7ea6ff;}",
+    ".px-ai-grade-metric-d{font-size:8.5px;font-weight:600;color:#7a7887;margin-top:5px;line-height:1.45;}",
+    ".px-ai-grade-stats-details{margin-top:10px;border:1px solid #2d2c36;border-radius:8px;background:#201f27;overflow:hidden;}",
+    ".px-ai-grade-stats-details summary{cursor:pointer;font-size:10px;font-weight:800;color:#8fb4e0;padding:9px 11px;list-style:none;user-select:none;}",
+    ".px-ai-grade-stats-details summary::-webkit-details-marker{display:none;}",
+    ".px-ai-grade-stats-details summary::after{content:'▾';float:right;color:#7a7887;font-size:11px;}",
+    ".px-ai-grade-stats-details[open] summary::after{transform:rotate(180deg);display:inline-block;}",
+    ".px-ai-grade-stats-details-body{padding:0 11px 10px;font-size:10px;color:#9b99a8;line-height:1.6;}",
+    ".px-ai-grade-stats-details-body p{margin:0 0 6px;}",
+    ".px-ai-grade-stats-details-body p:last-child{margin-bottom:0;}",
+    "@media (max-width:520px){.px-ai-grade-pos-summary{grid-template-columns:1fr;}.px-ai-survey-quartile-tick .lbl{font-size:8.5px;}.px-ai-grade-pos-headline{font-size:13px;}}",
     ".px-ai-breadcrumb{font-size:12px;font-weight:700;color:#9b99a8;margin:4px 0 14px;}",
     ".px-ai-top-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}",
     ".px-ai-report-head-btn{border:1px solid #8b5cf6;background:rgba(139,92,246,.12);color:#ddd6fe;font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap;}",
@@ -485,15 +635,15 @@
       cards: {
         simple: "AI 요약 · AI 인사이트 · 핵심 지표 변화 · 변화 키워드 TOP3",
         basic: "심플 + 상승(긍정) · 권장 조치 5개, 하락(부정) · 권장 조치 5개",
-        deep: "기본 + 유형 진단 매트릭스 · 모니터링 등 전체 상세 분석"
+        deep: "기본 + 긍정·부정 이슈 매트릭스 · 모니터링"
       }
     },
     survey: {
       subtitle: "분석 깊이를 선택하면 그에 맞는 환자경험평가 분석 결과를 보여드립니다.",
       cards: {
-        simple: "AI 요약 · AI 인사이트 · 핵심 지표 변화 · 변화 영역 및 문항 TOP3",
-        basic: "심플 + 상승 영역 · 권장 조치 5개, 하락 영역 · 권장 조치 5개",
-        deep: "기본 + 영역 진단 매트릭스 · 모니터링 등 전체 상세 분석"
+        simple: "AI 요약 · AI 인사이트 · 핵심 지표 · 등급 분석",
+        basic: "심플 + 병상수별 분석 · 영역별 격차",
+        deep: "기본 + 2등급 진입 우선순위 · 영역 진단 매트릭스 · 모니터링"
       }
     }
   };
@@ -550,9 +700,9 @@
       periodShort: "2025년 5차 · 전월 대비",
       title: "환자경험평가 AI 상세 분석",
       sum: {
-        simple: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 7개 영역 중 5개 영역이 상승했고, 정서적 지지는 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데 '위로와 공감' 문항이 하락을 견인했으며, 전반적인 평가는 71.11점으로 전월 대비 1.96점 하락하며 입원 경험 평가 문항 하락이 이어졌습니다.",
-        basic: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 정서적 지지 영역은 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데, '위로와 공감' 문항 62.89점이 이 하락을 견인하고 있습니다. 반면 입원 중 간호사 영역은 87.14점(+12.67점), 환자권리보장 영역은 86.31점(+11.69점)으로 상승폭이 가장 컸습니다. 6병동과 심장혈관흉부외과에서 점수 하락폭이 가장 크게 나타나 개별 관리가 필요합니다.",
-        deep: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 정서적 지지 영역은 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데, '위로와 공감' 문항 62.89점이 이 하락을 견인하고 있으며 심각도 '높음'으로 분류되었습니다. 전반적인 평가 영역도 71.11점(-1.96점)으로 함께 하락했습니다. 병동별로는 6병동이 57.52점으로 최저이며 하락폭도 16.81점으로 가장 컸고, 진료과별로는 심장혈관흉부외과가 동일하게 57.52점으로 최저·최대 하락폭을 기록해 두 조직 단위 모두 심각도 '높음'의 우선 관리 대상입니다. 반면 입원 중 간호사(+12.67점), 환자권리보장(+11.69점), 입원 중 의사(+8.76점), 환자안전과 병원 환경(+7.12점) 영역은 뚜렷한 상승세를 보였으며, 문19(재문의, +20.0점), 문1(예의, +14.8점), 문16(안전, +14.6점) 문항의 상승이 이를 뒷받침합니다. 정서적 지지·6병동·심장혈관흉부외과는 1개월 내 정상 범위 복귀 여부를 모니터링해야 할 우선 관리 대상으로 권고합니다."
+        simple: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승하며 전반적인 개선세를 보였습니다. 반면, 정서적 지지 영역은 62.89점으로 7개 평가 영역 중 가장 낮은 점수를 기록했으며, 전월 대비 11.77점 하락하여 주요 개선 과제로 확인되었습니다. 특히 '위로와 공감' 문항(62.89점)의 하락이 해당 영역의 점수 감소를 주도하였으며, 심각도는 '높음'으로 분류되었습니다. 또한 전반적인 평가 영역도 71.11점으로 전월 대비 1.96점 하락하였습니다.",
+        basic: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승하며 전반적인 개선세를 보였습니다. 반면, 정서적 지지 영역은 62.89점으로 7개 평가 영역 중 가장 낮은 점수를 기록했으며, 전월 대비 11.77점 하락하여 주요 개선 과제로 확인되었습니다. 특히 '위로와 공감' 문항(62.89점)의 하락이 해당 영역의 점수 감소를 주도하였으며, 심각도는 '높음'으로 분류되었습니다. 또한 전반적인 평가 영역도 71.11점으로 전월 대비 1.96점 하락하였습니다.\n\n조직별 분석에서는 6병동과 심장혈관흉부외과가 각각 57.52점으로 가장 낮은 점수를 기록했으며, 전월 대비 하락폭 또한 16.81점으로 가장 크게 나타나 우선적인 개선이 필요한 대상으로 분석되었습니다.\n\n반면 입원 중 간호사(+12.67점), 환자권리보장(+11.69점), 입원 중 의사(+8.76점), 환자안전과 병원 환경(+7.12점) 영역은 전반적인 상승세를 보였으며, 문19(재문의, +20.0점), 문1(예의, +14.8점), 문16(안전, +14.6점) 문항의 개선이 이러한 결과를 견인하였습니다.\n\n종합적으로 정서적 지지 영역과 6병동, 심장혈관흉부외과는 우선 관리 대상으로 판단되며, 향후 1개월간 개선 여부를 지속적으로 모니터링하고 원인 분석 및 개선 활동을 병행할 것을 권고합니다.",
+        deep: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승하며 전반적인 개선세를 보였습니다. 반면, 정서적 지지 영역은 62.89점으로 7개 평가 영역 중 가장 낮은 점수를 기록했으며, 전월 대비 11.77점 하락하여 주요 개선 과제로 확인되었습니다. 특히 '위로와 공감' 문항(62.89점)의 하락이 해당 영역의 점수 감소를 주도하였으며, 심각도는 '높음'으로 분류되었습니다. 또한 전반적인 평가 영역도 71.11점으로 전월 대비 1.96점 하락하였습니다.\n\n조직별 분석에서는 6병동과 심장혈관흉부외과가 각각 57.52점으로 가장 낮은 점수를 기록했으며, 전월 대비 하락폭 또한 16.81점으로 가장 크게 나타나 우선적인 개선이 필요한 대상으로 분석되었습니다.\n\n반면 입원 중 간호사(+12.67점), 환자권리보장(+11.69점), 입원 중 의사(+8.76점), 환자안전과 병원 환경(+7.12점) 영역은 전반적인 상승세를 보였으며, 문19(재문의, +20.0점), 문1(예의, +14.8점), 문16(안전, +14.6점) 문항의 개선이 이러한 결과를 견인하였습니다.\n\n종합적으로 정서적 지지 영역과 6병동, 심장혈관흉부외과는 우선 관리 대상으로 판단되며, 향후 1개월간 개선 여부를 지속적으로 모니터링하고 원인 분석 및 개선 활동을 병행할 것을 권고합니다."
       },
       pxAreas: [
         { name: "정서적 지지", score: 62.89, change: -11.77, lowPct: 22, org: "간호부 · 의료진 공통", weight: 18 },
@@ -643,16 +793,158 @@
         { name: "의사 경험", neg: 12 }
       ],
       insight: {
-        signal: { label: "주요 신호", value: "정서적 지지", chip: "우선개선 필요", tone: "h" },
-        action: { label: "권장 조치", value: "정서적 지지 강화", chip: "우선 실행 권장", tone: "m" },
-        monitor: { label: "모니터링", value: "의료진 위로 및 공감 문항", chip: "점수 상승 · 65점 이상 유지 여부", tone: "info" }
+        signal: { label: "주요 이슈", value: "정서적 지지", chip: "우선개선 필요", tone: "h" },
+        action: { label: "잠재 이슈", value: "정서적 지지 강화", chip: "우선 실행 권장", tone: "m" },
+        monitor: { label: "의료진 위로", value: "공감 문항", chip: "점수 상승·65세 이상 유지 여부", tone: "info" }
       },
       metricChanges: [
         { k: "종합점수", v: "81.27점", d: "▲6.9점", tone: "good" },
         { k: "응답자 수", v: "9명", d: "전월 대비 감소", tone: "neu" },
-        { k: "종합평가", v: "66.67점", d: "▼6.4점", tone: "bad" },
-        { k: "추천의향", v: "75.56점", d: "▲2.5점", tone: "good" }
+        { k: "추천의향", v: "66.67점", d: "▲6.4점", tone: "good" },
+        { k: "종합만족", v: "75.56점", d: "▲2.5점", tone: "good" }
       ],
+      gradeAnalysis: {
+        subtitle: "5차(2025) 실제 결과 · 360개 기관",
+        grades: [
+          { label: "1등급", range: "90점 ↑" },
+          { label: "2등급", range: "85~90" },
+          { label: "3등급", range: "80.20점", current: true },
+          { label: "4등급", range: "75~80" },
+          { label: "5등급", range: "75점 ↓" }
+        ],
+        upperGrades: {
+          title: "상위등급까지 남은 점수",
+          currentLabel: "80.20점",
+          items: [
+            { grade: "1등급", gap: "9.80", thresholdNote: "1등급 최저 90.00점", targetLabel: "90.00점", progressLeft: "1.9%" },
+            { grade: "2등급", gap: "4.96", thresholdNote: "2등급 최저 85.16점", targetLabel: "85.16점", progressLeft: "3.7%" }
+          ],
+          nearestTargetLabel: "85.16점"
+        },
+        demotionWarning: {
+          gap: "0.21",
+          text: "4등급 강등까지 단 0.21점 — 하락 시 즉시 강등 위험"
+        },
+        summaryHtml: "종합점수 <span class=\"hl\">80.20점</span>으로 <span class=\"hl\">3등급</span>이며, 5차 환자경험평가 결과 기준 총 360개 기관 중 하위 <span class=\"hl\">99위</span>에 해당합니다.",
+        summary: "종합점수 80.20점으로 3등급이며, 5차 환자경험평가 결과 기준으로 총 360개 기관 중 하위 99위에 해당합니다.",
+        positionSummary: {
+          gradeScope: {
+            tag: "3등급 내 기준",
+            headline: "3등급 127개 기관 중 하위 6.3%",
+            subline: "3등급 내에서도 최하위권에 가까운 위치입니다.",
+            directionNote: "3등급 내 하위 6.3%로, 같은 등급 기관 중 점수가 낮은 편입니다. (점수가 높을수록 좋은 평가)"
+          },
+          overallScope: {
+            tag: "전체 기준",
+            headline: "360개 기관 중 하위 99위",
+            subline: "전체 기관 대비 상위 72.8%"
+          }
+        },
+        metricsSource: {
+          currentScore: 80.20,
+          gradePercentile: 6.3,
+          gradeLabel: "3등급",
+          q1Score: 81.10,
+          medianScore: 82.39,
+          grade2MinScore: 85.16
+        },
+        quartileTitle: "3등급(127개 기관) 내 위치",
+        quartileMarker: { left: "3.8%", label: "우리 병원", sublabel: "80.20점" },
+        quartileLabels: [
+          { label: "최하위", score: "80.01", stat: "최소" },
+          { label: "상위 25% 경계", score: "81.10", stat: "Q1" },
+          { label: "중앙", score: "82.39", stat: "중앙값" },
+          { label: "상위 25%", score: "83.51", stat: "Q3" },
+          { label: "최상위", score: "84.99", stat: "최대" }
+        ],
+        statisticsDetails: {
+          summary: "3등급 25퍼센타일(81.10점)보다 낮아 하위 25% 구간에 위치합니다.",
+          items: [
+            "127개 기관 중 백분위 6.3(하위 6.3%) — 등급 명칭 대비 실질 위치는 최하위권",
+            "Q1(81.10) · 중앙값(82.39) · Q3(83.51) · 최소(80.01) · 최대(84.99)",
+            "Z-score · 표준편차 등 심화 통계는 원본 평가 데이터 연동 시 제공"
+          ]
+        },
+        quartileNote: "3등급 25퍼센타일(81.10점)보다 낮아 0~25퍼센타일 구간(하위 25%)에 위치합니다. 127개 기관 중 백분위 6.3(하위 6.3%)로, 등급 명칭 대비 실질 위치는 최하위권에 해당합니다.",
+        footnote: "※ 등급 제외 기준: 응답 표본 수 미충족 기관은 등급 부여 대상에서 제외"
+      },
+      bedAnalysis: {
+        subtitle: "구성 예시 · 병상수 데이터 미보유",
+        intro: "병상수 구간별로 나누어 유사 규모 병원 대비 우리 병원의 위치를 확인합니다.",
+        segments: [
+          { label: "100병상 미만", score: "76.50점", count: "90개" },
+          { label: "100~299병상·우리", score: "79.80점", count: "150개", current: true },
+          { label: "300~499병상", score: "84.20점", count: "80개" },
+          { label: "500병상 이상", score: "87.10점", count: "40개" }
+        ],
+        cards: [
+          { label: "100~299병상 그룹 내 순위", value: "71위 /150", note: "상위 47% · 그룹 중위권", tone: "good" },
+          { label: "그룹 평균 대비", value: "+0.40점", note: "79.80점 대비 소폭 상회", tone: "good" }
+        ],
+        summary: "전체 등급 기준으로는 3등급 내 최하위권(하위 9위)이지만, 동일 병상수(100~299병상) 그룹 안에서는 중위권(150개 중 71위)으로 확인됩니다. 병상 규모가 큰 병원일수록 평균 점수가 높은 경향(300~499병상 84.20점, 500병상 이상 87.10점)이 있어, 규모 차이를 감안하면 우리 병원의 상대적 위치는 전체 등급 순위보다 나은 편입니다. 다만 병상 규모가 낮은 점수의 원인은 아니므로, 개선 과제(환자권리보장·정서적 지지 등)는 규모와 무관하게 동일하게 적용됩니다.",
+        footnote: "※ 업로드된 5차 실제 데이터에는 병상수 항목이 없어 위 구간별 기관 수·평균·순위는 구성 예시입니다. 병상수 데이터가 확보되면 실제 값으로 교체가 필요합니다."
+      },
+      areaGapAnalysis: {
+        intro: "전체 유효 360개 기관 평균 및 소속 3등급(127개) 평균 대비 우리 병원 영역별 격차입니다. 격차가 큰 순으로 정렬했습니다.",
+        rows: [
+          { area: "환자권리보장", ours: "76.90", allGap: "▼6.99", gradeGap: "▼5.25", allTone: "bad", gradeTone: "bad" },
+          { area: "전반적 평가", ours: "81.50", allGap: "▼4.83", gradeGap: "▼3.57", allTone: "bad", gradeTone: "bad" },
+          { area: "정서적 지지", ours: "74.20", allGap: "▼4.62", gradeGap: "▼2.78", allTone: "bad", gradeTone: "bad" },
+          { area: "의사 영역", ours: "80.40", allGap: "▼3.68", gradeGap: "▼2.30", allTone: "warn", gradeTone: "warn" },
+          { area: "투약 및 치료과정", ours: "79.80", allGap: "▼3.06", gradeGap: "▼1.32", allTone: "warn", gradeTone: "warn" },
+          { area: "간호사 영역", ours: "83.50", allGap: "▼2.50", gradeGap: "▼1.02", allTone: "warn", gradeTone: "warn" },
+          { area: "환자안전·환경", ours: "85.10", allGap: "▼0.42", gradeGap: "▲1.35", allTone: "warn", gradeTone: "good" }
+        ],
+        summary: "환자권리보장이 전체 평균 대비 6.99점, 3등급 평균 대비 5.25점 모두 가장 크게 뒤처집니다. 환자 안전과 병원 환경은 전체 평균에는 소폭(-0.42점) 못 미치지만, 소속 3등급 안에서는 유일하게 평균을 넘어서는(+1.35점) 강점 영역입니다.",
+        footnote: "※ 전체 평균 83.89~86.33점(영역별) · 3등급(127개) 평균 76.98~85.07점(영역별)은 5차(2025) 실제 업로드 데이터 기준(병원명 비식별)."
+      },
+      gradePriority: {
+        intro: "2등급(85.16점) 평균 대비 영역별 격차가 큰 순으로 정렬하고, 각 영역에 속한 문항 점수까지 내려가 원인을 짚었습니다.",
+        areas: [
+          {
+            title: "① 환자권리보장",
+            pill: "2등급까지 ▼10.20",
+            pillTone: "h",
+            items: [
+              { label: "문19 · 불만 제기 용이성", score: "68.4점", hot: true },
+              { label: "문21 · 수치감 배려", score: "77.4점" },
+              { label: "문20 · 치료 결정 참여", score: "79.5점" },
+              { label: "문18 · 공평한 대우", score: "82.3점" }
+            ],
+            note: "문19가 5개월 연속 하락 중인 최저 문항 — 최우선 개선 대상"
+          },
+          {
+            title: "② 전반적 평가",
+            pill: "2등급까지 ▼8.96",
+            pillTone: "h",
+            items: [
+              { label: "문22 · 전반적 만족", score: "81.2점" },
+              { label: "문23 · 타인 추천 의향", score: "81.8점" }
+            ],
+            note: "두 문항 모두 고르게 낮아, 개별 문항보다 전반적 경험 만족도 자체를 끌어올려야 하는 영역"
+          },
+          {
+            title: "③ 정서적 지지",
+            pill: "2등급까지 ▼8.33",
+            pillTone: "h",
+            items: [{ label: "문14 · 위로와 공감", score: "74.2점", hot: true }],
+            note: "단일 문항으로 구성된 영역이라, 문14 점수가 곧 영역 점수 — 개선 시 영향이 즉시 반영됨"
+          },
+          {
+            title: "④ 의사 영역",
+            pill: "2등급까지 ▼6.66",
+            pillTone: "m",
+            items: [
+              { label: "문8 · 회진시간 정보제공", score: "74.5점", hot: true },
+              { label: "문7 · 만날 기회", score: "82.1점" },
+              { label: "문6 · 경청", score: "82.0점" },
+              { label: "문5 · 존중/예의", score: "83.0점" }
+            ],
+            note: "문8이 VOC의 \"회진시간 안내 부족\" 언급 급증과 동일한 이슈로 확인됨"
+          }
+        ],
+        summary: "2등급 진입을 위해 최우선으로 채워야 할 문항은 문19(불만 제기 용이성)와 문8(회진시간 정보제공)입니다. 두 문항 모두 각 영역 내 최저점이면서 동시에 5개월 연속 하락·VOC 연계 신호라는 별도의 위험 신호를 겸하고 있어, 다른 문항보다 개선 시급성이 높습니다."
+      },
       positiveKeywords: [
         { name: "친절한 응대", delta: "+14.8점" },
         { name: "안전한 환경", delta: "+14.6점" },
@@ -694,17 +986,19 @@
       ],
       reportBlockDefs: [
         { key: "overview", name: "개요" },
-        { key: "kpi", name: "핵심 지표" },
-        { key: "dist", name: "영역별 분포" },
+        { key: "status", name: "현황" },
+        { key: "statBrief", name: "전체 현황" },
+        { key: "grade", name: "등급 분석" },
+        { key: "beds", name: "병상수별 분석" },
+        { key: "gap", name: "영역별 격차" },
         { key: "matrix", name: "영역 진단 매트릭스" },
-        { key: "areas", name: "변화 영역 및 문항 TOP3" },
-        { key: "issues", name: "주요 이슈 및 권장 조치" },
-        { key: "plan", name: "개선 액션 플랜" }
+        { key: "gradePriority", name: "2등급 진입 우선순위" },
+        { key: "improvement", name: "개선 과제 및 권고" }
       ],
       reportDefaultBlocks: {
-        simple: ["overview", "kpi"],
-        basic: ["overview", "kpi", "dist", "areas", "issues"],
-        deep: ["overview", "kpi", "dist", "matrix", "areas", "issues", "plan"]
+        simple: ["overview", "status", "grade"],
+        basic: ["overview", "status", "grade", "beds", "gap"],
+        deep: ["overview", "status", "grade", "beds", "gap", "matrix", "gradePriority", "improvement"]
       },
       analysisBlockDefs: [
         { key: "matrix", name: "영역 진단 매트릭스" },
@@ -738,17 +1032,54 @@
         { name: "정형외과", score: "79.88", delta: "+1.45" }
       ],
       reportOverview: {
-        simple: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 7개 영역 중 5개 영역이 상승했고, 정서적 지지는 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데 '위로와 공감' 문항이 하락을 견인했으며, 전반적인 평가는 71.11점으로 전월 대비 1.96점 하락하며 입원 경험 평가 문항 하락이 이어졌습니다.",
-        basic: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 정서적 지지 영역은 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데, '위로와 공감' 문항 62.89점이 이 하락을 견인하고 있습니다. 반면 입원 중 간호사 영역은 87.14점(+12.67점), 환자권리보장 영역은 86.31점(+11.69점)으로 상승폭이 가장 컸습니다. 6병동과 심장혈관흉부외과에서 점수 하락폭이 가장 크게 나타나 개별 관리가 필요합니다.",
-        deep: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승했습니다. 정서적 지지 영역은 62.89점으로 7개 영역 중 최하위이며 전월 대비 11.77점 하락했는데, '위로와 공감' 문항 62.89점이 이 하락을 견인하고 있으며 심각도 '높음'으로 분류되었습니다. 전반적인 평가 영역도 71.11점(-1.96점)으로 함께 하락했습니다. 병동별로는 6병동이 57.52점으로 최저이며 하락폭도 16.81점으로 가장 컸고, 진료과별로는 심장혈관흉부외과가 동일하게 57.52점으로 최저·최대 하락폭을 기록해 두 조직 단위 모두 심각도 '높음'의 우선 관리 대상입니다. 반면 입원 중 간호사(+12.67점), 환자권리보장(+11.69점), 입원 중 의사(+8.76점), 환자안전과 병원 환경(+7.12점) 영역은 뚜렷한 상승세를 보였으며, 문19(재문의, +20.0점), 문1(예의, +14.8점), 문16(안전, +14.6점) 문항의 상승이 이를 뒷받침합니다. 정서적 지지·6병동·심장혈관흉부외과는 1개월 내 정상 범위 복귀 여부를 모니터링해야 할 우선 관리 대상으로 권고합니다."
+        simple: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승하며 전반적인 개선세를 보였습니다. 반면, 정서적 지지 영역은 62.89점으로 7개 평가 영역 중 가장 낮은 점수를 기록했으며, 전월 대비 11.77점 하락하여 주요 개선 과제로 확인되었습니다. 특히 '위로와 공감' 문항(62.89점)의 하락이 해당 영역의 점수 감소를 주도하였으며, 심각도는 '높음'으로 분류되었습니다. 또한 전반적인 평가 영역도 71.11점으로 전월 대비 1.96점 하락하였습니다.",
+        basic: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승하며 전반적인 개선세를 보였습니다. 반면, 정서적 지지 영역은 62.89점으로 7개 평가 영역 중 가장 낮은 점수를 기록했으며, 전월 대비 11.77점 하락하여 주요 개선 과제로 확인되었습니다. 특히 '위로와 공감' 문항(62.89점)의 하락이 해당 영역의 점수 감소를 주도하였으며, 심각도는 '높음'으로 분류되었습니다. 또한 전반적인 평가 영역도 71.11점으로 전월 대비 1.96점 하락하였습니다.\n\n조직별 분석에서는 6병동과 심장혈관흉부외과가 각각 57.52점으로 가장 낮은 점수를 기록했으며, 전월 대비 하락폭 또한 16.81점으로 가장 크게 나타나 우선적인 개선이 필요한 대상으로 분석되었습니다.\n\n반면 입원 중 간호사(+12.67점), 환자권리보장(+11.69점), 입원 중 의사(+8.76점), 환자안전과 병원 환경(+7.12점) 영역은 전반적인 상승세를 보였으며, 문19(재문의, +20.0점), 문1(예의, +14.8점), 문16(안전, +14.6점) 문항의 개선이 이러한 결과를 견인하였습니다.\n\n종합적으로 정서적 지지 영역과 6병동, 심장혈관흉부외과는 우선 관리 대상으로 판단되며, 향후 1개월간 개선 여부를 지속적으로 모니터링하고 원인 분석 및 개선 활동을 병행할 것을 권고합니다.",
+        deep: "2025년 5차 환자경험평가 종합점수는 81.27점으로 전월 대비 6.87점 상승하며 전반적인 개선세를 보였습니다. 반면, 정서적 지지 영역은 62.89점으로 7개 평가 영역 중 가장 낮은 점수를 기록했으며, 전월 대비 11.77점 하락하여 주요 개선 과제로 확인되었습니다. 특히 '위로와 공감' 문항(62.89점)의 하락이 해당 영역의 점수 감소를 주도하였으며, 심각도는 '높음'으로 분류되었습니다. 또한 전반적인 평가 영역도 71.11점으로 전월 대비 1.96점 하락하였습니다.\n\n조직별 분석에서는 6병동과 심장혈관흉부외과가 각각 57.52점으로 가장 낮은 점수를 기록했으며, 전월 대비 하락폭 또한 16.81점으로 가장 크게 나타나 우선적인 개선이 필요한 대상으로 분석되었습니다.\n\n반면 입원 중 간호사(+12.67점), 환자권리보장(+11.69점), 입원 중 의사(+8.76점), 환자안전과 병원 환경(+7.12점) 영역은 전반적인 상승세를 보였으며, 문19(재문의, +20.0점), 문1(예의, +14.8점), 문16(안전, +14.6점) 문항의 개선이 이러한 결과를 견인하였습니다.\n\n종합적으로 정서적 지지 영역과 6병동, 심장혈관흉부외과는 우선 관리 대상으로 판단되며, 향후 1개월간 개선 여부를 지속적으로 모니터링하고 원인 분석 및 개선 활동을 병행할 것을 권고합니다."
       },
       reportDrafts: {
+        overview: "본 보고서는 2025년 5차 환자경험평가 응답 결과를 대상으로, 통계 현황과 AI 분석(등급·영역·격차)을 바탕으로 경영진·실무 부서 내부 보고용으로 작성되었습니다.\n\n2025년 5차 종합점수는 81.27점으로 전월 대비 6.87점 상승하였음. 다만 정서적 지지(62.89점, ▼11.77점) · 전반적인 평가(71.11점, ▼1.96점) 2개 영역은 동시에 하락하였고, 6병동(57.52점) · 심장혈관흉부외과(57.52점)에서 조직 단위 하락폭이 가장 컸음. 아래 Ⅱ. 현황 · Ⅲ. 분석에서 세부 내용을 다룸.",
+        status: "환자경험평가는 7개 영역(간호사·의사·투약 및 치료·정서적 지지·환자안전·환자권리·전반적 평가) 23개 문항으로 구성됨. 전월 대비 점수 변화가 확인된 영역은 아래 표와 같음.\n\n종합점수는 상승하였으나, 정서적 지지·전반적인 평가 영역의 하락이 일부 상승 영역의 개선분을 상쇄한 결과로 해석됨. 병동·진료과별 점수는 하단 표·차트를 참고할 것.\n\n응답자 9명으로 표본이 작아(권장 30명 미만), 영역·문항별 변화 해석 시 소수 응답의 영향을 감안해야 함.",
+        statBrief: "2025년 5차 종합점수 81.27점(▲6.87점), 응답 9명. 정서적 지지(62.89점, ▼11.77점) · 전반적인 평가(71.11점, ▼1.96점) 하락, 6병동 · 심장혈관흉부외과 조직 하락폭 최대.",
+        grade: "종합점수 80.20점 기준 3등급(360개 기관 중 하위 99위)이며, 2등급 진입까지 4.96점 · 4등급 강등까지 0.21점 차이임. 3등급 내 백분위 6.3%(하위 6.3%)로, 등급 명칭 대비 실질 위치는 최하위권에 해당함. 2등급 진입을 위해서는 정서적 지지·환자권리보장 영역의 구조적 개선이 선행되어야 함.",
+        beds: "동일 병상수(100~299병상) 그룹 150개 기관 중 71위(상위 47%)로, 전체 등급 순위보다 상대적 위치는 나은 편임. 병상 규모 자체가 점수 하락의 직접 원인은 아니므로, 정서적 지지·환자권리보장 등 개선 과제는 규모와 무관하게 동일하게 적용함.",
+        gap: "환자권리보장이 전체 평균 대비 6.99점 · 3등급 평균 대비 5.25점 모두 가장 크게 뒤처짐. 환자 안전과 병원 환경은 3등급 내에서만 유일하게 평균을 넘어서는 강점 영역(+1.35점)임. 정서적 지지·전반적인 평가는 전체·3등급 평균 모두 하회하여 우선 개선 대상으로 분류함.",
+        matrix: "75점 기준 4분면 진단 결과, 정서적 지지 · 전반적인 평가 2개 영역이 '긴급 대응' 구간에 해당함. 두 영역 모두 절대 점수가 낮고 전월 대비 하락 중이므로, 1개월 내 원인 점검 및 현장 대응을 권고함.",
+        gradePriority: "2등급 진입을 위해 최우선으로 채워야 할 문항은 문19(불만 제기 용이성, 68.4점)과 문8(회진시간 정보제공, 74.5점)임. 두 문항 모두 5개월 연속 하락 추세이며, 환자권리보장·의사 영역 하락과 연계되어 개선 시급성이 가장 높음.",
+        improvement: "정서적 지지 강화, 6병동 · 심장혈관흉부외과 집중 관리, 환자권리보장(문19) 개선을 1개월 내 최우선 과제로 추진할 것을 건의함. 문19 · 문8은 환자경험평가와 VOC 지표가 동시에 악화 신호를 보내는 교차 확인 대상임.",
         kpi: "종합점수는 81.27점으로 전월 대비 6.87점 상승했으며, 종합평가는 66.67점(-6.4점), 추천의향은 75.56점(+2.5점)으로 지표 간 방향성이 엇갈렸습니다.",
         dist: "7개 영역 중 입원 중 간호사(87.14점)가 가장 높고, 정서적 지지(62.89점)가 가장 낮아 영역 간 24점 이상의 점수 격차가 존재합니다.",
-        matrix: "75점을 기준으로 절대 점수와 변화 방향을 함께 보면, 정서적 지지·전반적인 평가 2개 영역이 '긴급 대응' 구간에 속하고 나머지 5개 영역은 모두 '우수 사례' 구간에 속해, 이번 달은 중간 지대 없이 뚜렷하게 양극화된 모습을 보였습니다. 응답자 수가 9명으로 표본 규모가 작아 해석에 유의해야 합니다.",
         areas: "상승 영역은 입원 중 간호사(+12.67점)가 1위였고, 변화 문항은 문19 재문의(+20.0점)가 가장 큰 폭으로 상승했습니다.",
-        issues: "상승 영역 5개와 하락 영역 5개를 함께 제시하며, 정서적 지지·6병동·심장혈관흉부외과는 심각도 '높음'으로 분류되어 우선 대응이 필요합니다.",
+        issues: "정서적 지지·6병동·심장혈관흉부외과는 심각도 '높음'으로 분류되어 우선 대응이 필요합니다.",
         plan: "정서적 지지 강화, 6병동·심장혈관흉부외과 집중 관리를 1개월 내 착수할 최우선 과제로 건의함."
+      },
+      reportMeta: {
+        title: "2025년 5차 환자경험평가 분석보고서",
+        footerNote: "메디통 픽스 AI · 내부 보고 문서 (환자경험평가 통계 목업 기준)",
+        docInfo: {
+          author: "진보은 주임",
+          date: "2025. 08. 01.",
+          period: "2025년 5차",
+          subject: "2025년(5차) 환자경험평가 · 전월 대비"
+        }
+      },
+      reportImportableItems: {
+        "개요": [
+          { src: "통계 페이지", name: "종합점수 · 응답률 KPI" },
+          { src: "통계 페이지", name: "주요 영역 점수 카드" }
+        ],
+        "현황": [
+          { src: "통계 페이지", name: "영역별 점수 표" },
+          { src: "통계 페이지", name: "영역별 점수 차트" },
+          { src: "통계 페이지", name: "병동·진료과별 점수" }
+        ],
+        "분석": [
+          { src: "AI 분석", name: "등급 분석" },
+          { src: "AI 분석", name: "병상수별 분석" },
+          { src: "AI 분석", name: "영역별 격차" },
+          { src: "AI 분석", name: "영역 진단 매트릭스" },
+          { src: "AI 분석", name: "2등급 진입 우선순위" },
+          { src: "AI 분석", name: "개선 과제 및 권고" }
+        ]
       },
       actionPlanRows: [
         ["높음", "정서적 지지 강화", "1개월 내"],
@@ -897,8 +1228,30 @@
         { name: "비용관련", delta: "▲0.6%p", up: true }
       ],
       detailMonitors: [
-        { name: "비용관련 - 비용 부담", avg: "직전 6개월 평균 부정률 38.5% ± 표준편차 3.2%p", criteria: "확인 기준: 부정률이 41.7% 이하로 복귀 여부 · 목표: 1개월 내 정상 범위 복귀" },
-        { name: "시스템 및 서비스 - 예약 절차 복잡", avg: "직전 6개월 평균 부정률 54.1% ± 표준편차 4.5%p", criteria: "확인 기준: 부정률이 58.6% 이하로 복귀 여부 · 목표: 1개월 내 정상 범위 복귀" }
+        {
+          category: "비용관련",
+          keyword: "비용 부담",
+          avgNegRate: 38.5,
+          stdDev: 3.2,
+          reason: "지난달보다 '진료비·수납이 부담스럽다'는 불만이 눈에 띄게 늘었습니다. 평소(최근 6개월)보다도 많이 나온 수준이라, 원무·수납 창구의 비용 안내를 우선 점검해 보시는 것이 좋습니다.",
+          quotes: [
+            { text: "비용 안내가 사전에 충분하지 않았습니다.", meta: "원무 · 비용", channel: "앱", date: "2026-06-23" },
+            { text: "수납 대기 줄이 너무 길었습니다.", meta: "원무 · 비용", channel: "방문", date: "2026-06-17" },
+            { text: "진료비가 예상보다 많이 나와 부담이 컸습니다.", meta: "원무 · 비용", channel: "앱", date: "2026-06-21" }
+          ]
+        },
+        {
+          category: "시스템 및 서비스",
+          keyword: "예약 절차 복잡",
+          avgNegRate: 54.1,
+          stdDev: 4.5,
+          reason: "'예약·접수 절차가 복잡하다'는 불만이 한꺼번에 늘었습니다. 앱·전화·방문 예약 안내가 실제로 어렵지 않은지, 예약센터·원무 쪽에서 확인이 필요합니다.",
+          quotes: [
+            { text: "예약 절차가 너무 복잡해서 혼란스러웠습니다.", meta: "외래 · 시스템/서비스", channel: "앱", date: "2026-06-02" },
+            { text: "앱에서 예약 변경 방법을 찾기 어려웠어요.", meta: "외래 · 시스템/서비스", channel: "앱", date: "2026-06-09" },
+            { text: "전화 예약할 때 안내가 여러 번 바뀌어 헷갈렸습니다.", meta: "외래 · 시스템/서비스", channel: "전화", date: "2026-06-16" }
+          ]
+        }
       ],
       reportBlockDefs: [
         { key: "overview", name: "개요" },
@@ -908,13 +1261,12 @@
         { key: "keywords", name: "변화 키워드 TOP3" },
         { key: "issues", name: "주요 이슈 및 권장 조치" },
         { key: "plan", name: "개선 액션 플랜" },
-        { key: "monitor", name: "모니터링" },
-        { key: "quotes", name: "원문 및 인사이트" }
+        { key: "monitor", name: "모니터링" }
       ],
       reportDefaultBlocks: {
         simple: ["overview", "kpi"],
         basic: ["overview", "kpi", "dist", "keywords", "issues"],
-        deep: ["overview", "kpi", "dist", "matrix", "keywords", "issues", "plan", "monitor", "quotes"]
+        deep: ["overview", "kpi", "dist", "matrix", "keywords", "issues", "plan", "monitor"]
       },
       reportSectionOrder: ["개요", "현황 — 무엇이 달라졌나", "분석 — 어디서 달라졌나", "이슈 및 평가", "결론 및 제언", "모니터링 계획"],
       reportSectionMap: {
@@ -940,27 +1292,23 @@
       },
       reportImportableItems: {
         "개요": [{ src: "통계 페이지", name: "전체 VOC 현황 헤드라인 카드" }],
-        "현황 — 무엇이 달라졌나": [
+        "현황": [
           { src: "통계 페이지", name: "유형별 접수 현황 카드" },
           { src: "통계 페이지", name: "채널별 접수 도넛 차트" },
           { src: "통계 페이지", name: "월별 추이 라인 차트" }
         ],
-        "분석 — 어디서 달라졌나": [
+        "분석": [
           { src: "통계 페이지", name: "병동별 VOC 현황 표" },
           { src: "통계 페이지", name: "진료과별 VOC 현황 표" },
-          { src: "통계 페이지", name: "의사별 VOC 현황 표" }
-        ],
-        "이슈 및 평가": [
-          { src: "통계 페이지", name: "환자안전·감염관리 플래그" },
-          { src: "통계 페이지", name: "VOC 원문 사례" }
-        ],
-        "결론 및 제언": [{ src: "상세분석 페이지", name: "권장 조치 목록" }],
-        "모니터링 계획": [{ src: "통계 페이지", name: "부정률 전월대비 표" }]
+          { src: "AI 분석", name: "유형 진단 매트릭스" },
+          { src: "AI 분석", name: "변화 키워드 TOP3" },
+          { src: "AI 분석", name: "주요 이슈 및 권장 조치" }
+        ]
       },
       reportPresets: {
         exec: { label: "경영진 보고용", blocks: ["kpi", "matrix"] },
         team: { label: "실무 회의용", blocks: ["matrix", "issues", "plan"] },
-        full: { label: "전체 상세", blocks: ["kpi", "dist", "matrix", "keywords", "issues", "plan", "monitor", "quotes"] }
+        full: { label: "전체 상세", blocks: ["kpi", "dist", "matrix", "keywords", "issues", "plan", "monitor"] }
       },
       analysisBlockDefs: [
         { key: "matrix", name: "유형 진단 매트릭스" },
@@ -1122,9 +1470,9 @@
         deep: "6월 VOC는 총 8,323건 접수(▲214건), 언급 9,120건 · 평균 태그 1.10개입니다. 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p) 유형이 악화되었고, 7병동·내과 중환자실·내과 김의사 그룹에서 부정률이 올랐습니다. 정형외과·정형외과 원장은 개선폭이 가장 컸으며, 환자안전 플래그 12건(▲3건) 전수 검토가 필요합니다."
       },
       reportDrafts: {
-        overview: "6월 VOC는 총 8,323건 접수(전월 대비 ▲214건)되었고, 언급 기준 9,120건 · VOC 1건당 평균 1.10개 유형이 태깅되었습니다. 대부분 유형에서 부정률이 개선되었으나, 시스템 및 서비스(▲2.1%p)와 환경관련(▲1.0%p) 유형은 부정률이 악화되었고, 환자안전 관련 VOC도 12건(▲3건)으로 늘어 별도 확인이 필요합니다.",
-        status: "8개 유형 가운데 6종은 전월 대비 부정률이 개선되었고, 진료 및 치료·검사관련(▼1.2%p)·인적응대관련(▼0.9%p)에서 두드러집니다. 반면 시스템 및 서비스(▲2.1%p)·환경관련(▲1.0%p)·비용관련(▲0.6%p)은 악화 추세입니다. 긍정 키워드는 '친절함'·'세심함'이, 부정 키워드는 '비용 부담'·'예약 절차 복잡'이 상위를 차지했습니다.",
-        analysisOrg: "병동·진료과·의사 그룹별 부정률 변화(전월 대비)를 확인한 결과, 정형외과와 정형외과 원장의 개선폭이 가장 크고, 7병동·내과 중환자실·내과·내과 김의사는 부정률이 악화되었습니다.",
+        overview: "6월 VOC는 총 8,323건 접수(전월 대비 ▲214건)되었고, 언급 기준 9,120건 · VOC 1건당 평균 1.10개 유형이 태깅되었습니다. 대부분 유형에서 부정률이 개선되었으나, 시스템 및 서비스(▲2.1%p)와 환경관련(▲1.0%p) 유형은 부정률이 악화되었고, 환자안전 관련 VOC도 12건(▲3건)으로 늘어 별도 확인이 필요합니다. 아래 Ⅱ. 현황 · Ⅲ. 분석에서 세부 내용을 다룹니다.",
+        status: "8개 VOC 유형 가운데 6종은 전월 대비 부정률이 개선되었고, 진료 및 치료·검사관련(▼1.2%p) · 인적응대관련(▼0.9%p)에서 두드러집니다. 반면 시스템 및 서비스(▲2.1%p) · 환경관련(▲1.0%p) · 비용관련(▲0.6%p)은 악화 추세입니다.\n\n접수 채널·유형별 분포·월별 추이는 아래 표·차트를 참고할 것. 긍정 키워드는 '친절함' · '세심함', 부정 키워드는 '비용 부담' · '예약 절차 복잡'이 상위를 차지하였음.",
+        analysisOrg: "병동·진료과·의사 그룹별 부정률 변화(전월 대비)를 확인한 결과, 정형외과와 정형외과 원장의 개선폭이 가장 크고, 7병동 · 내과 중환자실 · 내과 · 내과 김의사는 부정률이 악화되었습니다. 아래 조직별 표는 확인이 필요한 그룹과 개선 그룹을 함께 제시한 것임.",
         issuesEval: "실제 접수된 VOC 원문 중 이번 달 흐름을 보여주는 사례입니다.\n\n리스크는 다음과 같이 진단됩니다. 현재는 7병동·내과 중환자실 등 일부 그룹에 한정된 부정률 악화이며, 시스템·환경관련 유형 부정률 상승이 이어지면 확산 우려가 있습니다. 환자안전 플래그 증가는 환자경험평가·수가 가감산에 부정적 영향을 줄 수 있습니다.",
         conclusionOpts: "아래 세 가지 대응 옵션 중 환자안전과 직결된 옵션 A를 최우선 과제로 추진할 것을 건의함.",
         kpi: "주요 지표는 전월 대비 다음과 같이 변화했습니다.",
@@ -1175,6 +1523,33 @@
         "수납 대기 줄이 너무 길었습니다.", "안내 표지판이 부족해 길을 헤맸어요.",
         "비용 안내가 사전에 충분하지 않았습니다.", "일부 직원분의 응대가 다소 사무적으로 느껴졌어요."
       ],
+      vocQuoteSamples: {
+        intro: "실제 접수된 VOC 원문 중 이번 달 흐름을 보여주는 사례입니다.",
+        positive: [
+          { text: "간호사분들이 정말 친절하고 세심하게 챙겨주셨어요.", meta: "12병동 · 인적응대", channel: "앱", date: "2026-06-03" },
+          { text: "회진 시 의사 선생님 설명이 이해하기 쉬웠습니다.", meta: "내과 · 진료/치료", channel: "전화", date: "2026-06-07" },
+          { text: "병실이 항상 깨끗하게 관리되어 있었어요.", meta: "51병동 · 환경", channel: "앱", date: "2026-06-11" },
+          { text: "호출벨을 누르면 응답이 빨랐습니다.", meta: "52병동 · 서비스제공", channel: "앱", date: "2026-06-14" },
+          { text: "수납 절차가 명확하게 안내되어 편했어요.", meta: "원무 · 비용", channel: "방문", date: "2026-06-18" },
+          { text: "검사 전 주의사항을 자세히 알려주셔서 좋았습니다.", meta: "영상의학 · 검사", channel: "앱", date: "2026-06-20" },
+          { text: "퇴원 후 관리 방법을 꼼꼼히 설명해 주셨어요.", meta: "내과 · 퇴원안내", channel: "앱", date: "2026-06-22" },
+          { text: "직원분들이 항상 웃으며 응대해 주셔서 감사했습니다.", meta: "12병동 · 직원칭찬", channel: "앱", date: "2026-06-24" },
+          { text: "대기 중에도 진행 상황을 안내해 주셔서 불안하지 않았어요.", meta: "외래 · 대기", channel: "전화", date: "2026-06-26" },
+          { text: "전반적으로 신뢰가 가는 진료였습니다.", meta: "정형외과 · 전반평가", channel: "앱", date: "2026-06-28" }
+        ],
+        negative: [
+          { text: "예약 절차가 너무 복잡해서 혼란스러웠습니다.", meta: "외래 · 시스템/서비스", channel: "앱", date: "2026-06-02" },
+          { text: "대기시간이 안내보다 훨씬 길었어요.", meta: "외래 · 대기", channel: "앱", date: "2026-06-05" },
+          { text: "통증 조절이 충분히 되지 않아 힘들었습니다.", meta: "6병동 · 진료/치료", channel: "전화", date: "2026-06-08" },
+          { text: "병동 소음이 심해서 잠을 설쳤어요.", meta: "7병동 · 환경", channel: "앱", date: "2026-06-10" },
+          { text: "호출 후 응대까지 시간이 오래 걸렸습니다.", meta: "51병동 · 인적응대", channel: "앱", date: "2026-06-13" },
+          { text: "주차 공간을 찾기 어려웠어요.", meta: "방문 · 환경", channel: "방문", date: "2026-06-15" },
+          { text: "수납 대기 줄이 너무 길었습니다.", meta: "원무 · 비용", channel: "방문", date: "2026-06-17" },
+          { text: "안내 표지판이 부족해 길을 헤맸어요.", meta: "본관 · 환경", channel: "앱", date: "2026-06-19" },
+          { text: "비용 안내가 사전에 충분하지 않았습니다.", meta: "원무 · 비용", channel: "앱", date: "2026-06-23" },
+          { text: "일부 직원분의 응대가 다소 사무적으로 느껴졌어요.", meta: "외래 · 인적응대", channel: "앱", date: "2026-06-27" }
+        ]
+      },
       reportPrefix: "VOC 통계",
       reportKpiRows: [
         ["접수된 VOC 건수", "8,323건"],
@@ -1495,8 +1870,9 @@
     }
     function renderMetricChanges() {
       var items = data.metricChanges || [];
+      var title = variant === "survey" ? "핵심 지표" : "핵심 지표 변화";
       return '<div class="px-ai-card">' +
-        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">핵심 지표 변화</span><span class="px-ai-card-sub">' +
+        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">' + esc(title) + '</span><span class="px-ai-card-sub">' +
         items.length + "개</span></div>" +
         '<div class="px-ai-metric-grid">' +
         items.map(function (m) {
@@ -1520,7 +1896,7 @@
       }).join("");
       return '<div class="px-ai-card">' +
         '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">변화 키워드 TOP3</span><span class="px-ai-card-sub">' +
-        (variant === "voc" ? "전월 대비 · 카테고리 단위 변화는 유형 진단 매트릭스에서 확인" : "전월 대비 · 상승·하락 포함 절대 변화폭 기준") +
+        (variant === "voc" ? "전월 대비 · 카테고리 단위 변화 기준" : "전월 대비 · 상승·하락 포함 절대 변화폭 기준") +
         '</span></div>' +
         '<div class="px-ai-catkw">' +
           '<div class="px-ai-catkw-col"><div class="px-ai-catkw-hd">긍정 키워드</div>' + left + "</div>" +
@@ -1542,35 +1918,17 @@
     function renderDetailJudgement(lv) {
       var pos = data.positiveIssueActions || [];
       var neg = data.negativeIssueActions || data.issueActions || [];
-      var html = '<div class="px-ai-detail-hd"><div><div class="px-ai-detail-title">AI 상세 판단</div>' +
-        '<div class="px-ai-detail-sub">긍정 이슈 · 권장 조치 ' + pos.length + "개</div></div>" +
-        '<div class="px-ai-detail-desc">이슈와 그에 대한 권장 조치를 이어서 확인합니다.</div></div>';
-      if (pos.length) {
-        html += '<div class="px-ai-card" style="padding-top:12px;margin-bottom:14px">' +
-          '<div class="px-ai-ia-list">' + renderIssueActionList(pos) + "</div></div>";
-      }
-      html += '<div class="px-ai-detail-hd" style="margin-top:8px"><div><div class="px-ai-detail-title" style="font-size:14px">부정 이슈 · 권장 조치 ' +
-        neg.length + "개</div></div></div>";
-      html += '<div class="px-ai-card" style="padding-top:12px">' +
-        '<div class="px-ai-ia-list">' + renderIssueActionList(neg) + "</div></div>";
+      var html = '<div class="px-ai-card" style="margin-bottom:14px">' +
+        renderIssueActionMatrix(pos, neg, { variant: variant }) + "</div>";
       if (lv === "deep") {
         var changes = (data.keyChanges || []).map(function (c) {
           return '<div class="px-ai-change-row"><span class="px-ai-change-name">' + esc(c.name) +
             '</span><span class="px-ai-change-d ' + (c.up ? "up" : "dn") + '">' + esc(c.delta) +
             "</span></div>";
         }).join("");
-        var mons = (data.detailMonitors || []).map(function (m) {
-          return '<div class="px-ai-mon-item"><div class="px-ai-mon-name">' + esc(m.name) +
-            '</div><div class="px-ai-mon-line">' + esc(m.avg) +
-            '</div><div class="px-ai-mon-line dim">' + esc(m.criteria) + "</div></div>";
-        }).join("");
         var changeTitle = data.changeSectionTitle || "부정률 변화";
-        html += '<div class="px-ai-split">' +
-          '<div class="px-ai-card"><div class="px-ai-card-hd"><span class="px-ai-card-ttl">' +
-            esc(changeTitle) + " " + (data.keyChanges || []).length + "개</span></div>" + changes + "</div>" +
-          '<div class="px-ai-card"><div class="px-ai-card-hd"><span class="px-ai-card-ttl">모니터링 ' +
-            (data.detailMonitors || []).length + "개 · 심각도 높음 이슈 기준</span></div>" + mons + "</div>" +
-          "</div>";
+        html += '<div class="px-ai-card"><div class="px-ai-card-hd"><span class="px-ai-card-ttl">' +
+          esc(changeTitle) + " " + (data.keyChanges || []).length + "개</span></div>" + changes + "</div>";
       }
       return html;
     }
@@ -1595,36 +1953,139 @@
         '<span class="px-ai-voc-ia-name">' + esc(p.action) + '</span></div>' +
         '<p class="px-ai-voc-ia-desc">' + esc(p.actionDesc) + '</p></div></div>';
     }
+    function formatIssueMatrixLabel(issue) {
+      return esc(String(issue || "").replace(/\s*-\s*/g, " · "));
+    }
+    function groupIssueActionsBySev(items) {
+      var groups = { h: [], m: [], l: [] };
+      (items || []).forEach(function (p) {
+        var key = p.sev === "h" || p.sev === "l" ? p.sev : "m";
+        groups[key].push(p);
+      });
+      return groups;
+    }
+    function renderIssueMatrixChip(polarity, item) {
+      var tip = [item.issueDesc, item.actionDesc].filter(Boolean).join(" — ");
+      return '<button type="button" class="px-ai-ia-matrix-chip ' + polarity + '"' +
+        (tip ? ' title="' + esc(tip) + '"' : "") + ">" +
+        '<span class="px-ai-ia-matrix-chip-issue">' + formatIssueMatrixLabel(item.issue) + "</span>" +
+        '<span class="px-ai-ia-matrix-chip-act">→ ' + esc(item.action) + "</span></button>";
+    }
+    function renderIssueMatrixCell(polarity, items) {
+      if (!items || !items.length) {
+        return '<div class="px-ai-ia-matrix-empty">해당 이슈 없음</div>';
+      }
+      return items.map(function (p) { return renderIssueMatrixChip(polarity, p); }).join("");
+    }
+    function renderIssueActionMatrix(pos, neg, opts) {
+      opts = opts || {};
+      var isSurvey = opts.variant === "survey";
+      var title = isSurvey ? "상승·하락 영역 매트릭스" : "긍정·부정 이슈 매트릭스";
+      var desc = isSurvey
+        ? "개선도·하락 심각도 기준으로 정렬했습니다. 칩을 눌러 상세 조치를 확인하세요."
+        : "개선도·심각도 기준으로 정렬했습니다. 칩을 눌러 상세 조치를 확인하세요.";
+      var posCol = isSurvey ? "상승 영역" : "긍정 이슈";
+      var negCol = isSurvey ? "하락 영역" : "부정 이슈";
+      var foot = isSurvey
+        ? "※ 행은 상승 영역의 개선도, 하락 영역의 심각도 기준입니다. 조치의 우선순위는 칩 색상(파랑=권장, 빨강=시급)으로 구분됩니다."
+        : "※ 행은 긍정 이슈의 개선도, 부정 이슈의 심각도 기준입니다. 조치의 우선순위는 칩 색상(파랑=권장, 빨강=시급)으로 구분됩니다.";
+      var total = (pos || []).length + (neg || []).length;
+      var posGroups = groupIssueActionsBySev(pos);
+      var negGroups = groupIssueActionsBySev(neg);
+      var rows = [
+        { key: "h", label: "높음", cls: "h" },
+        { key: "m", label: "보통", cls: "m" },
+        { key: "l", label: "낮음", cls: "l" }
+      ];
+      var body = rows.map(function (row) {
+        return '<div class="px-ai-ia-matrix-row">' +
+          '<div class="px-ai-ia-matrix-row-label ' + row.cls + '">' + row.label + "</div>" +
+          '<div class="px-ai-ia-matrix-cell">' + renderIssueMatrixCell("pos", posGroups[row.key]) + "</div>" +
+          '<div class="px-ai-ia-matrix-cell">' + renderIssueMatrixCell("neg", negGroups[row.key]) + "</div>" +
+          "</div>";
+      }).join("");
+      return '<div class="px-ai-ia-matrix">' +
+        '<div class="px-ai-ia-matrix-hd">' +
+          "<div>" +
+            '<div class="px-ai-ia-matrix-title">' + title + "</div>" +
+            '<div class="px-ai-ia-matrix-desc">' + desc + "</div>" +
+          "</div>" +
+          '<div class="px-ai-ia-matrix-meta">' + total + "개 이슈 · 권장조치 포함</div>" +
+        "</div>" +
+        '<div class="px-ai-ia-matrix-cols">' +
+          "<div></div>" +
+          '<div class="px-ai-ia-matrix-col-hd pos">' + posCol + "</div>" +
+          '<div class="px-ai-ia-matrix-col-hd neg">' + negCol + "</div>" +
+        "</div>" +
+        body +
+        '<div class="px-ai-ia-matrix-foot">' + foot + "</div>" +
+        "</div>";
+    }
     function renderVocDetailJudgement(includeFooter, posLimit, negLimit) {
       var pos = data.positiveIssueActions || [];
       var neg = data.negativeIssueActions || [];
       if (typeof posLimit === "number") pos = pos.slice(0, posLimit);
       if (typeof negLimit === "number") neg = neg.slice(0, negLimit);
-      var posLabel = variant === "survey" ? "상승 영역 · 권장 조치" : "긍정 이슈 · 권장 조치";
-      var negLabel = variant === "survey" ? "하락 영역 · 권장 조치" : "부정 이슈 · 권장 조치";
       var html = '<div class="px-ai-card">' +
-        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">AI 상세 판단</span><span class="px-ai-card-sub">이슈와 그에 대한 권장 조치를 이어서 확인합니다.</span></div>' +
-        '<p class="px-ai-voc-detail-sub pos">' + posLabel + ' <span class="px-ai-card-sub">' + pos.length + "개</span></p>" +
-        '<div class="px-ai-voc-col-labels"><span>' + (variant === "survey" ? "영역" : "이슈") + '</span><span>권장 조치</span></div>' +
-        pos.map(function (p) { return renderVocIssueCard("pos", p); }).join("") +
-        '<p class="px-ai-voc-detail-sub neg">' + negLabel + ' <span class="px-ai-card-sub">' + neg.length + "개</span></p>" +
-        '<div class="px-ai-voc-col-labels"><span>' + (variant === "survey" ? "영역" : "이슈") + '</span><span>권장 조치</span></div>' +
-        neg.map(function (p) { return renderVocIssueCard("neg", p); }).join("");
+        renderIssueActionMatrix(pos, neg, { variant: variant });
       if (includeFooter) {
         html += renderDetailMonitorsFooter();
       }
       html += "</div>";
       return html;
     }
+    function monitorItemTitle(m) {
+      if (m.category && m.keyword) return m.category + " - " + m.keyword;
+      return m.name || "";
+    }
+    function monitorItemStats(m) {
+      if (m.avgNegRate != null && m.stdDev != null) {
+        return "최근 6개월 평균 불만 비율 " + Number(m.avgNegRate).toFixed(1) +
+          "% (보통 ±" + Number(m.stdDev).toFixed(1) + "%p 범위)";
+      }
+      return m.avg || "";
+    }
+    function monitorItemReason(m) {
+      return m.reason || m.criteria || "";
+    }
+    function renderMonitorQuoteItem(item) {
+      var q = typeof item === "string" ? { text: item, meta: "", channel: "", date: "" } : item;
+      var metaParts = [q.meta, q.channel, q.date].filter(Boolean);
+      return '<div class="px-ai-voc-quote-item neg">' +
+        '<p class="px-ai-voc-quote-text">"' + esc(q.text || "") + '"</p>' +
+        (metaParts.length ? '<p class="px-ai-voc-quote-meta">' + esc(metaParts.join(" · ")) + "</p>" : "") +
+        "</div>";
+    }
+    function renderMonitorQuotes(m) {
+      var quotes = (m.quotes || []).slice(0, 3);
+      if (!quotes.length) return "";
+      return '<div class="px-ai-mon-quotes"><p class="px-ai-mon-quotes-hd">관련 VOC 원문</p>' +
+        quotes.map(renderMonitorQuoteItem).join("") + "</div>";
+    }
+    function renderMonitorItem(m) {
+      return '<div class="px-ai-mon-item"><div class="px-ai-mon-name">' + esc(monitorItemTitle(m)) +
+        '</div><div class="px-ai-mon-stats">' + esc(monitorItemStats(m)) +
+        '</div><div class="px-ai-mon-reason">' + esc(monitorItemReason(m)) + "</div>" +
+        renderMonitorQuotes(m) + "</div>";
+    }
+    function monitorItemPlainText(m) {
+      var text = monitorItemTitle(m) + "\n" + monitorItemStats(m) + "\n" + monitorItemReason(m);
+      var quotes = (m.quotes || []).slice(0, 3);
+      if (quotes.length) {
+        text += "\n관련 VOC 원문:";
+        quotes.forEach(function (q) {
+          var item = typeof q === "string" ? { text: q } : q;
+          text += '\n  "' + (item.text || "") + '"';
+        });
+      }
+      return text;
+    }
     function renderDetailMonitorsFooter() {
       var monCount = (data.detailMonitors || []).length;
-      var mons = (data.detailMonitors || []).map(function (m) {
-        return '<div class="px-ai-mon-item"><div class="px-ai-mon-name">' + esc(m.name) +
-          '</div><div class="px-ai-mon-line">' + esc(m.avg) +
-          '</div><div class="px-ai-mon-line dim">' + esc(m.criteria) + "</div></div>";
-      }).join("");
-      return '<p class="px-ai-voc-detail-sub monitor">모니터링 <span class="px-ai-card-sub">' +
-        monCount + "개 · 심각도 높음 이슈 기준</span></p>" + mons;
+      var mons = (data.detailMonitors || []).map(renderMonitorItem).join("");
+      return '<div class="px-ai-ia-matrix-monitor">' +
+        '<p class="px-ai-voc-detail-sub monitor">모니터링 <span class="px-ai-card-sub">' +
+        monCount + "개 · 심각도 높음 이슈 기준</span></p>" + mons + "</div>";
     }
     function categoryCardHtml(t, volMin) {
       var cls = t.negChange <= 0 ? "good" : "bad";
@@ -1714,6 +2175,222 @@
         (excellent.length ? excellent.map(areaCardHtml).join("") : '<p class="px-ai-matrix-empty">해당하는 영역이 없습니다.</p>') + "</div>" +
         "</div></div>";
     }
+    function surveyGapToneCls(tone) {
+      if (tone === "bad") return "bad";
+      if (tone === "good") return "good";
+      if (tone === "warn") return "neu";
+      return "neu";
+    }
+    function quartileMarkerStyle(left) {
+      var pct = parseFloat(String(left || "50"));
+      if (isNaN(pct)) pct = 50;
+      if (pct < 14) return { pos: "left:" + pct + "%", cls: "is-edge-left" };
+      if (pct > 86) return { pos: "right:" + (100 - pct) + "%", cls: "is-edge-right" };
+      return { pos: "left:" + pct + "%", cls: "is-center" };
+    }
+    function renderGradeCurrentPosition(src) {
+      if (!src) return "";
+      var gradeLabel = src.gradeLabel || "3등급";
+      var pct = src.gradePercentile;
+      return '<div class="px-ai-grade-current-only">' +
+        '<div class="px-ai-grade-metric is-status is-single">' +
+          '<div class="px-ai-grade-metric-k">' + esc(gradeLabel + " 내 현재 위치") + "</div>" +
+          '<div class="px-ai-grade-metric-v">하위 ' + esc(String(pct)) + "%</div>" +
+          '<div class="px-ai-grade-metric-d">동일한 ' + esc(gradeLabel) + " 기관 중 점수가 낮은 구간에 위치합니다.</div>" +
+        "</div></div>";
+    }
+    function renderGradePositionSummary(ps) {
+      if (!ps) return "";
+      var grade = ps.gradeScope || {};
+      var overall = ps.overallScope || {};
+      return '<div class="px-ai-grade-pos-summary">' +
+        '<div class="px-ai-grade-pos-block is-primary">' +
+          '<span class="px-ai-grade-pos-tag">' + esc(grade.tag || "3등급 내 기준") + "</span>" +
+          '<div class="px-ai-grade-pos-headline">' + esc(grade.headline || "") + "</div>" +
+          (grade.subline ? '<div class="px-ai-grade-pos-sub">' + esc(grade.subline) + "</div>" : "") +
+          (grade.directionNote ? '<div class="px-ai-grade-pos-dir">' + esc(grade.directionNote) + "</div>" : "") +
+        "</div>" +
+        '<div class="px-ai-grade-pos-block is-secondary">' +
+          '<span class="px-ai-grade-pos-tag">' + esc(overall.tag || "전체 기준") + "</span>" +
+          '<div class="px-ai-grade-pos-headline">' + esc(overall.headline || "") + "</div>" +
+          (overall.subline ? '<div class="px-ai-grade-pos-sub">' + esc(overall.subline) + "</div>" : "") +
+        "</div></div>";
+    }
+    function renderQuartilePositionBar(g) {
+      if (!g) return "";
+      var qMarker = g.quartileMarker || { left: "50%", label: "" };
+      var qMarkerPos = quartileMarkerStyle(qMarker.left);
+      var segColors = [
+        "rgba(242,148,156,.32)",
+        "rgba(232,196,106,.24)",
+        "rgba(126,166,255,.18)",
+        "rgba(127,214,176,.18)"
+      ];
+      var segHtml = segColors.map(function (color) {
+        return '<div class="px-ai-survey-quartile-seg" style="background:' + color + '"></div>';
+      }).join("");
+      var tickHtml = (g.quartileLabels || []).map(function (tick) {
+        if (typeof tick === "string") {
+          return '<div class="px-ai-survey-quartile-tick"><span class="lbl">' + esc(tick) + "</span></div>";
+        }
+        return '<div class="px-ai-survey-quartile-tick">' +
+          '<span class="lbl">' + esc(tick.label) + "</span>" +
+          (tick.score ? '<span class="score">' + esc(tick.score) + "</span>" : "") +
+          (tick.stat ? '<span class="stat">' + esc(tick.stat) + "</span>" : "") +
+        "</div>";
+      }).join("");
+      var markerLbl = qMarker.label
+        ? esc(qMarker.label) + (qMarker.sublabel ? '<span class="sub">' + esc(qMarker.sublabel) + "</span>" : "")
+        : "";
+      return '<div class="px-ai-quartile-bar-wrap">' +
+        '<div class="px-ai-survey-quartile-bar">' + segHtml +
+          '<div class="px-ai-survey-quartile-marker" style="left:' + esc(qMarker.left) + '">' +
+            '<div class="px-ai-survey-quartile-marker-dot"></div>' +
+          "</div>" +
+          (markerLbl ? '<div class="px-ai-survey-quartile-marker-lbl ' + qMarkerPos.cls + '" style="' + qMarkerPos.pos + '">' + markerLbl + "</div>" : "") +
+        "</div>" +
+        '<div class="px-ai-survey-quartile-ticks">' + tickHtml + "</div>" +
+      "</div>";
+    }
+    function renderStatisticsDetails(sd, fallbackNote) {
+      if (!sd && !fallbackNote) return "";
+      var body = "";
+      if (sd && sd.summary) body += "<p>" + esc(sd.summary) + "</p>";
+      (sd && sd.items ? sd.items : []).forEach(function (line) {
+        body += "<p>" + esc(line) + "</p>";
+      });
+      if (!body && fallbackNote) body = "<p>" + esc(fallbackNote) + "</p>";
+      if (!body) return "";
+      return '<details class="px-ai-grade-stats-details">' +
+        '<summary>통계 상세 보기</summary>' +
+        '<div class="px-ai-grade-stats-details-body">' + body + "</div></details>";
+    }
+    function renderGradePositionSection(g) {
+      if (!g) return "";
+      return '<div class="px-ai-grade-pos-card">' +
+        '<div class="px-ai-grade-pos-card-hd">' + esc(g.quartileTitle || "3등급 내 위치") + "</div>" +
+        renderGradePositionSummary(g.positionSummary) +
+        renderQuartilePositionBar(g) +
+        renderGradeCurrentPosition(g.metricsSource) +
+        renderStatisticsDetails(g.statisticsDetails, g.quartileNote) +
+      "</div>";
+    }
+    function renderSurveyUpperGradePanel(ug) {
+      if (!ug) return "";
+      var items = (ug.items || []).map(function (item) {
+        return '<div class="px-ai-survey-upper-grade-item">' +
+          '<div class="px-ai-survey-upper-grade-item-k">' + esc(item.grade) + "</div>" +
+          '<div class="px-ai-survey-upper-grade-item-v">' + esc(item.gap || "") + '<span class="unit">점</span></div>' +
+          '<div class="px-ai-survey-upper-grade-item-d">' + esc(item.thresholdNote || "") + "</div></div>";
+      }).join("");
+      var nearest = (ug.items || []).find(function (item) { return item.grade === (ug.progressGrade || "2등급"); }) ||
+        (ug.items || [])[0];
+      var progress = nearest && nearest.progressLeft ? nearest.progressLeft : "0%";
+      var trackHtml = nearest
+        ? '<div class="px-ai-survey-upper-grade-track-wrap px-ai-survey-next-grade-track-wrap">' +
+            '<div class="px-ai-survey-next-grade-track">' +
+              '<div class="px-ai-survey-next-grade-fill" style="width:' + esc(progress) + '"></div>' +
+              '<div class="px-ai-survey-next-grade-thumb" style="left:' + esc(progress) + '"></div>' +
+            "</div>" +
+            '<div class="px-ai-survey-next-grade-labels">' +
+              '<span class="cur">현재 ' + esc(ug.currentLabel || "") + "</span>" +
+              '<span class="tgt">목표 ' + esc(nearest.targetLabel || ug.nearestTargetLabel || "") + "</span>" +
+            "</div></div>"
+        : "";
+      return '<div class="px-ai-survey-upper-grade">' +
+        '<div class="px-ai-survey-upper-grade-title">' + esc(ug.title || "상위등급까지 남은 점수") + "</div>" +
+        '<div class="px-ai-survey-upper-grade-grid">' + items + "</div>" +
+        trackHtml + "</div>";
+    }
+    function renderSurveyGradeDemotionWarn(w) {
+      if (!w) return "";
+      var gap = esc(w.gap || "");
+      var text = w.text || "";
+      var html = text.replace(gap + "점", '<span class="hot">' + gap + "점</span>");
+      if (html === text && gap) html = text.replace(gap, '<span class="hot">' + gap + "</span>");
+      return '<div class="px-ai-survey-demotion-warn">' + html + "</div>";
+    }
+    function renderSurveyGradeAnalysis() {
+      var g = data.gradeAnalysis;
+      if (!g) return "";
+      var grades = (g.grades || []).map(function (item) {
+        return '<div class="px-ai-survey-grade-box' + (item.current ? " on" : "") + '">' +
+          '<div class="px-ai-survey-grade-lbl">' + esc(item.label) + '</div>' +
+          '<div class="px-ai-survey-grade-range">' + esc(item.range) + "</div></div>";
+      }).join("");
+      return '<div class="px-ai-card">' +
+        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">등급 분석</span><span class="px-ai-card-sub">' +
+          esc(g.subtitle || "") + "</span></div>" +
+        '<div class="px-ai-survey-grade-strip">' + grades + "</div>" +
+        renderSurveyUpperGradePanel(g.upperGrades) +
+        renderSurveyGradeDemotionWarn(g.demotionWarning) +
+        (g.footnote ? '<p class="px-ai-survey-footnote" style="margin-top:0;padding-top:0;border-top:none">' + esc(g.footnote) + "</p>" : "") +
+        '<div class="px-ai-survey-quartile-wrap">' + renderGradePositionSection(g) + "</div></div>";
+    }
+    function renderSurveyBedAnalysis() {
+      var b = data.bedAnalysis;
+      if (!b) return "";
+      var segments = (b.segments || []).map(function (seg) {
+        return '<div class="px-ai-survey-bed-chip' + (seg.current ? " on" : "") + '">' +
+          '<div class="px-ai-survey-bed-chip-lbl">' + esc(seg.label) + '</div>' +
+          '<div class="px-ai-survey-bed-chip-v">' + esc(seg.score) + '</div>' +
+          '<div class="px-ai-survey-bed-chip-n">' + esc(seg.count) + "</div></div>";
+      }).join("");
+      var cards = (b.cards || []).map(function (c) {
+        return '<div class="px-ai-survey-mini-card"><div class="px-ai-survey-mini-k">' + esc(c.label) +
+          '</div><div class="px-ai-survey-mini-v' + (c.tone === "good" ? '" style="color:#7ea6ff"' : '"') + ">" +
+          esc(c.value) + '</div><div class="px-ai-survey-mini-d">' + esc(c.note) + "</div></div>";
+      }).join("");
+      return '<div class="px-ai-card">' +
+        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">병상수별 분석</span><span class="px-ai-card-sub">' +
+          esc(b.subtitle || "") + "</span></div>" +
+        '<p class="px-ai-voc-sum" style="margin-bottom:10px">' + esc(b.intro || "") + "</p>" +
+        '<div class="px-ai-survey-bed-row">' + segments + "</div>" +
+        '<div class="px-ai-survey-mini-grid" style="margin-bottom:10px">' + cards + "</div>" +
+        '<p class="px-ai-voc-sum">' + esc(b.summary || "") + "</p>" +
+        (b.footnote ? '<p class="px-ai-survey-footnote">' + esc(b.footnote) + "</p>" : "") +
+        "</div>";
+    }
+    function renderSurveyAreaGapAnalysis() {
+      var g = data.areaGapAnalysis;
+      if (!g) return "";
+      var rows = (g.rows || []).map(function (row) {
+        return "<tr><td>" + esc(row.area) + '</td><td style="text-align:right">' + esc(row.ours) +
+          '</td><td style="text-align:right" class="px-ai-metric-d ' + surveyGapToneCls(row.allTone) + '">' + esc(row.allGap) +
+          '</td><td style="text-align:right" class="px-ai-metric-d ' + surveyGapToneCls(row.gradeTone) + '">' + esc(row.gradeGap) +
+          "</td></tr>";
+      }).join("");
+      return '<div class="px-ai-card">' +
+        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">영역별 격차 (전체 평균 · 3등급 평균 대비)</span></div>' +
+        '<p class="px-ai-voc-sum" style="margin-bottom:10px">' + esc(g.intro || "") + "</p>" +
+        '<table class="px-ai-survey-gap-tbl"><tr><th>영역</th><th>우리</th><th>전체평균 격차</th><th>3등급평균 격차</th></tr>' +
+          rows + "</table>" +
+        '<p class="px-ai-voc-sum" style="margin-top:10px">' + esc(g.summary || "") + "</p>" +
+        (g.footnote ? '<p class="px-ai-survey-footnote">' + esc(g.footnote) + "</p>" : "") +
+        "</div>";
+    }
+    function renderSurveyGradePriority() {
+      var p = data.gradePriority;
+      if (!p) return "";
+      var areas = (p.areas || []).map(function (area) {
+        var items = (area.items || []).map(function (item) {
+          return '<div class="px-ai-survey-rank-row"><span class="px-ai-survey-rank-lbl">' + esc(item.label) +
+            '</span><span class="px-ai-survey-rank-val' + (item.hot ? " hot" : "") + '">' + esc(item.score) + "</span></div>";
+        }).join("");
+        return '<div class="px-ai-survey-priority-card">' +
+          '<div class="px-ai-survey-priority-head"><span class="px-ai-survey-priority-title">' + esc(area.title) +
+            '</span><span class="px-ai-vbadge ' + (area.pillTone === "m" ? "px-ai-vbadge-mid" : "px-ai-vbadge-high") + '">' +
+            esc(area.pill) + "</span></div>" + items +
+          (area.note ? '<p style="font-size:10.5px;color:#7a7887;margin:6px 0 0">' + esc(area.note) + "</p>" : "") +
+          "</div>";
+      }).join("");
+      return '<div class="px-ai-card">' +
+        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">2등급 진입을 위한 영역·문항 우선순위</span></div>' +
+        '<p class="px-ai-voc-sum" style="margin-bottom:10px">' + esc(p.intro || "") + "</p>" +
+        areas +
+        '<p class="px-ai-voc-sum" style="margin-top:10px;padding-top:10px;border-top:1px dashed #2d2c36">' + esc(p.summary || "") + "</p>" +
+        "</div>";
+    }
     function renderSurveyTopAreas() {
       var areas = (data.pxAreas || []).slice().sort(function (a, b) {
         return Math.abs(b.change) - Math.abs(a.change);
@@ -1754,11 +2431,7 @@
         return '<div class="px-ai-change-row"><span class="px-ai-change-name">' + esc(c.name) +
           '</span><span class="px-ai-change-d ' + (c.up ? "up" : "dn") + '">' + esc(c.delta) + "</span></div>";
       }).join("");
-      var mons = (data.detailMonitors || []).map(function (m) {
-        return '<div class="px-ai-mon-item"><div class="px-ai-mon-name">' + esc(m.name) +
-          '</div><div class="px-ai-mon-line">' + esc(m.avg) +
-          '</div><div class="px-ai-mon-line dim">' + esc(m.criteria) + "</div></div>";
-      }).join("");
+      var mons = (data.detailMonitors || []).map(renderMonitorItem).join("");
       var changeTitle = data.changeSectionTitle || "부정률 변화";
       var monCount = (data.detailMonitors || []).length;
       var split = '<div class="px-ai-split' + (embedded ? " embedded" : "") + '">' +
@@ -1780,11 +2453,7 @@
     }
     function renderMonitorCard() {
       var monCount = (data.detailMonitors || []).length;
-      var mons = (data.detailMonitors || []).map(function (m) {
-        return '<div class="px-ai-mon-item"><div class="px-ai-mon-name">' + esc(m.name) +
-          '</div><div class="px-ai-mon-line">' + esc(m.avg) +
-          '</div><div class="px-ai-mon-line dim">' + esc(m.criteria) + "</div></div>";
-      }).join("");
+      var mons = (data.detailMonitors || []).map(renderMonitorItem).join("");
       return '<div class="px-ai-card"><div class="px-ai-card-hd"><span class="px-ai-card-ttl">모니터링 ' +
         monCount + "개 · 심각도 높음 이슈 기준</span></div>" + mons + "</div>";
     }
@@ -1795,13 +2464,13 @@
     }
     function blocksForLevel(lv) {
       if (variant === "survey") {
-        if (lv === "simple") return ["areas"];
-        if (lv === "basic") return ["areas", "actions"];
-        return ["matrix", "areas", "actions", "changes", "monitor"];
+        if (lv === "simple") return ["grade"];
+        if (lv === "basic") return ["grade", "beds", "gap"];
+        return ["grade", "beds", "gap", "gradePriority", "matrix"];
       }
       if (lv === "simple") return ["keywords"];
       if (lv === "basic") return ["keywords", "actions", "dist"];
-      return ["matrix", "keywords", "actions", "dist", "monitor"];
+      return ["keywords", "actions", "dist"];
     }
     function resolveAnalysisBlocks() {
       var lv = LV_KEYS[curLv];
@@ -1820,25 +2489,31 @@
       var sumText = summaryForLevel(lv);
       var periodSub = esc(data.periodShort || data.periodText || "");
       var rightHtml = renderInsightCard() + renderMetricChanges();
-      if (lv === "simple") {
-        if (variant === "voc") rightHtml += renderKeywordTop();
-        if (variant === "survey") rightHtml += renderSurveyTopAreas();
-      } else {
-        if (optional.indexOf("dist") > -1 && variant === "voc") rightHtml += renderDistCard();
-        if (optional.indexOf("keywords") > -1 && variant === "voc") rightHtml += renderKeywordTop();
-        if (optional.indexOf("areas") > -1 && variant === "survey") rightHtml += renderSurveyTopAreas();
-        if (lv === "basic" || lv === "deep") {
-          if (lv === "basic" || optional.indexOf("actions") > -1 || optional.indexOf("issues") > -1) {
-            rightHtml += renderVocDetailJudgement(lv === "deep", lv === "basic" ? 5 : undefined, lv === "basic" ? 5 : undefined);
+      if (variant === "voc") {
+        if (lv === "simple") {
+          rightHtml += renderKeywordTop();
+        } else {
+          if (optional.indexOf("dist") > -1) rightHtml += renderDistCard();
+          if (optional.indexOf("keywords") > -1) rightHtml += renderKeywordTop();
+          if (lv === "basic" || lv === "deep") {
+            if (optional.indexOf("actions") > -1) {
+              rightHtml += renderVocDetailJudgement(lv === "deep", lv === "basic" ? 5 : undefined, lv === "basic" ? 5 : undefined);
+            }
           }
         }
-      }
-      if (lv === "deep") {
-        if (optional.indexOf("matrix") > -1) {
-          rightHtml += variant === "voc" ? renderCategoryMatrix() : renderSurveyAreaMatrix();
+      } else if (variant === "survey") {
+        if (optional.indexOf("areas") > -1) rightHtml += renderSurveyTopAreas();
+        if (optional.indexOf("grade") > -1) rightHtml += renderSurveyGradeAnalysis();
+        if (optional.indexOf("beds") > -1) rightHtml += renderSurveyBedAnalysis();
+        if (optional.indexOf("gap") > -1) rightHtml += renderSurveyAreaGapAnalysis();
+        if (optional.indexOf("gradePriority") > -1) rightHtml += renderSurveyGradePriority();
+        if (optional.indexOf("matrix") > -1) rightHtml += renderSurveyAreaMatrix();
+        if (lv === "deep" && optional.indexOf("actions") > -1) {
+          rightHtml += renderVocDetailJudgement(true);
         }
-        if (optional.indexOf("changes") > -1 && variant === "survey") rightHtml += renderChangesCard();
-        if (optional.indexOf("monitor") > -1) rightHtml += renderMonitorCard();
+        if (lv === "deep") {
+          if (optional.indexOf("changes") > -1) rightHtml += renderChangesCard();
+        }
       }
       els.body.innerHTML =
         '<div class="px-ai-voc-layout">' +
@@ -2306,7 +2981,7 @@
       els.savedReportPane.innerHTML =
         '<div class="px-ai-saved-rpt-wrap">' +
           '<div class="px-ai-saved-rpt-meta">' + esc(statusLabel) + (when ? " · " + esc(when) : "") + "</div>" +
-          '<iframe class="px-ai-saved-rpt-frame" title="저장된 보고서 미리보기" sandbox="allow-same-origin"></iframe>' +
+          '<iframe class="px-ai-saved-rpt-frame" title="저장된 보고서 미리보기" sandbox="allow-same-origin allow-scripts"></iframe>' +
         "</div>";
       var frame = els.savedReportPane.querySelector("iframe");
       if (frame) frame.srcdoc = sanitizeSavedReportHtml(savedReportEntry.html);
@@ -2539,32 +3214,69 @@
       return '<p style="font-size:11px;font-weight:700;color:#f2949c;margin:0 0 6px">저점 영역·문항</p>' +
         reportStatTableHtml(areaRows.concat(qRows));
     }
+    function renderSurveyOverviewKpiHtml() {
+      var metrics = data.metricChanges || [];
+      var kpiStrip = metrics.length
+        ? '<div class="px-ai-rpt-kpi-strip" style="grid-template-columns:repeat(' + Math.min(4, metrics.length) + ',1fr)">' +
+          metrics.map(function (m) {
+            return '<div class="px-ai-rpt-kpi-box"><div class="kl">' + esc(m.k) + '</div><div class="kv">' + esc(m.v) +
+              '</div><div class="kd' + (m.tone === "good" ? " good" : m.tone === "bad" ? " bad" : "") + '">' + esc(m.d) + "</div></div>";
+          }).join("") + "</div>"
+        : "";
+      var declining = (data.pxAreas || []).filter(function (a) { return a.change < 0; });
+      var rising = (data.pxAreas || []).filter(function (a) { return a.change >= 0; }).sort(function (a, b) {
+        return b.change - a.change;
+      });
+      var focusAreas = declining.concat(rising.slice(0, Math.max(0, 3 - declining.length))).slice(0, 3);
+      var focusStrip = focusAreas.length
+        ? '<div class="px-ai-rpt-kpi-strip" style="grid-template-columns:repeat(' + focusAreas.length + ',1fr);margin-top:8px">' +
+          focusAreas.map(function (a) {
+            var good = a.change >= 0;
+            return '<div class="px-ai-rpt-kpi-box"><div class="kl">' + esc(a.name) + '</div><div class="kv">' +
+              a.score.toFixed(2) + '점</div><div class="kd' + (good ? " good" : " bad") + '">' +
+              (good ? "▲" : "▼") + Math.abs(a.change).toFixed(2) + "점</div></div>";
+          }).join("") + "</div>"
+        : "";
+      return kpiStrip + focusStrip;
+    }
+    function renderSurveyStatusDetailHtml() {
+      var areaTable = '<table class="px-ai-rpt-exec-tbl"><thead><tr><th>영역</th><th>점수</th><th>전월 대비</th></tr></thead><tbody>' +
+        (data.pxAreas || []).map(function (a) {
+          var tone = a.change >= 0 ? "good" : "bad";
+          var sign = a.change >= 0 ? "▲" : "▼";
+          return '<tr><td class="rowlabel">' + esc(a.name) + "</td><td>" + a.score.toFixed(2) +
+            '점</td><td class="' + tone + '">' + sign + Math.abs(a.change).toFixed(2) + "점</td></tr>";
+        }).join("") + "</tbody></table>";
+      return areaTable +
+        '<div class="px-ai-rpt-chart-block" style="margin-top:12px"><p class="px-ai-rpt-chart-title">영역별 점수 현황</p>' +
+        reportAreaBarHtml() + "</div>" +
+        '<p class="px-ai-rpt-chart-title" style="margin-top:14px">병동 · 진료과별 점수</p>' +
+        reportSurveyStatOrgHtml();
+    }
+    function renderSurveyStatBriefingHtml() {
+      return renderSurveyOverviewKpiHtml() + renderSurveyStatusDetailHtml();
+    }
+    function renderSurveyImprovementHtml() {
+      var pos = (data.positiveIssueActions || []).slice(0, 3);
+      var neg = (data.negativeIssueActions || []).slice(0, 5);
+      var issueHtml = (pos.length || neg.length)
+        ? renderIssueActionMatrix(pos, neg, { variant: "survey" })
+        : "";
+      return issueHtml + reportActionPlanHtml();
+    }
     function getReportBuilderSections() {
       if (data.reportBuilderSections) return data.reportBuilderSections;
       if (variant === "survey") {
-        var sections = [
-          { key: "overview", title: "종합 AI 요약", desc: "결론 · 원인 · 영향 범위 · 권고", aiBlock: "overview", statBlock: "stat_overview", defaultAi: true, defaultStat: true },
-          { key: "kpi", title: "핵심 지표", desc: "종합점수 · 응답자 · 추천의향", aiBlock: "kpi", statBlock: "stat_overview", defaultAi: true, defaultStat: false },
-          { key: "matrix", title: "영역 진단 매트릭스", desc: "75점 기준 4분면 진단", aiBlock: "matrix", statBlock: "stat_area", defaultAi: true, defaultStat: false }
+        return [
+          { key: "overview", title: "개요", desc: "보고 목적 · 핵심 요약", aiBlock: "overview", statBlock: null, defaultAi: true, defaultStat: false },
+          { key: "status", title: "현황", desc: "통계 기반 전체 현황", aiBlock: "status", statBlock: "statBrief", defaultAi: true, defaultStat: true },
+          { key: "grade", title: "등급 분석", desc: "5등급 · 백분위 · 2등급 격차", aiBlock: "grade", statBlock: null, defaultAi: true, defaultStat: false },
+          { key: "beds", title: "병상수별 분석", desc: "규모별 그룹 비교", aiBlock: "beds", statBlock: null, defaultAi: true, defaultStat: false },
+          { key: "gap", title: "영역별 격차", desc: "전체·3등급 평균 대비", aiBlock: "gap", statBlock: null, defaultAi: true, defaultStat: false },
+          { key: "matrix", title: "영역 진단 매트릭스", desc: "75점 기준 4분면 진단", aiBlock: "matrix", statBlock: null, defaultAi: true, defaultStat: false },
+          { key: "gradePriority", title: "2등급 진입 우선순위", desc: "영역·문항별 격차", aiBlock: "gradePriority", statBlock: "stat_priority", defaultAi: true, defaultStat: false },
+          { key: "improvement", title: "개선 과제 및 권고", desc: "우선순위 · 실행 일정", aiBlock: "improvement", statBlock: null, defaultAi: true, defaultStat: false }
         ];
-        (data.pxAreas || []).forEach(function (a, i) {
-          sections.push({
-            key: "area_" + i,
-            title: (sections.length) + ". " + a.name,
-            desc: a.org + " · 가중치 " + a.weight + "%",
-            area: a,
-            aiBlock: "area",
-            statBlock: "stat_area",
-            defaultAi: i < 4,
-            defaultStat: i < 2
-          });
-        });
-        sections.push(
-          { key: "org", title: "조직별 분석", desc: "병동 · 진료과 비교", aiBlock: "areas", statBlock: "stat_org", defaultAi: false, defaultStat: true },
-          { key: "issues", title: "이슈 및 권장 조치", desc: "상승 · 하락 영역 권장 조치", aiBlock: "issues", statBlock: "stat_priority", defaultAi: true, defaultStat: false },
-          { key: "plan", title: "개선 액션 플랜", desc: "우선순위 · 일정별 과제", aiBlock: "plan", statBlock: null, defaultAi: false, defaultStat: false }
-        );
-        return sections;
       }
       return [
         { key: "overview", title: "종합 AI 요약", desc: "결론 · 원인 · 영향 범위 · 권고", aiBlock: "overview", statBlock: null, defaultAi: true, defaultStat: false },
@@ -2574,8 +3286,7 @@
         { key: "keywords", title: "변화 키워드 TOP3", desc: "긍·부정 키워드 변화", aiBlock: "keywords", statBlock: "stat_category", defaultAi: true, defaultStat: false },
         { key: "issues", title: "주요 이슈 및 권장 조치", desc: "심각도 · 우선순위 매칭", aiBlock: "issues", statBlock: "stat_group", defaultAi: true, defaultStat: true },
         { key: "plan", title: "개선 액션 플랜", desc: "우선순위별 실행 과제", aiBlock: "plan", statBlock: null, defaultAi: false, defaultStat: false },
-        { key: "monitor", title: "모니터링", desc: "고심각도 이슈 추적", aiBlock: "monitor", statBlock: null, defaultAi: true, defaultStat: false },
-        { key: "quotes", title: "원문 및 인사이트", desc: "긍정 · 개선 제안 원문", aiBlock: "quotes", statBlock: null, defaultAi: false, defaultStat: false }
+        { key: "monitor", title: "모니터링", desc: "고심각도 이슈 추적", aiBlock: "monitor", statBlock: null, defaultAi: true, defaultStat: false }
       ];
     }
     function defaultReportSectionSel() {
@@ -2646,7 +3357,14 @@
       var drafts = data.reportDrafts || {};
       var statsDrafts = data.reportStatsDrafts || {};
       var aiEmbed = {
-        overview: "",
+        overview: variant === "survey" ? renderSurveyOverviewKpiHtml() : "",
+        status: variant === "survey" ? renderSurveyStatusDetailHtml() : "",
+        statBrief: variant === "survey" ? renderSurveyStatBriefingHtml() : "",
+        grade: variant === "survey" ? renderSurveyGradeAnalysis() : "",
+        beds: variant === "survey" ? renderSurveyBedAnalysis() : "",
+        gap: variant === "survey" ? renderSurveyAreaGapAnalysis() : "",
+        gradePriority: variant === "survey" ? renderSurveyGradePriority() : "",
+        improvement: variant === "survey" ? renderSurveyImprovementHtml() : "",
         kpi: reportSurveyKpiTableHtml(),
         dist: reportTypeDistHtml(),
         matrix: variant === "voc" ? renderCategoryMatrix() : renderSurveyAreaMatrix(),
@@ -2654,8 +3372,7 @@
         areas: renderSurveyTopAreas(),
         issues: reportIssuesEmbedHtml(),
         plan: reportActionPlanHtml(),
-        monitor: renderMonitorCard(),
-        quotes: reportQuoteListHtml()
+        monitor: renderMonitorCard()
       };
       var statEmbed = {
         stat_overview: reportKpiTableHtml(),
@@ -2708,34 +3425,29 @@
     function getReportDocumentStructure() {
       if (variant === "survey") {
         return [
-          { num: 1, title: "개요", importSection: "개요", blocks: [{ key: "overview", label: "개요" }] },
-          { num: 2, title: "현황", importSection: "현황", blocks: [
-            { key: "kpi", label: "핵심 지표" },
-            { key: "dist", label: "영역별 분포" }
-          ]},
+          { num: 1, title: "개요", importSection: "개요", blocks: [{ key: "overview", label: "" }] },
+          { num: 2, title: "현황", importSection: "현황", blocks: [{ key: "status", label: "" }] },
           { num: 3, title: "분석", importSection: "분석", blocks: [
+            { key: "grade", label: "등급 분석" },
+            { key: "beds", label: "병상수별 분석" },
+            { key: "gap", label: "영역별 격차" },
             { key: "matrix", label: "영역 진단 매트릭스" },
-            { key: "areas", label: "변화 영역 및 문항 TOP3" }
-          ]},
-          { num: 4, title: "이슈 및 평가", importSection: "이슈 및 평가", blocks: [
-            { key: "issues", label: "주요 이슈 및 권장 조치" }
-          ]},
-          { num: 5, title: "결론 및 제언", importSection: "결론 및 제언", blocks: [
-            { key: "conclusion", label: "결론 및 제언" },
-            { key: "plan", label: "개선 액션 플랜" }
-          ]},
-          { num: 6, title: "모니터링 계획", importSection: "모니터링 계획", blocks: [
-            { key: "monitor", label: "모니터링" }
+            { key: "gradePriority", label: "2등급 진입 우선순위" },
+            { key: "improvement", label: "개선 과제 및 권고" }
           ]}
         ];
       }
       return [
         { num: 1, title: "개요", importSection: "개요", blocks: [{ key: "overview", label: "" }] },
-        { num: 2, title: "현황 — 무엇이 달라졌나", importSection: "현황 — 무엇이 달라졌나", blocks: [{ key: "status", label: "" }] },
-        { num: 3, title: "분석 — 어디서 달라졌나", importSection: "분석 — 어디서 달라졌나", blocks: [{ key: "analysisOrg", label: "" }] },
-        { num: 4, title: "이슈 및 평가", importSection: "이슈 및 평가", blocks: [{ key: "issuesEval", label: "" }] },
-        { num: 5, title: "결론 및 제언", importSection: "결론 및 제언", blocks: [{ key: "conclusionOpts", label: "" }] },
-        { num: 6, title: "모니터링 계획", importSection: "모니터링 계획", blocks: [{ key: "monitorPlan", label: "" }] }
+        { num: 2, title: "현황", importSection: "현황", blocks: [{ key: "status", label: "" }] },
+        { num: 3, title: "분석", importSection: "분석", blocks: [
+          { key: "analysisOrg", label: "조직별 분석" },
+          { key: "matrix", label: "유형 진단 매트릭스" },
+          { key: "keywords", label: "변화 키워드 TOP3" },
+          { key: "issues", label: "주요 이슈 및 권장 조치" },
+          { key: "plan", label: "개선 액션 플랜" },
+          { key: "monitor", label: "모니터링" }
+        ]}
       ];
     }
     function getReportBlockDraft(key) {
@@ -2761,6 +3473,7 @@
         return data.reportExecRecommendation || drafts.recommendation || "";
       }
       if (key === "status") {
+        if (variant === "survey") return drafts.status || drafts.statBrief || "";
         return drafts.status || drafts.statusNarrative || "";
       }
       if (key === "analysisOrg") {
@@ -2787,9 +3500,7 @@
         return drafts.monitor || "";
       }
       if (key === "monitor" && !drafts.monitor) {
-        return (data.detailMonitors || []).map(function (m) {
-          return m.name + "\n" + m.avg + "\n" + m.criteria;
-        }).join("\n\n");
+        return (data.detailMonitors || []).map(monitorItemPlainText).join("\n\n");
       }
       return drafts[key] || "";
     }
@@ -2953,9 +3664,19 @@
     }
     function getReportBlockEmbed(key) {
       switch (key) {
+        case "statBrief": return variant === "survey" ? renderSurveyStatBriefingHtml() : "";
+        case "grade": return variant === "survey" ? renderSurveyGradeAnalysis() : "";
+        case "beds": return variant === "survey" ? renderSurveyBedAnalysis() : "";
+        case "gap": return variant === "survey" ? renderSurveyAreaGapAnalysis() : "";
+        case "gradePriority": return variant === "survey" ? renderSurveyGradePriority() : "";
+        case "improvement": return variant === "survey" ? renderSurveyImprovementHtml() : "";
         case "overview":
-          return variant === "voc" && data.reportDoc ? renderOverviewSectionHtml() : "";
-        case "status": return variant === "voc" ? renderStatusSectionHtml() : "";
+          if (variant === "survey") return renderSurveyOverviewKpiHtml();
+          if (variant === "voc" && data.reportDoc) return renderOverviewSectionHtml();
+          return "";
+        case "status":
+          if (variant === "survey") return renderSurveyStatusDetailHtml();
+          return variant === "voc" ? renderStatusSectionHtml() : "";
         case "analysisOrg": return variant === "voc" ? renderAnalysisOrgSectionHtml() : "";
         case "issuesEval": return variant === "voc" ? renderIssuesEvalSectionHtml() : "";
         case "conclusionOpts": return variant === "voc" ? renderConclusionSectionHtml() : "";
@@ -3213,25 +3934,72 @@
             esc(r[1]) + '</td><td style="text-align:right;color:#a9a7b6">' + esc(r[2]) + "</td></tr>";
         }).join("") + "</tbody></table>";
     }
+    function normalizeVocQuote(item) {
+      if (typeof item === "string") return { text: item, meta: "", channel: "", date: "" };
+      return {
+        text: item.text || "",
+        meta: item.meta || "",
+        channel: item.channel || "",
+        date: item.date || ""
+      };
+    }
+    function renderVocQuoteItem(item, polarity) {
+      var q = normalizeVocQuote(item);
+      var metaParts = [q.meta, q.channel, q.date].filter(Boolean);
+      return '<div class="px-ai-voc-quote-item ' + polarity + '">' +
+        '<p class="px-ai-voc-quote-text">"' + esc(q.text) + '"</p>' +
+        (metaParts.length ? '<p class="px-ai-voc-quote-meta">' + esc(metaParts.join(" · ")) + "</p>" : "") +
+        "</div>";
+    }
+    function getVocQuoteLists(limitPos, limitNeg) {
+      var samples = data.vocQuoteSamples || {};
+      var posAll = samples.positive || (data.posQuotes || []).map(function (t) { return { text: t }; });
+      var negAll = samples.negative || (data.negQuotes || []).map(function (t) { return { text: t }; });
+      return {
+        intro: samples.intro || (data.reportDoc && data.reportDoc.quotesIntro) ||
+          "실제 접수된 VOC 원문 중 이번 달 흐름을 보여주는 사례입니다.",
+        positive: typeof limitPos === "number" ? posAll.slice(0, limitPos) : posAll,
+        negative: typeof limitNeg === "number" ? negAll.slice(0, limitNeg) : negAll,
+        totalPos: posAll.length,
+        totalNeg: negAll.length
+      };
+    }
+    function renderVocQuotesContent(limitPos, limitNeg) {
+      var lists = getVocQuoteLists(limitPos, limitNeg);
+      var scrollCls = (typeof limitPos !== "number" && typeof limitNeg !== "number") ? "px-ai-voc-quotes-scroll" : "";
+      var posHtml = lists.positive.map(function (q) { return renderVocQuoteItem(q, "pos"); }).join("");
+      var negHtml = lists.negative.map(function (q) { return renderVocQuoteItem(q, "neg"); }).join("");
+      var posLabel = "긍정 원문 (" + lists.positive.length + "건" +
+        (lists.positive.length < lists.totalPos ? " / 전체 " + lists.totalPos + "건" : "") + ")";
+      var negLabel = "부정·개선 원문 (" + lists.negative.length + "건" +
+        (lists.negative.length < lists.totalNeg ? " / 전체 " + lists.totalNeg + "건" : "") + ")";
+      return '<div class="px-ai-voc-quotes-grid">' +
+          '<div><p class="px-ai-voc-quotes-col-hd pos">' + posLabel + '</p><div' +
+            (scrollCls ? ' class="' + scrollCls + '"' : "") + ">" + posHtml + "</div></div>" +
+          '<div style="border-left:1px solid #2d2c36;padding-left:14px">' +
+            '<p class="px-ai-voc-quotes-col-hd neg">' + negLabel + '</p><div' +
+            (scrollCls ? ' class="' + scrollCls + '"' : "") + ">" + negHtml + "</div></div>" +
+        "</div>";
+    }
+    function renderVocQuotesPanel(limitPos, limitNeg) {
+      var lists = getVocQuoteLists(limitPos, limitNeg);
+      return '<div class="px-ai-card">' +
+        '<div class="px-ai-card-hd"><span class="px-ai-card-ttl">VOC 원문 확인</span>' +
+        '<span class="px-ai-card-sub">' + esc(lists.intro) + "</span></div>" +
+        renderVocQuotesContent(limitPos, limitNeg) +
+        "</div>";
+    }
     function reportQuoteListHtml() {
-      var pos = (data.posQuotes || []).map(function (q, i) {
-        return '<div class="px-ai-quote-pos">' + (i + 1) + ". " + esc(q) + "</div>";
-      }).join("");
-      var neg = (data.negQuotes || []).map(function (q, i) {
-        return '<div class="px-ai-quote-neg">' + (i + 1) + ". " + esc(q) + "</div>";
-      }).join("");
-      return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px">' +
-        '<div><p style="font-size:11px;font-weight:700;color:#7ea6ff;margin:0 0 6px">긍정 원문 (10건)</p>' + pos + "</div>" +
-        '<div style="border-left:1px solid #2d2c36;padding-left:14px"><p style="font-size:11px;font-weight:700;color:#f2949c;margin:0 0 6px">개선 제안 원문 (10건)</p>' + neg + "</div></div>";
+      var lists = getVocQuoteLists();
+      return '<div style="margin-top:8px">' +
+        '<p style="font-size:12px;font-weight:700;color:#cfcdda;margin:0 0 4px">VOC 원문 확인</p>' +
+        '<p style="font-size:10px;color:#7a7887;margin:0 0 10px">' + esc(lists.intro) + "</p>" +
+        renderVocQuotesContent() +
+        "</div>";
     }
     function reportIssuesEmbedHtml(includeMonitorFooter) {
-      var posLabel = variant === "survey" ? "상승 영역 · 권장 조치" : "긍정 이슈 · 권장 조치";
-      var negLabel = variant === "survey" ? "하락 영역 · 권장 조치" : "부정 이슈 · 권장 조치";
       var html = '<div style="margin-top:10px">' +
-        '<p style="font-size:11px;font-weight:700;color:#7ea6ff;margin:0 0 8px">' + posLabel + "</p>" +
-        '<div class="px-ai-ia-list">' + renderIssueActionList(data.positiveIssueActions || []) + "</div>" +
-        '<p style="font-size:11px;font-weight:700;color:#f2949c;margin:14px 0 8px">' + negLabel + "</p>" +
-        '<div class="px-ai-ia-list">' + renderIssueActionList(data.negativeIssueActions || []) + "</div>";
+        renderIssueActionMatrix(data.positiveIssueActions || [], data.negativeIssueActions || [], { variant: variant });
       if (includeMonitorFooter !== false) html += renderDetailMonitorsFooter();
       return html + "</div>";
     }
@@ -3351,7 +4119,9 @@
       var drafts = data.reportDrafts || {};
       var statsDrafts = data.reportStatsDrafts || {};
       return {
-        overview: ["개요", reportDraftHtml(overviewReportText()), ""],
+        overview: ["개요", reportDraftHtml(overviewReportText()), renderOverviewSectionHtml()],
+        status: ["현황", reportDraftHtml(getReportBlockDraft("status")), renderStatusSectionHtml()],
+        analysisOrg: ["조직별 분석", reportDraftHtml(getReportBlockDraft("analysisOrg")), renderAnalysisOrgSectionHtml()],
         kpi: ["핵심 지표", reportDraftHtml(drafts.kpi), reportKpiTableHtml()],
         dist: ["유형별 분포", reportDraftHtml(drafts.dist), reportTypeDistHtml()],
         matrix: ["유형 진단 매트릭스", reportDraftHtml(drafts.matrix || ""), renderCategoryMatrix()],
@@ -3359,7 +4129,6 @@
         issues: ["주요 이슈 및 권장 조치", reportDraftHtml(drafts.issues), reportIssuesEmbedHtml()],
         plan: ["개선 액션 플랜", reportDraftHtml(drafts.plan), reportActionPlanHtml()],
         monitor: ["모니터링", reportDraftHtml(drafts.monitor || ""), renderMonitorCard()],
-        quotes: ["원문 및 인사이트", reportDraftHtml(drafts.quotes), reportQuoteListHtml()],
         stat_overview: ["전체 VOC 현황", reportDraftHtml(statsDrafts.stat_overview), reportKpiTableHtml()],
         stat_type: ["유형별 접수 현황", reportDraftHtml(statsDrafts.stat_type), reportTypeDistHtml()],
         stat_trend: ["VOC 월별 추이", reportDraftHtml(statsDrafts.stat_trend), reportVocStatTrendHtml()],
@@ -3445,7 +4214,7 @@
     }
     function reportMonitorsBody() {
       return (data.detailMonitors || []).map(function (m) {
-        return "· " + m.name + "\n  " + m.avg + "\n  " + m.criteria;
+        return "· " + monitorItemPlainText(m).replace(/\n/g, "\n  ");
       }).join("\n\n");
     }
     function reportTemplate() {
@@ -3482,12 +4251,19 @@
       var drafts = data.reportDrafts || {};
       var statsDrafts = data.reportStatsDrafts || {};
       var blockContent = {
-        overview: ["개요", reportDraftHtml(overviewReportText()), ""],
+        overview: ["개요", reportDraftHtml(drafts.overview || overviewReportText()), renderSurveyOverviewKpiHtml()],
+        status: ["현황", reportDraftHtml(drafts.status || drafts.statBrief), renderSurveyStatusDetailHtml()],
+        statBrief: ["전체 현황", reportDraftHtml(drafts.statBrief || drafts.status), renderSurveyStatBriefingHtml()],
+        grade: ["등급 분석", reportDraftHtml(drafts.grade), renderSurveyGradeAnalysis()],
+        beds: ["병상수별 분석", reportDraftHtml(drafts.beds), renderSurveyBedAnalysis()],
+        gap: ["영역별 격차", reportDraftHtml(drafts.gap), renderSurveyAreaGapAnalysis()],
+        matrix: ["영역 진단 매트릭스", reportDraftHtml(drafts.matrix), renderSurveyAreaMatrix()],
+        gradePriority: ["2등급 진입 우선순위", reportDraftHtml(drafts.gradePriority), renderSurveyGradePriority()],
+        improvement: ["개선 과제 및 권고", reportDraftHtml(drafts.improvement), renderSurveyImprovementHtml()],
         kpi: ["핵심 지표", reportDraftHtml(drafts.kpi), reportSurveyKpiTableHtml()],
         dist: ["영역별 분포", reportDraftHtml(drafts.dist), reportAreaBarHtml()],
-        matrix: ["영역 진단 매트릭스", reportDraftHtml(drafts.matrix), renderSurveyAreaMatrix()],
         areas: ["변화 영역 및 문항 TOP3", reportDraftHtml(drafts.areas), renderSurveyTopAreas()],
-        issues: ["주요 이슈 및 권장 조치", reportDraftHtml(drafts.issues), renderVocDetailJudgement(true)],
+        issues: ["주요 이슈 및 권장 조치", reportDraftHtml(drafts.issues), reportIssuesEmbedHtml()],
         plan: ["개선 액션 플랜", reportDraftHtml(drafts.plan), reportActionPlanHtml()],
         stat_overview: ["전체 현황", reportDraftHtml(statsDrafts.stat_overview), reportSurveyStatOverviewHtml()],
         stat_area: ["영역·문항 분석", reportDraftHtml(statsDrafts.stat_area), reportSurveyStatAreaHtml()],
@@ -3668,6 +4444,7 @@
       els.reportBtn.addEventListener("click", function (e) {
         e.preventDefault();
         if (analysisPhase !== "ready") return;
+        if (variant === "survey" && els.reportDoc) renderFullReportDocument();
         openExternalReportDrawer();
       });
     }
@@ -3779,8 +4556,8 @@
     global.addEventListener("pix-report-persisted", onReportPersisted);
 
     function beginCompletedAnalysisView(levelKey) {
-      var idx = LV_KEYS.indexOf(levelKey || options.level || "deep");
-      if (idx < 0) idx = 2;
+      var idx = LV_KEYS.indexOf(levelKey || options.level || "basic");
+      if (idx < 0) idx = 1;
       curLv = idx;
       global.__pxAiAnalysisLevel = LV_KEYS[curLv];
       analysisPhase = "ready";
@@ -3835,6 +4612,26 @@
       };
     }
 
+    function buildReportSrcDoc() {
+      if (disposed || analysisPhase !== "ready" || variant !== "survey") return null;
+      renderFullReportDocument();
+      if (!els.reportDoc) return null;
+      var clone = els.reportDoc.cloneNode(true);
+      clone.querySelectorAll(".px-ai-rpt-actions, [data-remove-block], .px-ai-import-btn, .px-ai-rpt-remove, .px-ai-rpt-draft-tag").forEach(function (el) {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
+      clone.querySelectorAll("[contenteditable]").forEach(function (el) {
+        el.removeAttribute("contenteditable");
+        el.removeAttribute("spellcheck");
+      });
+      var meta = data.reportMeta || {};
+      return "<!DOCTYPE html><html lang=\"ko\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
+        "<title>" + esc(meta.title || "환자경험평가 분석보고서") + "</title>" +
+        "<style>" + CSS + VOC_CSS + "</style></head>" +
+        "<body style=\"margin:0;background:#17171c;padding:20px 16px 40px;font-family:'Malgun Gothic',sans-serif\">" +
+        clone.innerHTML + "</body></html>";
+    }
+
     var captureKeys = [];
     if (options.reportStorageKey) captureKeys.push(options.reportStorageKey);
     captureKeys.push("variant:" + variant);
@@ -3842,9 +4639,15 @@
     captureKeys.forEach(function (key) {
       global.__pixAnalysisPanelCaptures[key] = captureAnalysisSnapshot;
     });
+    if (variant === "survey") {
+      global.__pixBuildSurveyReportSrcDoc = buildReportSrcDoc;
+    }
 
     return function dispose() {
       disposed = true;
+      if (variant === "survey" && global.__pixBuildSurveyReportSrcDoc === buildReportSrcDoc) {
+        try { delete global.__pixBuildSurveyReportSrcDoc; } catch (_e) {}
+      }
       dispatchHistoryCleared();
       captureKeys.forEach(function (key) {
         if (global.__pixAnalysisPanelCaptures && global.__pixAnalysisPanelCaptures[key] === captureAnalysisSnapshot) {
@@ -4253,6 +5056,114 @@
   };
 
   var PIX_REPORT_GEN_MS = 2800;
+  var PIX_AI_SPLIT_PANEL_WIDTH = 780;
+
+  var pixAiModalBridge = {
+    handlers: {},
+    pending: {}
+  };
+
+  function pixAiModalBridgeKey(variant, mode) {
+    return String(variant || "") + ":" + String(mode || "");
+  }
+
+  function registerPixAiModalHandler(variant, mode, fn) {
+    var key = pixAiModalBridgeKey(variant, mode);
+    if (typeof fn === "function") {
+      pixAiModalBridge.handlers[key] = fn;
+    } else {
+      try { delete pixAiModalBridge.handlers[key]; } catch (_e) {}
+    }
+    if (pixAiModalBridge.pending[key] && typeof fn === "function") {
+      pixAiModalBridge.pending[key] = false;
+      fn();
+    }
+  }
+
+  function dispatchPixAiModal(variant, mode) {
+    var key = pixAiModalBridgeKey(variant, mode);
+    var handler = pixAiModalBridge.handlers[key];
+    if (typeof handler === "function") {
+      handler();
+      return true;
+    }
+    pixAiModalBridge.pending[key] = true;
+    try {
+      global.dispatchEvent(new CustomEvent("pix-ai-modal-request", {
+        detail: { variant: variant, mode: mode }
+      }));
+    } catch (_e) {}
+    return false;
+  }
+
+  function installPixAiModalGlobals() {
+    global.openPxSurveyAiModal = function () {
+      dispatchPixAiModal("survey", "analysis");
+    };
+    global.openPxSurveyAiReportModal = function () {
+      dispatchPixAiModal("survey", "report");
+    };
+    global.openVocAiModal = function () {
+      dispatchPixAiModal("voc", "analysis");
+    };
+    global.openVocAiReportModal = function () {
+      dispatchPixAiModal("voc", "report");
+    };
+  }
+
+  installPixAiModalGlobals();
+  global.__pixAiModalBridge = pixAiModalBridge;
+  global.registerPixAiModalHandler = registerPixAiModalHandler;
+
+  function flushPixAiModalPending() {
+    var keys = Object.keys(pixAiModalBridge.pending);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (!pixAiModalBridge.pending[key]) continue;
+      var handler = pixAiModalBridge.handlers[key];
+      if (typeof handler === "function") {
+        pixAiModalBridge.pending[key] = false;
+        handler();
+      }
+    }
+  }
+
+  function installPixAiModalBridgeListeners() {
+    if (global.__pixAiModalBridgeListenersInstalled) return;
+    global.__pixAiModalBridgeListenersInstalled = true;
+
+    document.addEventListener("click", function (e) {
+      var t = e.target;
+      if (!t || !t.closest) return;
+      var btn = t.closest(".voc-filter-action, [data-pix-ai-open]");
+      if (!btn) return;
+      var variant = btn.getAttribute("data-pix-ai-open") || "voc";
+      var mode = btn.getAttribute("data-pix-ai-mode") || "analysis";
+      dispatchPixAiModal(variant, mode);
+    }, true);
+
+    var flushAttempts = 0;
+    var flushTimer = global.setInterval(function () {
+      flushPixAiModalPending();
+      flushAttempts += 1;
+      if (flushAttempts > 50) global.clearInterval(flushTimer);
+    }, 200);
+  }
+
+  installPixAiModalBridgeListeners();
+
+  function ensurePixAiSplitCss() {
+    if (document.getElementById("pix-ai-split-css")) return;
+    var style = document.createElement("style");
+    style.id = "pix-ai-split-css";
+    style.textContent =
+      ".pix-ai-stats-shell{display:flex;width:100%;min-width:0;box-sizing:border-box;}" +
+      ".pix-ai-stats-shell.is-open{height:calc(100vh - 140px);min-height:640px;overflow:hidden;}" +
+      ".pix-ai-stats-shell-pane{min-height:0;min-width:0;box-sizing:border-box;}" +
+      ".pix-ai-stats-shell-pane.stats{flex:1 1 auto;overflow:auto;}" +
+      ".pix-ai-split-pane{flex:0 0 " + PIX_AI_SPLIT_PANEL_WIDTH + "px;width:" + PIX_AI_SPLIT_PANEL_WIDTH + "px;max-width:min(50vw,920px);min-width:560px;}";
+    document.head.appendChild(style);
+  }
 
   function ensurePixReportDrawerCss() {
     if (document.getElementById("pix-report-drawer-css")) return;
@@ -4287,15 +5198,25 @@
     );
   }
 
-  function enablePixReportIframeEdit(iframe) {
-    if (!iframe) return;
+  function enablePixReportIframeEdit(iframe, onDone) {
+    if (!iframe) {
+      if (typeof onDone === "function") onDone(false);
+      return;
+    }
     var attempts = 0;
+    var maxAttempts = 80;
+    var loadBound = false;
+    function finish(enabled) {
+      if (typeof onDone === "function") onDone(!!enabled);
+    }
     function tryEnable() {
       attempts += 1;
       var enabled = false;
       try {
         var win = iframe.contentWindow;
-        if (win && win.PixReportLayoutEdit && typeof win.PixReportLayoutEdit.enable === "function") {
+        var doc = win && win.document;
+        if (doc && (doc.readyState === "complete" || doc.readyState === "interactive") &&
+            win.PixReportLayoutEdit && typeof win.PixReportLayoutEdit.enable === "function") {
           if (!win.PixReportLayoutEdit.isEditMode()) win.PixReportLayoutEdit.enable();
           enabled = win.PixReportLayoutEdit.isEditMode();
         }
@@ -4311,7 +5232,30 @@
           enabled = !!(winAfter && winAfter.PixReportLayoutEdit && winAfter.PixReportLayoutEdit.isEditMode());
         } catch (_checkErr) {}
       }
-      if (!enabled && attempts < 50) setTimeout(tryEnable, 100);
+      if (enabled) {
+        finish(true);
+        return;
+      }
+      if (attempts < maxAttempts) {
+        setTimeout(tryEnable, 100);
+        return;
+      }
+      finish(false);
+    }
+    function bindLoadRetry() {
+      if (loadBound) return;
+      loadBound = true;
+      iframe.addEventListener("load", function onFrameLoad() {
+        iframe.removeEventListener("load", onFrameLoad);
+        attempts = 0;
+        tryEnable();
+      });
+    }
+    try {
+      var initialDoc = iframe.contentDocument;
+      if (!initialDoc || initialDoc.readyState === "loading") bindLoadRetry();
+    } catch (_loadErr) {
+      bindLoadRetry();
     }
     tryEnable();
   }
@@ -4323,6 +5267,7 @@
     var useEffect = React.useEffect;
     var useRef = React.useRef;
     var drawerBodyRef = useRef(null);
+    var pendingEditRef = useRef(false);
     var phaseState = useState("generating");
     var phase = phaseState[0];
     var setPhase = phaseState[1];
@@ -4338,12 +5283,36 @@
       return opts.iframeRef && opts.iframeRef.current ? opts.iframeRef.current : null;
     }
 
+    function beginReportEdit() {
+      pendingEditRef.current = true;
+      enablePixReportIframeEdit(resolveReportIframe(), function (enabled) {
+        if (enabled) {
+          pendingEditRef.current = false;
+          return;
+        }
+        pendingEditRef.current = false;
+        setEditing(false);
+      });
+    }
+
     function handleEditClick() {
       setEditing(true);
-      enablePixReportIframeEdit(resolveReportIframe());
+    }
+
+    function handleIframeLoad() {
+      if (!pendingEditRef.current && !editing) return;
+      beginReportEdit();
     }
 
     useEffect(function () {
+      if (!opts.open) {
+        pendingEditRef.current = false;
+        setEditing(false);
+      }
+    }, [opts.open]);
+
+    useEffect(function () {
+      pendingEditRef.current = false;
       setEditing(false);
       if (opts.skipGeneration || opts.reportSrcDoc) {
         setPhase("ready");
@@ -4356,7 +5325,7 @@
 
     useEffect(function () {
       if (phase !== "ready" || !editing) return undefined;
-      enablePixReportIframeEdit(resolveReportIframe());
+      beginReportEdit();
       return undefined;
     }, [phase, editing]);
 
@@ -4380,8 +5349,8 @@
       "div",
       {
         className: isModal
-          ? "w-full max-w-[960px] h-[92vh] max-h-[92vh] overflow-hidden rounded-[14px] shadow-2xl border border-[#cfcdc5] flex flex-col"
-          : "absolute top-0 right-0 h-full w-full max-w-[900px] shadow-2xl animate-drawerSlideIn overflow-hidden border-l border-[#cfcdc5] pointer-events-auto",
+          ? "relative z-10 w-full max-w-[960px] h-[92vh] max-h-[92vh] overflow-hidden rounded-[14px] shadow-2xl border border-[#cfcdc5] flex flex-col pointer-events-auto"
+          : "absolute top-0 right-0 z-10 h-full w-full max-w-[900px] shadow-2xl animate-drawerSlideIn overflow-hidden border-l border-[#cfcdc5] pointer-events-auto",
         style: isModal
           ? {
             background: "#eae8e2",
@@ -4488,8 +5457,9 @@
             "data-pix-report-frame": "1",
             src: opts.reportSrcDoc ? undefined : opts.reportUrl,
             srcDoc: opts.reportSrcDoc || undefined,
-            sandbox: opts.reportSrcDoc ? "allow-same-origin" : undefined,
+            sandbox: opts.reportSrcDoc ? "allow-same-origin allow-scripts" : undefined,
             title: opts.iframeTitle || opts.title,
+            onLoad: handleIframeLoad,
             style: {
               width: "100%",
               flex: "1 1 auto",
@@ -4582,6 +5552,34 @@
 
   function createPixAiAnalysisDrawer(React, opts) {
     if (!opts || !opts.open) return null;
+    if (opts.layout === "split") {
+      ensurePixAiSplitCss();
+      return React.createElement(
+        "div",
+        {
+          className: "pix-ai-split-pane flex flex-col shrink-0 min-h-0 overflow-hidden border-l border-[#2d2c36] shadow-2xl",
+          style: {
+            background: "#17171c",
+            color: "#e7e6ee",
+            boxSizing: "border-box"
+          }
+        },
+        React.createElement(
+          "div",
+          {
+            style: {
+              flex: "1 1 auto",
+              minHeight: 0,
+              overflow: "auto",
+              padding: "22px 22px 18px",
+              display: "flex",
+              flexDirection: "column"
+            }
+          },
+          opts.children
+        )
+      );
+    }
     return React.createElement(
       "div",
       { className: "fixed inset-0 z-[120]" },
@@ -4702,6 +5700,9 @@
       var _historyReportEntry = useState(null);
       var historyReportEntry = _historyReportEntry[0];
       var setHistoryReportEntry = _historyReportEntry[1];
+      var _reportSrcDoc = useState(null);
+      var reportSrcDoc = _reportSrcDoc[0];
+      var setReportSrcDoc = _reportSrcDoc[1];
       var panelRef = useRef(null);
       var reportFrameRef = useRef(null);
       var historyReportFrameRef = useRef(null);
@@ -4754,14 +5755,24 @@
         };
       }, []);
       useEffect(function () {
-        global[openGlobal] = function () {
+        function openAnalysisModal() {
           openModeRef.current = "analysis";
           setReportOpen(false);
           setOpen(true);
-        };
-        global[openReportGlobal] = function () {
+        }
+        function openReportModal() {
+          setReportSrcDoc(null);
           setReportOpen(true);
-        };
+        }
+        registerPixAiModalHandler(cfg.variant, "analysis", openAnalysisModal);
+        registerPixAiModalHandler(cfg.variant, "report", openReportModal);
+        function onModalRequest(ev) {
+          var detail = ev && ev.detail;
+          if (!detail || detail.variant !== cfg.variant) return;
+          if (detail.mode === "report") openReportModal();
+          else openAnalysisModal();
+        }
+        global.addEventListener("pix-ai-modal-request", onModalRequest);
         var removeDocClick = null;
         if (cfg.variant === "voc") {
           function onClick(e) {
@@ -4770,17 +5781,16 @@
             var btn = t.closest(".voc-filter-action");
             if (!btn) return;
             e.preventDefault();
-            openModeRef.current = "analysis";
-            setReportOpen(false);
-            setOpen(true);
+            openAnalysisModal();
           }
           document.addEventListener("click", onClick, true);
           removeDocClick = function () { document.removeEventListener("click", onClick, true); };
         }
         return function () {
           if (removeDocClick) removeDocClick();
-          try { if (global[openGlobal]) delete global[openGlobal]; } catch (_e) {}
-          try { if (global[openReportGlobal]) delete global[openReportGlobal]; } catch (_e) {}
+          global.removeEventListener("pix-ai-modal-request", onModalRequest);
+          registerPixAiModalHandler(cfg.variant, "analysis", null);
+          registerPixAiModalHandler(cfg.variant, "report", null);
         };
       }, []);
       useEffect(function () {
@@ -4799,7 +5809,10 @@
             setHistoryReportOpen(false);
             setHistoryReportEntry(null);
           },
-          onOpenReport: function () { setReportOpen(true); }
+          onOpenReport: function () {
+            setReportSrcDoc(null);
+            setReportOpen(true);
+          }
         });
       }, [open, props.showToast]);
       var actions = global.pixReportDocActions || {};
@@ -4814,6 +5827,7 @@
         : null;
       var aiDrawer = typeof global.createPixAiAnalysisDrawer === "function"
         ? global.createPixAiAnalysisDrawer(React, {
+          layout: "split",
           open: open,
           onClose: function () {
             setOpen(false);
@@ -4821,7 +5835,10 @@
             setHistoryReportOpen(false);
             setHistoryReportEntry(null);
           },
-          children: React.createElement("div", { ref: panelRef, style: { width: "100%" } })
+          children: React.createElement("div", {
+            ref: panelRef,
+            style: { width: "100%", height: "100%", minHeight: 0, flex: "1 1 auto" }
+          })
         })
         : null;
       var historyEntry = historyReportEntry || {};
@@ -4880,10 +5897,12 @@
       var reportModal = typeof global.createPixReportIframeModal === "function"
         ? global.createPixReportIframeModal(React, {
           open: reportOpen,
-          onClose: function () { setReportOpen(false); },
+          onClose: function () { setReportOpen(false); setReportSrcDoc(null); },
           title: cfg.reportTitle,
           subtitle: cfg.reportSubtitle,
-          reportUrl: cfg.reportUrl,
+          reportUrl: reportSrcDoc ? undefined : cfg.reportUrl,
+          reportSrcDoc: reportSrcDoc || undefined,
+          skipGeneration: !!reportSrcDoc || !!cfg.reportUrl,
           iframeTitle: cfg.iframeTitle,
           iframeRef: reportFrameRef,
           footer: reportFooter
@@ -4895,11 +5914,27 @@
           ? ReactDOM.createPortal(node, document.body)
           : node;
       }
+      ensurePixAiSplitCss();
       return React.createElement(
         React.Fragment,
         null,
-        React.createElement("div", { ref: statsHostRef, style: { width: "100%" } }, props.children),
-        portalize(aiDrawer),
+        React.createElement(
+          "div",
+          {
+            className: "pix-ai-stats-shell" + (open ? " is-open" : ""),
+            style: open ? undefined : { width: "100%" }
+          },
+          React.createElement(
+            "div",
+            {
+              ref: statsHostRef,
+              className: "pix-ai-stats-shell-pane stats",
+              style: { width: "100%" }
+            },
+            props.children
+          ),
+          open ? aiDrawer : null
+        ),
         portalize(reportModal),
         portalize(historyReportModal)
       );
