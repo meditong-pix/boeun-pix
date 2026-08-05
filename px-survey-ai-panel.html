@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIX AI · 환자경험평가 AI 분석</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+
+  :root{
+    --blue-700:#1d4ed8; --blue-600:#2563eb; --blue-500:#3b82f6; --blue-100:#dbeafe; --blue-50:#eff6ff;
+    --red-700:#b91c1c; --red-600:#dc2626; --red-500:#ef4444; --red-100:#fee2e2; --red-50:#fef2f2;
+    --amber-700:#b45309; --amber-500:#f59e0b; --amber-100:#fef3c7; --amber-50:#fffbeb;
+    --ink:#0f172a; --g700:#334155; --g600:#475569; --g500:#64748b; --g400:#94a3b8; --g300:#cbd5e1; --g200:#e2e8f0; --g100:#f1f5f9; --g50:#f8fafc;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Noto Sans KR','Inter',sans-serif; background:var(--g50); color:var(--ink); font-size:13px; line-height:1.5;}
+  ::-webkit-scrollbar{width:8px; height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--g200); border-radius:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  .app{display:flex; flex-direction:column; height:100vh;}
+
+  .topbar{height:52px; flex-shrink:0; background:var(--ink); color:#fff; display:flex; align-items:center; padding:0 20px; gap:10px;}
+  .topbar .logo{font-weight:900; letter-spacing:-0.03em; font-family:'Inter',sans-serif; font-size:15px;}
+  .topbar .crumbs{font-size:11px; font-weight:700; color:#94a3b8; margin-left:4px;}
+  .topbar .crumbs b{color:#e2e8f0;}
+  .topbar .spacer{flex:1;}
+  .topbar .dept-tag{font-size:10.5px; font-weight:800; color:#cbd5e1; background:rgba(148,163,184,.15); padding:5px 10px; border-radius:20px; display:flex; align-items:center; gap:5px;}
+
+  .body-wrap{flex:1; min-height:0; display:flex;}
+  .main-col{flex:1; min-width:0; overflow-y:auto; padding:22px 26px 60px; transition:padding .25s;}
+  .main-col.panel-open{padding-right:14px;}
+
+  .filterbar{display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--g200); border-radius:14px; padding:12px 16px; margin-bottom:18px; flex-wrap:wrap;}
+  .filterbar select{border:1px solid var(--g200); background:var(--g50); border-radius:9px; padding:7px 10px; font-size:12px; font-weight:700; color:var(--g700); font-family:inherit;}
+  .filterbar .spacer{flex:1;}
+  .btn{border:none; border-radius:9px; padding:8px 14px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-family:inherit; transition:all .15s;}
+  .btn-ghost{background:var(--g50); color:var(--g700); border:1px solid var(--g200);}
+  .btn-ghost:hover{background:var(--g100);}
+  .btn-primary{background:var(--ink); color:#fff;}
+  .btn-primary:hover{background:#000;}
+  .btn-ai{background:linear-gradient(135deg,#4338ca,#2563eb); color:#fff; box-shadow:0 4px 14px rgba(37,99,235,.35);}
+  .btn-ai:hover{filter:brightness(1.08);}
+
+  .grid5{display:grid; grid-template-columns:1.25fr 1fr 1fr 1fr 1fr; gap:12px; margin-bottom:18px;}
+  .kcard{background:#fff; border:1px solid var(--g200); border-radius:14px; padding:15px 16px;}
+  .kcard .lbl{font-size:11px; font-weight:800; color:var(--g500); margin-bottom:8px;}
+  .kcard .val{font-size:21px; font-weight:900; color:var(--ink);}
+  .kcard .delta{font-size:11px; font-weight:800; margin-top:6px; display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:20px;}
+  .delta.good{color:var(--blue-700); background:var(--blue-50);}
+  .delta.bad{color:var(--red-700); background:var(--red-50);}
+  .delta.neu{color:var(--g500); background:var(--g100);}
+
+  .grade-kcard{background:linear-gradient(135deg,#1e293b,#0f172a); color:#fff; border:none;}
+  .grade-kcard .lbl{color:#94a3b8;}
+  .grade-kcard .gval{font-size:26px; font-weight:900; display:flex; align-items:baseline; gap:6px;}
+  .grade-kcard .gval small{font-size:12px; font-weight:800; color:#93c5fd;}
+  .grade-kcard .gnext{font-size:10.5px; font-weight:700; color:#cbd5e1; margin-top:7px;}
+
+  .card{background:#fff; border:1px solid var(--g200); border-radius:14px; padding:18px 20px; margin-bottom:18px;}
+  .card h3{font-size:13px; font-weight:900; margin:0 0 14px; display:flex; align-items:center; gap:6px;}
+  .card h3 .ic{color:var(--g400);}
+  .row2{display:grid; grid-template-columns:1.4fr 1fr; gap:14px;}
+
+  table.dt{width:100%; border-collapse:collapse; font-size:12px;}
+  table.dt th{text-align:left; font-size:10px; font-weight:800; color:var(--g400); text-transform:uppercase; padding:6px 8px; border-bottom:1px solid var(--g200);}
+  table.dt td{padding:9px 8px; border-bottom:1px solid var(--g100); font-weight:700; color:var(--g700);}
+  table.dt tr:last-child td{border-bottom:none;}
+  .up{color:var(--blue-600); font-weight:900;}
+  .down{color:var(--red-600); font-weight:900;}
+  .flat{color:var(--g400); font-weight:900;}
+
+  .ai-panel{width:0; flex-shrink:0; background:#fff; border-left:1px solid var(--g200); overflow:hidden; transition:width .32s cubic-bezier(.16,1,.3,1); display:flex; flex-direction:column;}
+  .ai-panel.open{width:472px;}
+  .ai-panel-inner{width:472px; display:flex; flex-direction:column; height:100%;}
+
+  .ph{padding:16px 18px 0; flex-shrink:0; background:linear-gradient(180deg,#eef2ff 0%,#fff 100%); border-bottom:1px solid var(--g100);}
+  .ph-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .ai-title{display:flex; align-items:center; gap:8px; font-weight:900; font-size:14px;}
+  .ai-title .bic{width:26px; height:26px; border-radius:9px; background:linear-gradient(135deg,#4338ca,#2563eb); display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;}
+  .close-btn{background:none; border:none; color:var(--g400); cursor:pointer; padding:4px; border-radius:8px;}
+  .close-btn:hover{background:var(--g100); color:var(--g700);}
+
+  .tabs{display:flex; gap:4px;}
+  .tab-btn{flex:1; text-align:center; padding:9px 0; font-size:12px; font-weight:800; color:var(--g500); background:none; border:none; cursor:pointer; border-bottom:2px solid transparent; font-family:inherit;}
+  .tab-btn.active{color:var(--blue-700); border-bottom-color:var(--blue-600);}
+
+  .iw{padding:12px 18px 14px; border-bottom:1px solid var(--g100); flex-shrink:0;}
+  .iw .il{display:flex; justify-content:space-between; font-size:10px; font-weight:800; color:var(--g400); margin-bottom:8px;}
+  .itrack{position:relative; height:30px; background:var(--g100); border-radius:20px; display:flex;}
+  .iopt{flex:1; z-index:1; text-align:center; line-height:30px; font-size:11px; font-weight:800; color:var(--g500); cursor:pointer; user-select:none;}
+  .iopt.sel{color:#fff;}
+  .ithumb{position:absolute; top:2px; bottom:2px; width:calc(33.333% - 4px); background:var(--ink); border-radius:16px; transition:left .25s cubic-bezier(.16,1,.3,1); left:2px;}
+
+  .pbody{flex:1; overflow-y:auto; padding:16px 18px 40px;}
+  .gmeta{font-size:10px; font-weight:700; color:var(--g400); display:flex; align-items:center; gap:5px; margin-bottom:14px;}
+
+  .hl{background:linear-gradient(135deg,#0f172a,#1e293b); color:#fff; border-radius:14px; padding:16px; margin-bottom:16px;}
+  .hl .tag{font-size:9px; font-weight:900; letter-spacing:.06em; color:#93c5fd; text-transform:uppercase; margin-bottom:6px;}
+  .hl p{margin:0; font-size:13px; font-weight:700; line-height:1.65; color:#f1f5f9;}
+  .hl .bad{color:#fca5a5; font-weight:900;} .hl .good{color:#93c5fd; font-weight:900;}
+
+  .sec{margin-bottom:20px;}
+  .sec-title{display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:900; color:var(--ink); margin-bottom:11px;}
+  .sec-title .n{width:18px; height:18px; border-radius:6px; background:var(--ink); color:#fff; font-size:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .sec-note{font-size:10px; font-weight:700; color:var(--g400); margin-left:auto;}
+
+  .ladder{border:1px solid var(--g200); border-radius:14px; padding:14px; margin-bottom:12px;}
+  .ladder-rows{display:flex; flex-direction:column-reverse; gap:5px;}
+  .lrow{display:flex; align-items:center; gap:10px; padding:7px 9px; border-radius:9px; position:relative;}
+  .lrow .lg{width:46px; font-size:11px; font-weight:900; color:var(--g500); flex-shrink:0;}
+  .lrow .lrange{font-size:10.5px; font-weight:700; color:var(--g400); flex:1;}
+  .lrow .lcount{font-size:10px; font-weight:700; color:var(--g400);}
+  .lrow.here{background:var(--ink);}
+  .lrow.here .lg{color:#fff;} .lrow.here .lrange{color:#cbd5e1;}
+  .lrow.next{background:var(--blue-50); border:1px dashed var(--blue-500);}
+  .lrow.next .lg{color:var(--blue-700);} .lrow.next .lrange{color:var(--blue-600);}
+  .here-badge{font-size:9px; font-weight:900; color:#fff; background:var(--blue-600); padding:2px 6px; border-radius:20px;}
+  .next-badge{font-size:9px; font-weight:900; color:var(--blue-700); background:#fff; border:1px solid var(--blue-500); padding:2px 6px; border-radius:20px;}
+
+  .gauge-wrap{margin-top:12px;}
+  .gauge-lbl{display:flex; justify-content:space-between; font-size:10.5px; font-weight:800; color:var(--g500); margin-bottom:5px;}
+  .gauge{position:relative; height:12px; background:var(--g100); border-radius:8px; overflow:hidden;}
+  .gauge-fill{height:100%; background:linear-gradient(90deg,#3b82f6,#1d4ed8); border-radius:8px;}
+  .gauge-caption{font-size:11px; font-weight:800; color:var(--blue-700); margin-top:7px; display:flex; align-items:center; gap:5px;}
+
+  .bench{border:1px solid var(--g200); border-radius:12px; padding:12px 13px; margin-bottom:4px;}
+  .bench-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;}
+  .bench-top .bl{font-size:11px; font-weight:800; color:var(--g500);}
+  .bench-top .bv{font-size:11.5px; font-weight:900;}
+  .distrib{position:relative; height:38px; margin-top:10px;}
+  .distrib .axis{position:absolute; top:16px; left:0; right:0; height:4px; background:linear-gradient(90deg,#fecaca,#fde68a,#bfdbfe); border-radius:4px;}
+  .distrib .tick{position:absolute; top:22px; transform:translateX(-50%); font-size:8.5px; font-weight:700; color:var(--g400); white-space:nowrap;}
+  .distrib .tick .tl{display:block; text-align:center;}
+  .distrib .marker{position:absolute; top:8px; transform:translateX(-50%); width:2px; height:20px; background:var(--ink);}
+  .distrib .marker::after{content:''; position:absolute; top:-6px; left:-4px; width:10px; height:10px; border-radius:50%; background:var(--ink);}
+  .distrib .mlabel{position:absolute; top:-8px; transform:translateX(-50%); font-size:9px; font-weight:900; color:var(--ink); white-space:nowrap;}
+
+  .aline{display:flex; align-items:center; gap:9px; padding:8px 0; border-bottom:1px solid var(--g100);}
+  .aline:last-child{border-bottom:none;}
+  .aline .an{width:96px; flex-shrink:0; font-size:11px; font-weight:800; color:var(--g700); line-height:1.25;}
+  .aline .abar{flex:1; height:8px; background:var(--g100); border-radius:6px; position:relative; overflow:hidden;}
+  .aline .afill{height:100%; border-radius:6px;}
+  .aline .anat{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--g400);}
+  .aline .as{width:38px; text-align:right; font-size:11px; font-weight:900; flex-shrink:0;}
+  .aline .agap{width:52px; text-align:right; font-size:10px; font-weight:800; flex-shrink:0;}
+  .acomment{font-size:10.5px; color:var(--g500); font-weight:600; margin:1px 0 7px 105px; line-height:1.5;}
+  .legend{font-size:9.5px; font-weight:700; color:var(--g400); display:flex; align-items:center; gap:12px; margin-bottom:9px;}
+  .legend .li{display:flex; align-items:center; gap:4px;}
+  .legend .natmark{width:2px; height:11px; background:var(--g400); display:inline-block;}
+
+  .sim{display:none;}
+  .sim-readout,.sslider,.sim-reset,.sim-hint{display:none;}
+
+  .strat{border:1px solid var(--g200); border-radius:12px; padding:13px; margin-bottom:9px; position:relative;}
+  .strat.primary{border-color:#bfdbfe; background:var(--blue-50);}
+  .strat .stag{font-size:9px; font-weight:900; color:#fff; background:var(--blue-600); padding:2px 7px; border-radius:20px; position:absolute; top:-8px; left:12px;}
+  .strat .sh{font-size:12px; font-weight:900; color:var(--ink); margin:6px 0 6px;}
+  .strat .sbody{font-size:11px; font-weight:600; color:var(--g600); line-height:1.6;}
+  .strat .sbody b{color:var(--blue-700); font-weight:900;}
+  .strat .sresult{display:flex; align-items:center; gap:7px; margin-top:9px; font-size:11px; font-weight:900; color:var(--blue-700);}
+
+  .pcard{border:1px solid var(--g200); border-radius:12px; padding:12px 13px; margin-bottom:9px; position:relative;}
+  .pcard.r1{border-color:#fecaca; background:var(--red-50);}
+  .prank{position:absolute; top:-9px; left:12px; background:var(--ink); color:#fff; font-size:9.5px; font-weight:900; padding:2px 8px; border-radius:20px;}
+  .pcard.r1 .prank{background:var(--red-600);}
+  .pcard .pq{font-size:12px; font-weight:800; color:var(--ink); margin:6px 0 6px; line-height:1.4;}
+  .pmeta{display:flex; gap:12px; margin-bottom:7px; flex-wrap:wrap;}
+  .pmeta div{font-size:10px; font-weight:700; color:var(--g500);}
+  .pmeta b{color:var(--ink); font-weight:900;}
+  .pwhy{font-size:10.5px; color:var(--g600); font-weight:600; line-height:1.55; background:var(--g50); border-radius:8px; padding:8px 10px;}
+
+  .scard{display:flex; align-items:center; gap:10px; border:1px solid var(--g200); border-radius:12px; padding:10px 12px; margin-bottom:8px;}
+  .scard .siw{width:30px; height:30px; border-radius:9px; background:var(--red-50); color:var(--red-600); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .scard .st{flex:1;}
+  .scard .st .q{font-size:11.5px; font-weight:800; color:var(--ink);}
+  .scard .st .m{font-size:10px; font-weight:700; color:var(--g500); margin-top:2px;}
+  .sdots{display:flex; gap:3px; flex-shrink:0;}
+  .sdots span{width:7px; height:7px; border-radius:50%;}
+
+  .glist{display:flex; flex-direction:column; gap:8px;}
+  .gitem{display:flex; gap:9px; align-items:flex-start; border:1px solid var(--g200); border-radius:10px; padding:10px 11px;}
+  .gitem .ic{color:var(--blue-600); flex-shrink:0; margin-top:1px;}
+  .gitem .t{font-size:11px; font-weight:700; color:var(--g700); line-height:1.5;}
+  .gitem .t b{color:var(--ink); font-weight:900;}
+
+  /* structured monitoring cards */
+  .mlist{display:flex; flex-direction:column; gap:10px;}
+  .mcard{border:1px solid var(--g200); border-radius:12px; padding:12px 13px;}
+  .mcard .mhead{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .mcard .mic{width:26px; height:26px; border-radius:8px; background:var(--blue-50); color:var(--blue-600); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .mcard .mtitle{font-size:12px; font-weight:900; color:var(--ink); line-height:1.35;}
+  .mcard .mrow{display:flex; gap:8px; margin-bottom:6px;}
+  .mcard .mrow:last-child{margin-bottom:0;}
+  .mcard .mlbl{flex-shrink:0; width:54px; font-size:9.5px; font-weight:900; color:var(--g400); padding-top:1px; letter-spacing:.02em;}
+  .mcard .mtext{font-size:11px; font-weight:600; color:var(--g600); line-height:1.6;}
+  .mcard .mtext b{color:var(--ink); font-weight:900;}
+  .mcard .mtext .em-bad{color:var(--red-700); font-weight:900;}
+  .mcard .mtext .em-good{color:var(--blue-700); font-weight:900;}
+  .mcard .mhow{background:var(--g50); border-radius:8px; padding:7px 9px; font-size:10.5px; font-weight:700; color:var(--g600); line-height:1.55; display:flex; gap:6px; align-items:flex-start;}
+  .mcard .mhow .hic{color:var(--g400); flex-shrink:0; margin-top:1px;}
+
+  .actions{display:flex; gap:8px; margin-top:18px;}
+  .actions .btn{flex:1; justify-content:center;}
+
+  .locked{display:flex; align-items:center; gap:8px; font-size:10.5px; font-weight:700; color:var(--g400); border:1px dashed var(--g200); border-radius:10px; padding:10px 12px; margin-top:4px;}
+
+  .report-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;}
+  .ropt{border:1.5px solid var(--g200); border-radius:10px; padding:12px 10px; text-align:center; cursor:pointer; font-weight:800; font-size:11.5px; color:var(--g600);}
+  .ropt.sel{border-color:var(--blue-500); background:var(--blue-50); color:var(--blue-700);}
+  .ropt .ic{display:block; margin:0 auto 6px; color:inherit;}
+
+  .fade{animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+  .loadw{display:flex; flex-direction:column; align-items:center; justify-content:center; padding:70px 20px; gap:14px; text-align:center;}
+  .spin{width:34px; height:34px; border-radius:50%; border:3px solid var(--g100); border-top-color:var(--blue-600); animation:sp .8s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .loadw .lt{font-size:12px; font-weight:800; color:var(--g500);} .loadw .ls{font-size:10.5px; font-weight:600; color:var(--g400);}
+  .empty{display:flex; flex-direction:column; align-items:center; text-align:center; padding:70px 24px; color:var(--g400);}
+  .empty .ic{width:52px; height:52px; border-radius:16px; background:var(--g100); display:flex; align-items:center; justify-content:center; margin-bottom:14px;}
+  .empty .t{font-size:12.5px; font-weight:800; color:var(--g600); margin-bottom:5px;} .empty .s{font-size:11px; font-weight:600; line-height:1.6;}
+
+  /* embed in PIX split pane: AI panel only */
+  html.embed, html.embed body{height:100%; overflow:hidden; background:#fff;}
+  html.embed .app{height:100%;}
+  html.embed .topbar,
+  html.embed .main-col{display:none !important;}
+  html.embed .body-wrap{height:100%;}
+  html.embed .ai-panel,
+  html.embed .ai-panel.open{width:100% !important; border-left:none; height:100%;}
+  html.embed .ai-panel-inner{width:100%; height:100%;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <span class="logo">PIX AI</span>
+    <span class="crumbs">통계 <span style="opacity:.5">›</span> <b>환자경험평가</b></span>
+    <div class="spacer"></div>
+    <span class="dept-tag"><i data-lucide="users" style="width:12px;height:12px"></i>고객경험관리팀 (CRM)</span>
+  </div>
+
+  <div class="body-wrap">
+
+    <div class="main-col" id="mainCol">
+      <div class="filterbar">
+        <select><option>2026년</option><option>2025년</option></select>
+        <select><option>2차</option><option>1차</option></select>
+        <select><option>전체 부서</option><option>소화기내과 병동</option><option>정형외과 병동</option></select>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost"><i data-lucide="rotate-ccw" style="width:13px;height:13px"></i>초기화</button>
+        <button class="btn btn-ghost"><i data-lucide="search" style="width:13px;height:13px"></i>조회</button>
+        <button class="btn btn-ai" id="aiTriggerBtn" onclick="openAiPanel()"><i data-lucide="sparkles" style="width:13px;height:13px"></i>AI 분석하기</button>
+      </div>
+
+      <div class="grid5">
+        <div class="kcard grade-kcard">
+          <div class="lbl">평가등급 <span style="opacity:.6">(심평원 기준)</span></div>
+          <div class="gval">3등급 <small>84.31점</small></div>
+          <div class="gnext">2등급까지 0.69점</div>
+        </div>
+        <div class="kcard">
+          <div class="lbl">응답자 수</div>
+          <div class="val">428명</div>
+          <span class="delta good"><i data-lucide="arrow-up" style="width:10px;height:10px"></i>전기대비 +12%</span>
+        </div>
+        <div class="kcard">
+          <div class="lbl">전국 평균 대비</div>
+          <div class="val" style="color:var(--blue-700)">+0.42점</div>
+          <span class="delta neu">전국 83.89점</span>
+        </div>
+        <div class="kcard">
+          <div class="lbl">고점 영역</div>
+          <div class="val" style="font-size:15px">전반적 평가</div>
+          <span class="delta good">90.50점</span>
+        </div>
+        <div class="kcard">
+          <div class="lbl">저점 영역</div>
+          <div class="val" style="font-size:15px">환자 안전·병원환경</div>
+          <span class="delta bad">76.40점</span>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="card">
+          <h3><i data-lucide="bar-chart-3" class="ic" style="width:14px;height:14px"></i>평가영역 점수 <span style="font-size:10px;font-weight:700;color:var(--g400);margin-left:4px">우리 병원 · 전국 평균 대비</span></h3>
+          <table class="dt">
+            <thead><tr><th>영역</th><th>우리 병원</th><th>전국 평균</th><th>격차</th></tr></thead>
+            <tbody id="areaTableBody"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3><i data-lucide="trending-up" class="ic" style="width:14px;height:14px"></i>연도별 종합점수 추이</h3>
+          <canvas id="trendChart" height="180"></canvas>
+        </div>
+      </div>
+
+      <div class="card" style="border-style:dashed; text-align:center; padding:22px; color:var(--g400); font-weight:700; font-size:11.5px;">
+        우측 상단 <b style="color:var(--g600)">[AI 분석하기]</b>를 클릭하면 등급 진단, 상위 등급 도달 전략, 개선 우선순위를 확인할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-inner">
+        <div class="ph">
+          <div class="ph-top">
+            <div class="ai-title"><div class="bic"><i data-lucide="sparkles" style="width:14px;height:14px"></i></div>AI 분석</div>
+            <button class="close-btn" onclick="closeAiPanel()"><i data-lucide="x" style="width:17px;height:17px"></i></button>
+          </div>
+          <div class="tabs">
+            <button class="tab-btn active" id="tabAnalysis" onclick="switchTab('analysis')">분석</button>
+            <button class="tab-btn" id="tabReport" onclick="switchTab('report')">보고서 작성</button>
+          </div>
+        </div>
+        <div class="iw" id="intensityWrap">
+          <div class="il"><span>분석 강도</span><span id="intensityDesc">기본 – 등급 진단 + 상승 전략 + 개선 우선순위</span></div>
+          <div class="itrack">
+            <div class="ithumb" id="intensityThumb"></div>
+            <div class="iopt" onclick="setIntensity(0)">심플</div>
+            <div class="iopt sel" onclick="setIntensity(1)">기본</div>
+            <div class="iopt" onclick="setIntensity(2)">고강도</div>
+          </div>
+        </div>
+        <div class="pbody" id="panelBody">
+          <div class="empty">
+            <div class="ic"><i data-lucide="sparkles" style="width:24px;height:24px"></i></div>
+            <div class="t">AI 분석을 시작해 보세요</div>
+            <div class="s">조회된 통계 결과를 바탕으로 등급 진단과<br>상위 등급 도달 전략을 제안합니다.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const AREAS = [
+  {name:'간호사 영역',        ours:86.9, nat:85.97},
+  {name:'의사 영역',          ours:88.4, nat:84.04},
+  {name:'투약 및 치료과정',    ours:83.5, nat:82.82},
+  {name:'정서적 지지',        ours:78.9, nat:78.77},
+  {name:'환자 안전과 병원 환경', ours:76.4, nat:85.50},
+  {name:'환자권리보장',        ours:85.6, nat:83.86},
+  {name:'전반적 평가',        ours:90.5, nat:86.29},
+];
+const NATIONAL = { avg:83.89, q1:79.97, median:83.11, q3:87.96,
+  counts:{1:'57건 (15.7%)',2:'85건 (23.4%)',3:'129건 (35.5%)',4:'80건 (22.1%)',5:'12건 (3.3%)'} };
+const GRADE_BANDS = [
+  {g:1, lo:90, hi:Infinity, label:'90점 이상'},
+  {g:2, lo:85, hi:90,       label:'85 ~ 90점'},
+  {g:3, lo:80, hi:85,       label:'80 ~ 85점'},
+  {g:4, lo:75, hi:80,       label:'75 ~ 80점'},
+  {g:5, lo:-Infinity, hi:75,label:'75점 미만'},
+];
+function mean(a){ return a.reduce((x,y)=>x+y,0)/a.length; }
+function gradeOf(s){ for(const b of GRADE_BANDS){ if(s>=b.lo && s<b.hi) return b.g; } return 5; }
+function nextThreshold(s){ if(s>=90) return null; if(s>=85) return 90; if(s>=80) return 85; if(s>=75) return 80; return 75; }
+const OUR_COMPOSITE = mean(AREAS.map(a=>a.ours));
+const GC = {good:'#2563eb', bad:'#dc2626', neu:'#94a3b8'};
+
+/* ---------- safe CDN ---------- */
+function safeIcons(){ try{ if(typeof lucide!=='undefined') lucide.createIcons(); }catch(e){ console.warn(e); } }
+function initTrendChart(){
+  try{
+    if(typeof Chart==='undefined') throw new Error('no chart');
+    new Chart(document.getElementById('trendChart'),{
+      type:'line',
+      data:{ labels:['2019','2021','2023','2025','2026'],
+        datasets:[{ data:[80.1,81.0,81.3,85.8,84.31], borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,.08)', fill:true, tension:.35, pointRadius:4, pointBackgroundColor:'#2563eb', borderWidth:2.5 }] },
+      options:{ plugins:{legend:{display:false}}, scales:{
+        y:{min:75,max:92,grid:{color:'#f1f5f9'},ticks:{font:{size:10,weight:700},color:'#94a3b8'}},
+        x:{grid:{display:false},ticks:{font:{size:10,weight:700},color:'#94a3b8'}} } }
+    });
+  }catch(e){
+    const cv=document.getElementById('trendChart');
+    if(cv&&cv.parentNode){ const d=document.createElement('div'); d.style.cssText='padding:30px 10px;text-align:center;color:#94a3b8;font-size:11px;font-weight:700;'; d.textContent='차트 로딩 실패 (2025: 85.8 → 2026: 84.31)'; cv.parentNode.replaceChild(d,cv);} }
+}
+function renderAreaTable(){
+  const tb=document.getElementById('areaTableBody'); if(!tb) return;
+  tb.innerHTML = AREAS.map(a=>{
+    const gap=+(a.ours-a.nat).toFixed(2);
+    const cls = gap>0.2?'up':(gap<-0.2?'down':'flat');
+    const sym = gap>0.2?'▲':(gap<-0.2?'▼':'–');
+    return `<tr><td>${a.name}</td><td>${a.ours.toFixed(2)}</td><td>${a.nat.toFixed(2)}</td><td class="${cls}">${sym} ${Math.abs(gap).toFixed(2)}</td></tr>`;
+  }).join('');
+}
+safeIcons(); initTrendChart(); renderAreaTable();
+
+/* ---------- panel ---------- */
+let panelOpen=false, currentTab='analysis', currentIntensity=1, generated=false;
+
+function postToParent(type, payload){
+  try{
+    if(window.parent && window.parent !== window){
+      window.parent.postMessage(Object.assign({ source:'pix-survey-ai-panel', type:type }, payload||{}), '*');
+    }
+  }catch(e){}
+}
+function openAiPanel(){ panelOpen=true; document.getElementById('aiPanel').classList.add('open'); const mc=document.getElementById('mainCol'); if(mc) mc.classList.add('panel-open'); runAnalysis(); }
+function closeAiPanel(){
+  panelOpen=false;
+  document.getElementById('aiPanel').classList.remove('open');
+  const mc=document.getElementById('mainCol'); if(mc) mc.classList.remove('panel-open');
+  postToParent('close');
+}
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('tabAnalysis').classList.toggle('active',tab==='analysis');
+  document.getElementById('tabReport').classList.toggle('active',tab==='report');
+  if(tab==='analysis'){ renderAnalysis(); }
+  else if(document.documentElement.classList.contains('embed')){
+    postToParent('open-report');
+    /* keep analysis visible in embed; parent opens report modal */
+    currentTab='analysis';
+    document.getElementById('tabAnalysis').classList.add('active');
+    document.getElementById('tabReport').classList.remove('active');
+    renderAnalysis();
+  } else {
+    renderReportTab();
+  }
+}
+function setIntensity(i){
+  currentIntensity=i;
+  document.getElementById('intensityThumb').style.left=(2+i*(100/3))+'%';
+  document.querySelectorAll('.iopt').forEach((el,idx)=>el.classList.toggle('sel',idx===i));
+  const d=['심플 – 등급 진단 요약','기본 – 등급 진단 + 상승 전략 + 개선 우선순위','고강도 – 반복저하 문항 + 모니터링'];
+  document.getElementById('intensityDesc').textContent=d[i];
+  if(currentTab==='analysis'&&generated) renderAnalysis();
+}
+function runAnalysis(){
+  const body=document.getElementById('panelBody');
+  body.innerHTML=`<div class="loadw"><div class="spin"></div><div class="lt">통계 결과를 분석하고 등급을 진단하고 있습니다</div><div class="ls">7개 영역 · 종합점수 · 전국 벤치마크 대조 중</div></div>`;
+  setTimeout(()=>{ generated=true; renderAnalysis(); },900);
+}
+
+function renderAnalysis(){
+  if(!generated) return;
+  const body=document.getElementById('panelBody');
+  const now=new Date();
+  const ts=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} 생성`;
+  const grade=gradeOf(OUR_COMPOSITE);
+  const nt=nextThreshold(OUR_COMPOSITE);
+  const remain=nt? +(nt-OUR_COMPOSITE).toFixed(2) : 0;
+  const worst=[...AREAS].sort((a,b)=>(a.ours-a.nat)-(b.ours-b.nat))[0];
+  const worstGap=+(worst.ours-worst.nat).toFixed(1);
+  const bandLo=GRADE_BANDS.find(b=>b.g===grade).lo;
+
+  let html=`<div class="fade">
+    <div class="gmeta"><i data-lucide="clock" style="width:11px;height:11px"></i>${ts} · 2026년 2차 · 전체 부서 · 심평원 6차 기준</div>
+
+    <div class="hl">
+      <div class="tag">등급 종합 진단</div>
+      <p>종합점수 <b>${OUR_COMPOSITE.toFixed(2)}점</b>으로 현재 <b class="${grade<=2?'good':'bad'}">${grade}등급</b>입니다. ${nt?`상위 <span class="good">${grade-1}등급</span> 도달선(${nt}점)까지 <b class="good">${remain}점</b> 남았습니다.`:'최고 등급입니다.'} <b class="bad">${worst.name}</b> 영역이 전국 평균 대비 <span class="bad">${Math.abs(worstGap)}점 낮아</span> 등급 상승의 핵심 병목으로 분석됩니다.</p>
+    </div>`;
+
+  /* 1. 평가등급 진단 */
+  html+=`<div class="sec">
+    <div class="sec-title"><span class="n">1</span>평가등급 진단 <span class="sec-note">심평원 5등급제</span></div>
+    <div class="ladder">
+      <div class="ladder-rows">
+        ${GRADE_BANDS.map(b=>{
+          const isHere=b.g===grade, isNext=nt&&b.g===grade-1;
+          return `<div class="lrow ${isHere?'here':''} ${isNext?'next':''}">
+            <span class="lg">${b.g}등급</span>
+            <span class="lrange">${b.label}</span>
+            ${isHere?'<span class="here-badge">현재</span>':(isNext?'<span class="next-badge">목표</span>':`<span class="lcount">${NATIONAL.counts[b.g]}</span>`)}
+          </div>`;
+        }).join('')}
+      </div>
+      ${nt?`<div class="gauge-wrap">
+        <div class="gauge-lbl"><span>${grade}등급 하한 ${bandLo}점</span><span>${grade-1}등급 도달선 ${nt}점</span></div>
+        <div class="gauge"><div class="gauge-fill" style="width:${((OUR_COMPOSITE-bandLo)/(nt-bandLo)*100).toFixed(0)}%"></div></div>
+        <div class="gauge-caption"><i data-lucide="flag" style="width:12px;height:12px"></i>현재 ${OUR_COMPOSITE.toFixed(2)}점 · ${grade-1}등급까지 ${remain}점</div>
+      </div>`:''}
+    </div>
+    <div class="bench">
+      <div class="bench-top"><span class="bl">전체 분포 내 위치</span><span class="bv" style="color:var(--blue-700)">중앙값 상회</span></div>
+      <div class="distrib">
+        <div class="axis"></div>
+        <div class="tick" style="left:${bpos(NATIONAL.q1)}%"><span class="tl">Q1</span>${NATIONAL.q1}</div>
+        <div class="tick" style="left:${bpos(NATIONAL.median)}%"><span class="tl">중앙값</span>${NATIONAL.median}</div>
+        <div class="tick" style="left:${bpos(NATIONAL.q3)}%"><span class="tl">Q3</span>${NATIONAL.q3}</div>
+        <div class="marker" style="left:${bpos(OUR_COMPOSITE)}%"></div>
+        <div class="mlabel" style="left:${bpos(OUR_COMPOSITE)}%">우리 ${OUR_COMPOSITE.toFixed(1)}</div>
+      </div>
+    </div>
+  </div>`;
+
+  /* 2. 영역별 진단 (기본↑) */
+  if(currentIntensity>=1){
+    html+=`<div class="sec">
+      <div class="sec-title"><span class="n">2</span>영역별 진단 (전국 평균 대비)</div>
+      <div class="legend"><span class="li"><span class="natmark"></span>전국 평균선</span><span class="li"><span style="width:10px;height:6px;background:var(--red-600);border-radius:3px;display:inline-block"></span>전국 대비 열위</span><span class="li"><span style="width:10px;height:6px;background:var(--blue-600);border-radius:3px;display:inline-block"></span>우위</span></div>
+      ${AREAS.map(a=>{
+        const gap=+(a.ours-a.nat).toFixed(1);
+        const color=gap<-0.5?GC.bad:(gap>0.5?GC.good:GC.neu);
+        const gapColor=gap<-0.5?'var(--red-700)':(gap>0.5?'var(--blue-700)':'var(--g400)');
+        const pct=Math.min(100,Math.max(0,(a.ours-70)/25*100));
+        const natPct=Math.min(100,Math.max(0,(a.nat-70)/25*100));
+        let comment=null;
+        if(currentIntensity>=2){
+          if(a.name==='환자 안전과 병원 환경') comment='전국 평균보다 9.1점 낮습니다. 낙상 예방 안내·소음 관리 문항이 동반 하락하며 이 영역 전체를 끌어내리고 있습니다.';
+          else if(a.name==='정서적 지지') comment='전국 평균과 비슷하나, 신설 영역으로 전국적으로도 가장 낮아 관리 여지가 있습니다.';
+          else if(gap>3) comment='전국 대비 확실한 강점 영역입니다. 현재 수준 유지에 집중하세요.';
+          else comment='전국 평균 수준을 안정적으로 유지하고 있습니다.';
+        }
+        return `<div class="aline">
+          <div class="an">${a.name}</div>
+          <div class="abar"><div class="afill" style="width:${pct}%;background:${color}"></div><div class="anat" style="left:${natPct}%"></div></div>
+          <div class="as">${a.ours.toFixed(1)}</div>
+          <div class="agap" style="color:${gapColor}">${gap>0?'▲':(gap<0?'▼':'–')} ${Math.abs(gap).toFixed(1)}</div>
+        </div>${comment?`<div class="acomment">${comment}</div>`:''}`;
+      }).join('')}
+    </div>`;
+  }
+
+  /* 3. 상승 전략 (기본↑) */
+  if(currentIntensity>=1){
+    const lifted = AREAS.map(a=>a===worst? a.nat : a.ours);
+    const newComp = mean(lifted);
+    const newGrade = gradeOf(newComp);
+    const soloTarget = (nt*AREAS.length - (AREAS.reduce((s,a)=>s+a.ours,0)-worst.ours));
+    html+=`<div class="sec">
+      <div class="sec-title"><span class="n">3</span>상위 등급 도달 전략</div>
+      <div class="strat primary">
+        <span class="stag">최우선</span>
+        <div class="sh">${worst.name} 영역을 집중 개선</div>
+        <div class="sbody">이 영역만 전국 평균 <b>${worst.nat.toFixed(1)}점</b> 수준으로 끌어올리면, 종합점수가 <b>${newComp.toFixed(2)}점</b>이 되어 <b>${newGrade}등급</b>에 도달합니다. 다른 영역이 이미 전국 평균을 웃돌기 때문에, 가장 낮은 이 한 영역이 등급을 좌우하는 지렛대입니다.</div>
+        <div class="sresult"><i data-lucide="arrow-up-right" style="width:13px;height:13px"></i>예상 종합점수 ${OUR_COMPOSITE.toFixed(2)} → ${newComp.toFixed(2)}점 · ${grade}등급 → ${newGrade}등급</div>
+      </div>
+      <div class="strat">
+        <span class="stag" style="background:var(--g500)">대안</span>
+        <div class="sh">${worst.name} 단독으로 ${grade-1}등급 진입</div>
+        <div class="sbody">전국 평균까지 가지 않더라도, 이 영역을 <b>${soloTarget.toFixed(1)}점</b> 이상(현재 +${(soloTarget-worst.ours).toFixed(1)}점)으로만 올려도 종합 ${nt}점을 넘겨 ${grade-1}등급에 진입합니다.</div>
+      </div>`;
+    if(currentIntensity>=2){
+      html+=`<div class="strat">
+        <span class="stag" style="background:var(--g500)">분산</span>
+        <div class="sh">여러 영역 소폭 개선</div>
+        <div class="sbody">한 영역 집중이 어렵다면, 종합 ${nt}점 도달에는 <b>7개 영역 합계 +${(remain*7).toFixed(1)}점</b>이 필요합니다. 정서적 지지·환자 안전과 병원 환경 두 저점 영역에 나눠 배분하는 방식도 가능합니다.</div>
+      </div>`;
+    }
+    html+=`</div>`;
+  }
+
+  /* 4. 개선 우선순위 (기본↑) */
+  if(currentIntensity>=1){
+    html+=`<div class="sec">
+      <div class="sec-title"><span class="n">4</span>개선 우선순위 TOP 3 <span class="sec-note">문항 단위</span></div>
+      <div class="pcard r1"><span class="prank">1순위</span>
+        <div class="pq">낙상 예방을 위한 주의사항을 안내받았다</div>
+        <div class="pmeta"><div>영역 <b>환자 안전과 병원 환경</b></div><div>점수 <b style="color:var(--red-700)">68.2</b></div><div>부정응답 <b style="color:var(--red-700)">24%</b></div><div>응답수 <b>412</b></div></div>
+        <div class="pwhy">점수가 가장 낮고 3차수 연속 하락 중이며 응답 수도 많아 영역 점수 기여도가 가장 큽니다. 병동 낙상 예방 안내 프로세스 점검·교육 자료 재배포를 권장합니다.</div>
+      </div>
+      <div class="pcard"><span class="prank">2순위</span>
+        <div class="pq">병원 환경이 쾌적하고 소음이 적절히 관리되었다</div>
+        <div class="pmeta"><div>영역 <b>환자 안전과 병원 환경</b></div><div>점수 <b>71.5</b></div><div>부정응답 <b>19%</b></div><div>응답수 <b>405</b></div></div>
+        <div class="pwhy">저점 영역 내 두 번째 하락 문항으로, 1순위와 같은 영역이라 함께 개선 시 등급 상승 효과가 가장 직접적입니다.</div>
+      </div>
+      <div class="pcard"><span class="prank">3순위</span>
+        <div class="pq">힘들 때 정서적으로 위로와 지지를 받았다</div>
+        <div class="pmeta"><div>영역 <b>정서적 지지</b></div><div>점수 <b>79.8</b></div><div>부정응답 <b>17%</b></div><div>응답수 <b>398</b></div></div>
+        <div class="pwhy">전국적으로도 가장 낮은 신설 영역으로, VOC 내 유사 민원과 교차 확인이 필요합니다.</div>
+      </div>
+    </div>`;
+  }
+
+  /* 5~6. 반복저하 + 모니터링 (고강도) */
+  if(currentIntensity>=2){
+    html+=`<div class="sec">
+      <div class="sec-title"><span class="n">5</span>반복 저하 문항 감지</div>
+      <div class="scard"><div class="siw"><i data-lucide="trending-down" style="width:15px;height:15px"></i></div>
+        <div class="st"><div class="q">낙상 예방을 위한 주의사항을 안내받았다</div><div class="m">환자 안전과 병원 환경 · 3차수 연속 하락 · 부정 24%</div></div>
+        <div class="sdots"><span style="background:#fecaca"></span><span style="background:#fca5a5"></span><span style="background:#dc2626"></span></div></div>
+      <div class="scard"><div class="siw"><i data-lucide="trending-down" style="width:15px;height:15px"></i></div>
+        <div class="st"><div class="q">병실 소음이 적절히 관리되었다</div><div class="m">환자 안전과 병원 환경 · 2차수 연속 하락 · 부정 19%</div></div>
+        <div class="sdots"><span style="background:#fecaca"></span><span style="background:#dc2626"></span></div></div>
+    </div>
+    <div class="sec">
+      <div class="sec-title"><span class="n">6</span>앞으로 무엇을 지켜봐야 하나 <span class="sec-note">모니터링 포인트 4가지</span></div>
+      <div class="mlist">
+
+        <div class="mcard">
+          <div class="mhead"><div class="mic"><i data-lucide="target" style="width:14px;height:14px"></i></div><div class="mtitle">환자 안전과 병원 환경 영역 점수</div></div>
+          <div class="mrow"><div class="mlbl">볼 것</div><div class="mtext">다음 차수(3차)에 이 영역 점수가 <b>다시 오르는지</b>를 봅니다.</div></div>
+          <div class="mrow"><div class="mlbl">왜</div><div class="mtext">지금 종합점수를 끌어내리는 <span class="em-bad">유일한 저점 영역</span>입니다. 이 영역이 오르면 등급이 오르고, 그대로면 3등급에 머뭅니다. 사실상 이 영역 하나가 등급을 결정합니다.</div></div>
+          <div class="mhow"><i data-lucide="check" class="hic" style="width:12px;height:12px"></i><div>개선 활동 뒤 3차 점수가 전국 평균 <b>85.5점</b>에 얼마나 가까워졌는지 비교</div></div>
+        </div>
+
+        <div class="mcard">
+          <div class="mhead"><div class="mic"><i data-lucide="bell" style="width:14px;height:14px"></i></div><div class="mtitle">부정응답이 20%를 넘는 문항</div></div>
+          <div class="mrow"><div class="mlbl">볼 것</div><div class="mtext">부정응답 비율이 <b>20%를 넘는 문항</b>이 새로 생기거나 늘어나는지를 봅니다.</div></div>
+          <div class="mrow"><div class="mlbl">왜</div><div class="mtext">부정응답이 높은 문항은 영역 점수를 빠르게 떨어뜨리는 신호입니다. 미리 알림을 걸어두면 다음 차수에 <span class="em-bad">점수가 무너지기 전에</span> 손을 쓸 수 있습니다.</div></div>
+          <div class="mhow"><i data-lucide="check" class="hic" style="width:12px;height:12px"></i><div>해당 문항에 알림을 설정하고, 매 차수 목록에서 새로 20%를 넘긴 문항 확인</div></div>
+        </div>
+
+        <div class="mcard">
+          <div class="mhead"><div class="mic"><i data-lucide="link-2" style="width:14px;height:14px"></i></div><div class="mtitle">같은 기간의 VOC(고객의 소리)</div></div>
+          <div class="mrow"><div class="mlbl">볼 것</div><div class="mtext">같은 기간 VOC 통계에서 <b>환경·안전 관련 불편</b>이 함께 늘었는지를 봅니다.</div></div>
+          <div class="mrow"><div class="mlbl">왜</div><div class="mtext">설문 점수만으로는 <b>왜</b> 낮은지 알기 어렵습니다. 같은 시기에 환자들이 실제로 남긴 불편(소음·시설 등)을 함께 보면 <span class="em-good">원인을 구체적으로</span> 짚을 수 있습니다.</div></div>
+          <div class="mhow"><i data-lucide="check" class="hic" style="width:12px;height:12px"></i><div>환자경험평가 저점 영역과 VOC 불편 카테고리를 같은 기간으로 나란히 비교</div></div>
+        </div>
+
+        <div class="mcard">
+          <div class="mhead"><div class="mic"><i data-lucide="calendar-check" style="width:14px;height:14px"></i></div><div class="mtitle">개선 활동의 반영 시점</div></div>
+          <div class="mrow"><div class="mlbl">볼 것</div><div class="mtext">개선 조치가 <b>이번 차수 설문이 끝나기 전에</b> 실제로 반영되는지를 봅니다.</div></div>
+          <div class="mrow"><div class="mlbl">왜</div><div class="mtext">6차 결과는 병원평가통합포털에 공개됩니다. 조사가 끝난 뒤에 개선하면 이번 등급에는 반영되지 않고, <span class="em-bad">다음 공개까지</span> 기다려야 합니다.</div></div>
+          <div class="mhow"><i data-lucide="check" class="hic" style="width:12px;height:12px"></i><div>개선 일정과 이번 차수 조사 종료일을 한 화면에서 함께 관리</div></div>
+        </div>
+
+      </div>
+    </div>`;
+  }
+
+  if(currentIntensity===0){ html+=`<div class="locked"><i data-lucide="lock" style="width:13px;height:13px"></i>영역별 진단, 상승 전략, 개선 우선순위는 ‘기본’ 이상에서 제공됩니다.</div>`; }
+  else if(currentIntensity===1){ html+=`<div class="locked"><i data-lucide="lock" style="width:13px;height:13px"></i>반복 저하 문항, 모니터링 가이드는 ‘고강도’에서 제공됩니다.</div>`; }
+
+  html+=`<div class="actions">
+    <button class="btn btn-ghost" onclick="switchTab('report')"><i data-lucide="file-text" style="width:13px;height:13px"></i>보고서로 만들기</button>
+    <button class="btn btn-primary"><i data-lucide="share-2" style="width:13px;height:13px"></i>담당자 공유</button>
+  </div></div>`;
+
+  body.innerHTML=html;
+  safeIcons();
+}
+function bpos(v){ const min=76,max=90; return Math.min(100,Math.max(0,((v-min)/(max-min))*100)); }
+
+/* ---------- report tab ---------- */
+let reportFormat='summary';
+function renderReportTab(){
+  const body=document.getElementById('panelBody');
+  const label={summary:'요약',detail:'상세',ppt:'슬라이드',table:'표 중심'}[reportFormat];
+  body.innerHTML=`<div class="fade">
+    <div class="sec-title" style="margin-bottom:12px;"><span class="n">1</span>보고서 형식 선택</div>
+    <div class="report-grid">
+      <div class="ropt ${reportFormat==='summary'?'sel':''}" onclick="setRF('summary')"><i data-lucide="file-text" class="ic" style="width:18px;height:18px"></i>등급 요약 보고서</div>
+      <div class="ropt ${reportFormat==='detail'?'sel':''}" onclick="setRF('detail')"><i data-lucide="file-bar-chart" class="ic" style="width:18px;height:18px"></i>영역별 상세 보고서</div>
+      <div class="ropt ${reportFormat==='ppt'?'sel':''}" onclick="setRF('ppt')"><i data-lucide="presentation" class="ic" style="width:18px;height:18px"></i>경영진 보고 슬라이드</div>
+      <div class="ropt ${reportFormat==='table'?'sel':''}" onclick="setRF('table')"><i data-lucide="table" class="ic" style="width:18px;height:18px"></i>지표 표 중심</div>
+    </div>
+    <div class="sec-title" style="margin-bottom:10px;"><span class="n">2</span>포함 항목 선택</div>
+    <div class="glist" style="margin-bottom:16px;">
+      <label class="gitem" style="cursor:pointer;"><input type="checkbox" checked style="margin-top:2px"><span class="t">등급 진단 · 상위 등급 도달 전략</span></label>
+      <label class="gitem" style="cursor:pointer;"><input type="checkbox" checked style="margin-top:2px"><span class="t">영역별 점수 · 전국 평균 대비 표</span></label>
+      <label class="gitem" style="cursor:pointer;"><input type="checkbox" checked style="margin-top:2px"><span class="t">개선 우선순위 TOP 3</span></label>
+      <label class="gitem" style="cursor:pointer;"><input type="checkbox" style="margin-top:2px"><span class="t">문항별 상세 척도 분포</span></label>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px;"><i data-lucide="download" style="width:13px;height:13px"></i>보고서 생성 (강도 ${['심플','기본','고강도'][currentIntensity]} · ${label})</button>
+  </div>`;
+  safeIcons();
+}
+function setRF(f){ reportFormat=f; renderReportTab(); }
+
+/* embed bootstrap */
+(function(){
+  const params = new URLSearchParams(location.search);
+  const embed = params.get('embed') === '1' || params.get('embed') === 'true';
+  if(!embed) return;
+  document.documentElement.classList.add('embed');
+  setIntensity(1);
+  openAiPanel();
+})();
+</script>
+</body>
+</html>

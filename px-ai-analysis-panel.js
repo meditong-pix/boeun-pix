@@ -6256,7 +6256,7 @@
         ? React.createElement("iframe", {
           className: "pix-ai-survey-frame",
           title: "환자경험평가 AI 분석",
-          src: "px-survey-ai-panel.html?embed=1&v=20260805-2"
+          src: "px-survey-ai-panel.html?embed=1&v=20260805-4"
         })
         : React.createElement("div", {
           ref: panelRef,
