@@ -241,9 +241,22 @@
       <div id="flagListPanel2" style="margin-top:12px"></div>
     </div>
 
-    <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border)">
-      <p style="font-size:13px;font-weight:600;margin:0 0 4px">VOC 월별 추이</p>
-      <p style="font-size:11px;color:var(--text-muted);margin:0 0 10px">월별 긍정·부정 TOP3 카테고리를 확인합니다.</p>
+    <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border)" id="vocTrendSection">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+        <div>
+          <p id="vocTrendTitle" style="font-size:13px;font-weight:600;margin:0 0 4px">VOC 월별 추이</p>
+          <p id="vocTrendSubtitle" style="font-size:11px;color:var(--text-muted);margin:0">월별 긍정·부정 TOP3 카테고리를 확인합니다.</p>
+        </div>
+        <div id="vocYearTrendFilterWrap" style="display:none;flex-direction:column;align-items:flex-end;gap:6px">
+          <span class="voc-filter-label">비교 기간</span>
+          <select class="voc-filter-select" id="vocYearTrendSpanSelect">
+            <option value="2">최근 2년</option>
+            <option value="3" selected>최근 3년</option>
+            <option value="4">최근 4년</option>
+            <option value="5">최근 5년</option>
+          </select>
+        </div>
+      </div>
 
       <div style="display:flex;gap:16px;margin-bottom:10px;font-size:11px;color:var(--text-secondary)">
         <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:#1baf7a"></span>긍정</span>
@@ -680,19 +693,291 @@ var monthlyTrend = [
     negTop3: [["진료 및 치료·검사관련", 2040], ["인적응대관련", 840], ["환경관련", 650]] }
 ];
 
-var maxMonthlyTotal = Math.max.apply(null, monthlyTrend.map(function (r) { return r.total; }));
-
-new Chart(document.getElementById("monthlyTrendChart"), {
-  type: "line",
-  data: {
-    labels: monthlyTrend.map(function (r) { return r.m; }),
-    datasets: [
-      { label: "긍정", data: monthlyTrend.map(function (r) { return r.posCnt; }), borderColor: "#1baf7a", backgroundColor: "rgba(27,175,122,0.12)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 },
-      { label: "부정", data: monthlyTrend.map(function (r) { return r.negCnt; }), borderColor: "#e24b4a", backgroundColor: "rgba(226,75,74,0.12)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 }
-    ]
+var yearlyTrendByYear = {
+  "2022년": {
+    label: "2022",
+    posCnt: 89240, negCnt: 76820,
+    posTop3: [["인적응대관련", 24100], ["진료 및 치료·검사관련", 22800], ["서비스제공관련", 9800]],
+    negTop3: [["진료 및 치료·검사관련", 21400], ["환경관련", 8200], ["인적응대관련", 7600]]
   },
-  options: {
-    responsive: true, maintainAspectRatio: false,
+  "2023년": {
+    label: "2023",
+    posCnt: 91850, negCnt: 73120,
+    posTop3: [["진료 및 치료·검사관련", 25200], ["인적응대관련", 23600], ["서비스제공관련", 10100]],
+    negTop3: [["진료 및 치료·검사관련", 20600], ["인적응대관련", 7900], ["시스템 및 서비스", 6800]]
+  },
+  "2024년": {
+    label: "2024",
+    posCnt: 94120, negCnt: 70240,
+    posTop3: [["진료 및 치료·검사관련", 26100], ["인적응대관련", 24400], ["서비스제공관련", 10800]],
+    negTop3: [["진료 및 치료·검사관련", 19800], ["환경관련", 7600], ["비용관련", 6200]]
+  },
+  "2025년": {
+    label: "2025",
+    posCnt: 96480, negCnt: 68410,
+    posTop3: [["진료 및 치료·검사관련", 26800], ["인적응대관련", 24900], ["서비스제공관련", 11200]],
+    negTop3: [["진료 및 치료·검사관련", 19200], ["인적응대관련", 7400], ["환경관련", 6100]]
+  }
+};
+
+yearlyTrendByYear["2026년"] = (function () {
+  var posCnt = 0, negCnt = 0;
+  monthlyTrend.forEach(function (r) { posCnt += r.posCnt; negCnt += r.negCnt; });
+  return {
+    label: "2026",
+    posCnt: posCnt,
+    negCnt: negCnt,
+    posTop3: monthlyTrend[5].posTop3.map(function (c) { return [c[0], Math.round(c[1] * 6.2)]; }),
+    negTop3: monthlyTrend[5].negTop3.map(function (c) { return [c[0], Math.round(c[1] * 6.2)]; })
+  };
+})();
+
+var vocYearTrendOptions = ["2022년", "2023년", "2024년", "2025년", "2026년"];
+var vocYearTrendSpan = 3;
+var monthlyTrendChartInstance = null;
+var quarterFactors = [0.23, 0.27, 0.24, 0.26];
+var halfFactors = [0.48, 0.52];
+var quarterlyTrendByKey = {};
+var halfTrendByKey = {};
+
+function parseVocYear(yearStr) {
+  return parseInt(String(yearStr).replace(/\D/g, ""), 10) || 2026;
+}
+
+function getQuarterFromBucket(bucket) {
+  return parseInt(String(bucket), 10) || 1;
+}
+
+function getHalfFromBucket(bucket) {
+  return bucket === "하반기" ? 2 : 1;
+}
+
+function toQuarterIndex(year, quarter) {
+  return year * 4 + (quarter - 1);
+}
+
+function fromQuarterIndex(idx) {
+  return { year: Math.floor(idx / 4), quarter: (idx % 4) + 1 };
+}
+
+function toHalfIndex(year, half) {
+  return year * 2 + (half - 1);
+}
+
+function fromHalfIndex(idx) {
+  return { year: Math.floor(idx / 2), half: (idx % 2) + 1 };
+}
+
+function formatQuarterShortLabel(year, quarter) {
+  return "'" + String(year).slice(-2) + " " + quarter + "Q";
+}
+
+function formatQuarterRangeLabel(year, quarter) {
+  return year + " Q" + quarter;
+}
+
+function formatHalfShortLabel(year, half) {
+  return "'" + String(year).slice(-2) + " " + (half === 1 ? "상" : "하");
+}
+
+function formatHalfRangeLabel(year, half) {
+  return year + " " + (half === 1 ? "상반기" : "하반기");
+}
+
+function scaleTop3(top3, factor) {
+  return top3.map(function (c) { return [c[0], Math.round(c[1] * factor)]; });
+}
+
+function sumMonthlySlice(rows, field) {
+  return rows.reduce(function (sum, row) { return sum + row[field]; }, 0);
+}
+
+function top3FromMonthlySlice(rows, field) {
+  var base = rows[rows.length - 1][field];
+  return base.map(function (c) { return [c[0], Math.round(c[1] * rows.length)]; });
+}
+
+function buildQuarterHalfTrendMocks() {
+  vocYearTrendOptions.forEach(function (yearKey) {
+    var year = parseVocYear(yearKey);
+    var row = yearlyTrendByYear[yearKey];
+    if (!row) return;
+    var q;
+    for (q = 1; q <= 4; q++) {
+      var qFactor = quarterFactors[q - 1];
+      quarterlyTrendByKey[year + "-Q" + q] = {
+        m: formatQuarterShortLabel(year, q),
+        posCnt: Math.round(row.posCnt * qFactor),
+        negCnt: Math.round(row.negCnt * qFactor),
+        posTop3: scaleTop3(row.posTop3, qFactor),
+        negTop3: scaleTop3(row.negTop3, qFactor)
+      };
+    }
+    var h;
+    for (h = 1; h <= 2; h++) {
+      var hFactor = halfFactors[h - 1];
+      halfTrendByKey[year + "-H" + h] = {
+        m: formatHalfShortLabel(year, h),
+        posCnt: Math.round(row.posCnt * hFactor),
+        negCnt: Math.round(row.negCnt * hFactor),
+        posTop3: scaleTop3(row.posTop3, hFactor),
+        negTop3: scaleTop3(row.negTop3, hFactor)
+      };
+    }
+  });
+
+  quarterlyTrendByKey["2026-Q1"] = {
+    m: formatQuarterShortLabel(2026, 1),
+    posCnt: sumMonthlySlice(monthlyTrend.slice(0, 3), "posCnt"),
+    negCnt: sumMonthlySlice(monthlyTrend.slice(0, 3), "negCnt"),
+    posTop3: top3FromMonthlySlice(monthlyTrend.slice(0, 3), "posTop3"),
+    negTop3: top3FromMonthlySlice(monthlyTrend.slice(0, 3), "negTop3")
+  };
+  quarterlyTrendByKey["2026-Q2"] = {
+    m: formatQuarterShortLabel(2026, 2),
+    posCnt: sumMonthlySlice(monthlyTrend.slice(3, 6), "posCnt"),
+    negCnt: sumMonthlySlice(monthlyTrend.slice(3, 6), "negCnt"),
+    posTop3: top3FromMonthlySlice(monthlyTrend.slice(3, 6), "posTop3"),
+    negTop3: top3FromMonthlySlice(monthlyTrend.slice(3, 6), "negTop3")
+  };
+  halfTrendByKey["2026-H1"] = {
+    m: formatHalfShortLabel(2026, 1),
+    posCnt: sumMonthlySlice(monthlyTrend, "posCnt"),
+    negCnt: sumMonthlySlice(monthlyTrend, "negCnt"),
+    posTop3: top3FromMonthlySlice(monthlyTrend, "posTop3"),
+    negTop3: top3FromMonthlySlice(monthlyTrend, "negTop3")
+  };
+}
+
+buildQuarterHalfTrendMocks();
+
+function getQuarterTrendRow(year, quarter) {
+  return quarterlyTrendByKey[year + "-Q" + quarter] || null;
+}
+
+function getHalfTrendRow(year, half) {
+  return halfTrendByKey[year + "-H" + half] || null;
+}
+
+function getRecentQuarterRows(endYear, endQuarter, count) {
+  var endIdx = toQuarterIndex(endYear, endQuarter);
+  var rows = [];
+  var i;
+  for (i = endIdx - count + 1; i <= endIdx; i++) {
+    var part = fromQuarterIndex(i);
+    var row = getQuarterTrendRow(part.year, part.quarter);
+    if (row) rows.push(row);
+  }
+  return rows;
+}
+
+function getRecentHalfRows(endYear, endHalf, count) {
+  var endIdx = toHalfIndex(endYear, endHalf);
+  var rows = [];
+  var i;
+  for (i = endIdx - count + 1; i <= endIdx; i++) {
+    var part = fromHalfIndex(i);
+    var row = getHalfTrendRow(part.year, part.half);
+    if (row) rows.push(row);
+  }
+  return rows;
+}
+
+function getVocFilterState() {
+  return window.__vocFilterState || { year: "2026년", period: "month", bucket: "6월" };
+}
+
+function getSelectedYearKeys() {
+  var span = Math.max(2, Math.min(vocYearTrendSpan, vocYearTrendOptions.length));
+  return vocYearTrendOptions.slice(vocYearTrendOptions.length - span);
+}
+
+function getTrendChartMeta() {
+  var state = getVocFilterState();
+  if (state.period === "year") {
+    var yearKeys = getSelectedYearKeys();
+    var rows = yearKeys.map(function (yearKey) {
+      var row = yearlyTrendByYear[yearKey];
+      return {
+        m: row.label,
+        posCnt: row.posCnt,
+        negCnt: row.negCnt,
+        posTop3: row.posTop3,
+        negTop3: row.negTop3
+      };
+    });
+    var rangeLabel = yearKeys.length
+      ? parseVocYear(yearKeys[0]) + " ~ " + parseVocYear(yearKeys[yearKeys.length - 1])
+      : "";
+    return { rows: rows, rangeLabel: rangeLabel, mode: "year" };
+  }
+  if (state.period === "quarter") {
+    var endYear = parseVocYear(state.year);
+    var endQuarter = getQuarterFromBucket(state.bucket);
+    var endIdx = toQuarterIndex(endYear, endQuarter);
+    var startPart = fromQuarterIndex(endIdx - 3);
+    var rows = getRecentQuarterRows(endYear, endQuarter, 4);
+    return {
+      rows: rows,
+      rangeLabel: formatQuarterRangeLabel(startPart.year, startPart.quarter) + " ~ " + formatQuarterRangeLabel(endYear, endQuarter),
+      mode: "quarter"
+    };
+  }
+  if (state.period === "half") {
+    var halfEndYear = parseVocYear(state.year);
+    var endHalf = getHalfFromBucket(state.bucket);
+    var halfEndIdx = toHalfIndex(halfEndYear, endHalf);
+    var halfStartPart = fromHalfIndex(halfEndIdx - 3);
+    var halfRows = getRecentHalfRows(halfEndYear, endHalf, 4);
+    return {
+      rows: halfRows,
+      rangeLabel: formatHalfRangeLabel(halfStartPart.year, halfStartPart.half) + " ~ " + formatHalfRangeLabel(halfEndYear, endHalf),
+      mode: "half"
+    };
+  }
+  return { rows: monthlyTrend, rangeLabel: "", mode: "month" };
+}
+
+function getTrendChartRows() {
+  return getTrendChartMeta().rows;
+}
+
+function renderTrendCards(rows) {
+  var grid = document.getElementById("monthCardGrid");
+  if (!grid) return;
+  var cols = Math.max(rows.length, 1);
+  grid.style.gridTemplateColumns = "repeat(" + Math.min(cols, 6) + ", minmax(0, 1fr))";
+  grid.innerHTML = rows.map(function (r) {
+    var posRows = r.posTop3.map(function (c) {
+      return '<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0"><span style="color:var(--text-secondary)">' + c[0] + '</span><span style="font-weight:500">' + c[1].toLocaleString() + '</span></div>';
+    }).join("");
+    var negRows = r.negTop3.map(function (c) {
+      return '<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0"><span style="color:var(--text-secondary)">' + c[0] + '</span><span style="font-weight:500">' + c[1].toLocaleString() + '</span></div>';
+    }).join("");
+    return '<div style="background:var(--surface-1);border-radius:10px;padding:10px 11px">' +
+      '<p style="font-size:12px;font-weight:600;margin:0 0 6px">' + r.m + '</p>' +
+      '<p style="font-size:10.5px;font-weight:600;color:#1baf7a;margin:0 0 2px">긍정 TOP3</p>' + posRows +
+      '<p style="font-size:10.5px;font-weight:600;color:#e24b4a;margin:6px 0 2px">부정 TOP3</p>' + negRows +
+      '</div>';
+  }).join("");
+}
+
+function renderVocYearTrendSelect() {
+  var wrap = document.getElementById("vocYearTrendFilterWrap");
+  var selectEl = document.getElementById("vocYearTrendSpanSelect");
+  if (!wrap || !selectEl) return;
+  var isYear = getVocFilterState().period === "year";
+  wrap.style.display = isYear ? "flex" : "none";
+  if (!isYear) return;
+  selectEl.value = String(vocYearTrendSpan);
+}
+
+function updateTrendChartData(rows) {
+  var canvas = document.getElementById("monthlyTrendChart");
+  if (!canvas) return;
+  var chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: { callbacks: { label: function (item) { return item.dataset.label + ": " + item.raw.toLocaleString() + "건"; } } }
@@ -701,22 +986,70 @@ new Chart(document.getElementById("monthlyTrendChart"), {
       x: { grid: { display: false }, ticks: { color: "#898781" } },
       y: { ticks: { color: "#898781", callback: function (v) { return v.toLocaleString(); } }, grid: { color: "#e1e0d9" } }
     }
+  };
+  if (!monthlyTrendChartInstance) {
+    monthlyTrendChartInstance = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: rows.map(function (r) { return r.m; }),
+        datasets: [
+          { label: "긍정", data: rows.map(function (r) { return r.posCnt; }), borderColor: "#1baf7a", backgroundColor: "rgba(27,175,122,0.12)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 },
+          { label: "부정", data: rows.map(function (r) { return r.negCnt; }), borderColor: "#e24b4a", backgroundColor: "rgba(226,75,74,0.12)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 }
+        ]
+      },
+      options: chartOptions
+    });
+    return;
   }
-});
+  monthlyTrendChartInstance.data.labels = rows.map(function (r) { return r.m; });
+  monthlyTrendChartInstance.data.datasets[0].data = rows.map(function (r) { return r.posCnt; });
+  monthlyTrendChartInstance.data.datasets[1].data = rows.map(function (r) { return r.negCnt; });
+  monthlyTrendChartInstance.update();
+}
 
-document.getElementById("monthCardGrid").innerHTML = monthlyTrend.map(function (r) {
-  var posRows = r.posTop3.map(function (c) {
-    return '<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0"><span style="color:var(--text-secondary)">' + c[0] + '</span><span style="font-weight:500">' + c[1].toLocaleString() + '</span></div>';
-  }).join("");
-  var negRows = r.negTop3.map(function (c) {
-    return '<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0"><span style="color:var(--text-secondary)">' + c[0] + '</span><span style="font-weight:500">' + c[1].toLocaleString() + '</span></div>';
-  }).join("");
-  return '<div style="background:var(--surface-1);border-radius:10px;padding:10px 11px">' +
-    '<p style="font-size:12px;font-weight:600;margin:0 0 6px">' + r.m + '</p>' +
-    '<p style="font-size:10.5px;font-weight:600;color:#1baf7a;margin:0 0 2px">긍정 TOP3</p>' + posRows +
-    '<p style="font-size:10.5px;font-weight:600;color:#e24b4a;margin:6px 0 2px">부정 TOP3</p>' + negRows +
-    '</div>';
-}).join("");
+window.updateVocTrendView = function () {
+  var state = getVocFilterState();
+  var meta = getTrendChartMeta();
+  var titleEl = document.getElementById("vocTrendTitle");
+  var subtitleEl = document.getElementById("vocTrendSubtitle");
+  var canvas = document.getElementById("monthlyTrendChart");
+  var trendTitles = {
+    month: "VOC 월별 추이",
+    quarter: "VOC 분기별 추이",
+    half: "VOC 반기별 추이",
+    year: "VOC 연도별 추이"
+  };
+  var trendSubtitles = {
+    month: "월별 긍정·부정 TOP3 카테고리를 확인합니다.",
+    quarter: "선택 분기 기준 최근 4분기 긍정·부정 추이입니다.",
+    half: "선택 반기 기준 최근 4반기 긍정·부정 추이입니다.",
+    year: "비교 기간(최근 N년)을 선택해 연도별 긍정·부정 추이를 확인합니다."
+  };
+  var ariaLabels = {
+    month: "월별 긍정 부정 건수 추이",
+    quarter: "분기별 긍정 부정 건수 추이",
+    half: "반기별 긍정 부정 건수 추이",
+    year: "연도별 긍정 부정 건수 추이"
+  };
+  if (titleEl) titleEl.textContent = trendTitles[state.period] || trendTitles.month;
+  if (subtitleEl) {
+    var subtitle = trendSubtitles[state.period] || trendSubtitles.month;
+    if (meta.rangeLabel) subtitle += " 표시 구간: " + meta.rangeLabel;
+    subtitleEl.textContent = subtitle;
+  }
+  if (canvas) {
+    canvas.setAttribute("aria-label", ariaLabels[state.period] || ariaLabels.month);
+  }
+  renderVocYearTrendSelect();
+  updateTrendChartData(meta.rows);
+  renderTrendCards(meta.rows);
+};
+
+window.initVocTrendChart = function () {
+  if (window.__vocTrendChartReady) return;
+  window.__vocTrendChartReady = true;
+  window.updateVocTrendView();
+};
 </script>
 
 <script>
@@ -1561,7 +1894,8 @@ var vocFilterConfig = {
   half: { label: "반기 선택", basis: "기준 전반기 대비", options: ["상반기", "하반기"], selected: "상반기" },
   year: { label: "연도 선택", basis: "기준 전년도 대비", options: ["전체"], selected: "전체" }
 };
-var vocFilterState = { year: "2026년", period: "month", bucket: "6월" };
+var vocFilterState = window.__vocFilterState || { year: "2026년", period: "month", bucket: "6월" };
+window.__vocFilterState = vocFilterState;
 
 function renderVocFilters() {
   var config = vocFilterConfig[vocFilterState.period];
@@ -1577,11 +1911,17 @@ function renderVocFilters() {
   }).join("");
   selectEl.disabled = vocFilterState.period === "year";
 
-  basisEl.textContent = vocFilterState.year + " " + vocFilterState.bucket + " " + config.basis;
+  if (vocFilterState.period === "year") {
+    basisEl.textContent = vocFilterState.year + " " + config.basis;
+  } else {
+    basisEl.textContent = vocFilterState.year + " " + vocFilterState.bucket + " " + config.basis;
+  }
 
   Array.prototype.forEach.call(document.querySelectorAll("#vocPeriodButtons .voc-filter-chip"), function (button) {
     button.classList.toggle("active", button.getAttribute("data-period") === vocFilterState.period);
   });
+
+  if (typeof window.updateVocTrendView === "function") window.updateVocTrendView();
 }
 
 function bindVocFilters() {
@@ -1601,6 +1941,14 @@ function bindVocFilters() {
       renderVocFilters();
     });
   }
+  var spanSelect = document.getElementById("vocYearTrendSpanSelect");
+  if (spanSelect && !spanSelect.__vocBound) {
+    spanSelect.__vocBound = true;
+    spanSelect.addEventListener("change", function () {
+      vocYearTrendSpan = parseInt(spanSelect.value, 10) || 3;
+      if (typeof window.updateVocTrendView === "function") window.updateVocTrendView();
+    });
+  }
   Array.prototype.forEach.call(buttons, function (button) {
     button.addEventListener("click", function () {
       var nextPeriod = button.getAttribute("data-period");
@@ -1612,6 +1960,7 @@ function bindVocFilters() {
   });
 
   renderVocFilters();
+  if (typeof window.initVocTrendChart === "function") window.initVocTrendChart();
 }
 
 bindVocFilters();
