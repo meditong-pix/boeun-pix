@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOC AI 분석하기</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+  :root{
+    --bg:#0b0f14; --surface:#121820; --surface-2:#171f2a; --border:#243041;
+    --text:#eef2f7; --muted:#8b97a8; --accent:#38bdf8; --good:#34d399; --bad:#f87171; --warn:#fbbf24;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.55}
+  body.embed .top-actions{position:sticky;top:0;z-index:30;background:rgba(11,15,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  body:not(.embed) .top-actions{display:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 22px 88px}
+  body.embed .wrap{padding-top:12px}
+  .page-title{font-size:22px;font-weight:800;margin:0 0 4px}
+  .page-sub{font-size:12px;color:var(--muted);margin:0 0 16px}
+  .control-bar{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px}
+  .control-bar select{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 10px;font:inherit;font-size:12px;font-weight:600}
+  .run-btn{margin-left:auto;background:linear-gradient(135deg,#2563eb,#38bdf8);color:#fff;border:none;border-radius:9px;padding:9px 18px;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+  .close-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .notice{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:#fde68a;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:18px;line-height:1.6}
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+  .kpi .k{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .kpi .v{font-size:20px;font-weight:800;color:#fff}
+  .kpi .d{font-size:11px;font-weight:700;margin-top:4px}
+  .kpi .d.up{color:var(--good)} .kpi .d.down{color:var(--bad)} .kpi .d.warn{color:var(--warn)}
+  .sec{margin-bottom:26px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .sec-num{width:28px;height:28px;border-radius:999px;background:linear-gradient(135deg,#2563eb,#38bdf8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+  .sec-title{font-size:15px;font-weight:800;margin:0}
+  .sec-sub{font-size:11px;color:var(--muted);margin:2px 0 0}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+  .chart-box{position:relative;height:280px}
+  .chart-box.tall{height:360px}
+  .chart-box.cat-bar{height:420px}
+  .chart-box.ipa{height:380px}
+  .chart-cap{font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .diag-box{margin-top:12px;padding:12px 14px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:10px;font-size:12px;line-height:1.65}
+  .diag-box b{color:#fff}
+  .kw-wrap{margin-top:4px}
+  .kw-head{display:grid;grid-template-columns:1fr 120px 1fr;gap:8px;font-size:10px;font-weight:800;color:var(--muted);text-align:center;margin-bottom:8px}
+  .kw-row{display:grid;grid-template-columns:1fr 120px 1fr;gap:8px;align-items:center;margin-bottom:10px;font-size:10.5px}
+  .kw-cat{text-align:center;font-weight:800;font-size:11px;line-height:1.35;padding:4px 6px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px}
+  .kw-side{display:flex;flex-direction:column;gap:4px}
+  .kw-bar{display:flex;align-items:center;gap:6px;height:18px}
+  .kw-bar.neg{flex-direction:row-reverse;text-align:right}
+  .kw-bar .track{flex:1;height:10px;background:var(--surface-2);border-radius:5px;overflow:hidden;display:flex}
+  .kw-bar.neg .track{justify-content:flex-end}
+  .kw-bar.neg .fill{background:#c0392b;border-radius:5px 0 0 5px;margin-left:auto}
+  .kw-bar.pos .fill{background:#38bdf8;border-radius:0 5px 5px 0}
+  .kw-bar .lbl{white-space:nowrap;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .kw-bar.neg .lbl{color:#f87171}
+  .kw-bar.pos .lbl{color:#38bdf8}
+  .trend-note{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.65;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px dashed var(--border)}
+  .insight-grid{display:grid;grid-template-columns:1fr;gap:12px}
+  .insight-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--border);border-radius:12px;padding:15px 18px}
+  .insight-card.priority{border-left-color:var(--bad)}
+  .insight-card.good{border-left-color:#4e93f7}
+  .ic-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .ic-name{font-size:14px;font-weight:800}
+  .ic-body{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:12px;line-height:1.6}
+  .ic-col-label{font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px}
+  .footer-bar{margin-top:24px;padding:14px 0}
+  .footer-inner{display:flex;justify-content:flex-end}
+  .report-btn{background:linear-gradient(135deg,#2563eb,#6366f1);color:#fff;border:none;border-radius:10px;padding:12px 22px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.35)}
+  .loading{display:none;text-align:center;padding:80px 20px;color:var(--muted)}
+  .loading.on{display:block}
+  .loading .spin{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .content.hidden{display:none}
+  @media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}.ic-body{grid-template-columns:1fr}.kw-head,.kw-row{grid-template-columns:1fr;gap:4px}}
+</style>
+</head>
+<body>
+<div class="top-actions">
+  <div>
+    <div class="page-title" style="font-size:15px;margin:0">VOC AI 분석</div>
+    <div class="page-sub" style="margin:0">2026 Q2 · 전체 채널</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button type="button" class="report-btn" id="embedReportBtn" style="padding:8px 14px;font-size:12px">보고서 작성하기</button>
+    <button type="button" class="close-btn" id="embedCloseBtn">닫기</button>
+  </div>
+</div>
+<div class="wrap">
+  <h1 class="page-title">VOC AI 분석하기</h1>
+  <p class="page-sub">조회된 VOC 통계를 바탕으로 카테고리별 분석, 키워드, IPA, 월별 추이를 한 화면에서 확인합니다.</p>
+  <div class="control-bar">
+    <select><option>2026년</option><option>2025년</option></select>
+    <select><option>2분기 (Q2)</option><option>6월</option><option>상반기</option></select>
+    <select><option>전체 채널</option><option>메디통 픽스(앱)</option><option>고객의견카드</option></select>
+    <button type="button" class="run-btn" id="runBtn">AI 분석 시작</button>
+  </div>
+  <div class="loading" id="loading"><div class="spin"></div><div>VOC 데이터를 분석하고 있습니다…</div></div>
+  <div class="content hidden" id="content">
+    <div class="notice">※ 분석 표본은 2026 Q2 접수 686건 기준입니다. 불편비율 목표 15%와 전분기(Q1) 벤치마크를 대조하여 해석했습니다.</div>
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <section class="sec">
+      <div class="sec-head"><div class="sec-num">01</div><div><h2 class="sec-title">카테고리별 VOC 분석</h2><p class="sec-sub">카테고리별 긍정·부정 VOC 비율 · 불편 목표선(15%)</p></div></div>
+      <div class="panel">
+        <div class="chart-box cat-bar"><canvas id="catBarChart"></canvas></div>
+        <p class="chart-cap">파랑: 긍정 · 빨강: 부정(목표 15% 초과 시 진한 빨강) · 점선은 불편 목표선 15%</p>
+        <div class="diag-box" id="catDiag"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><div class="sec-num">02</div><div><h2 class="sec-title">카테고리별 대표 키워드</h2><p class="sec-sub">칭찬 vs 불편 Top 2 · 언급 건수</p></div></div>
+      <div class="panel">
+        <div class="kw-wrap" id="kwChart"></div>
+        <p class="chart-cap" style="margin-top:12px">왼쪽(빨강): 불편 키워드 · 오른쪽(파랑): 칭찬 키워드 · 막대 길이는 언급 건수</p>
+        <div class="trend-note" id="kwNote"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><div class="sec-num">03</div><div><h2 class="sec-title">IPA 매트릭스</h2><p class="sec-sub">빈도(접수 건수) × 불편 VOC 비율 · 개선 우선순위</p></div></div>
+      <div class="panel">
+        <div class="chart-box ipa"><canvas id="ipaChart"></canvas></div>
+        <p class="chart-cap">I·II 최우선 개선 · III 후순위 · IV 지속 관리</p>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><div class="sec-num">04</div><div><h2 class="sec-title">월별 카테고리 불편비율 변동</h2><p class="sec-sub">전체 카테고리 표시 · ±5%p 이상 변동만 컬러 강조</p></div></div>
+      <div class="panel">
+        <div class="chart-box tall"><canvas id="monthlyChart"></canvas></div>
+        <div class="trend-note" id="monthlyNote"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><div class="sec-num">05</div><div><h2 class="sec-title">AI 카테고리별 심층 분석</h2><p class="sec-sub">IPA 기준 우선순위 · 개선 제안</p></div></div>
+      <div class="insight-grid" id="deepGrid"></div>
+    </section>
+
+    <div class="footer-bar"><div class="footer-inner"><button type="button" class="report-btn" id="reportBtn">보고서 생성하기 →</button></div></div>
+  </div>
+</div>
+<script>
+var TARGET_NEG = 15;
+var IPA_X_MID = 110;
+var IPA_Y_MID = 22;
+var KW_MAX = 60;
+var MONTHLY_CHANGE_THRESHOLD = 5;
+var MONTHS = ["1월","2월","3월","4월","5월","6월"];
+var charts = {};
+
+var VOC_CATS = [
+  { name:"비용관련", neg:40, pos:60, prev:38, cnt:45, color:"#c9a227", barColor:"#c0392b",
+    negKw:[["예상치 못한 추가비용",21],["비용 설명 부족",15]],
+    posKw:[["합리적인 비용",9],["친절한 안내",5]],
+    monthly:[37,38,38,39,39,40] },
+  { name:"인적응대관련", neg:34, pos:66, prev:30, cnt:189, color:"#c0392b", barColor:"#c0392b",
+    negKw:[["불친절한 말투",58],["설명 부족",45]],
+    posKw:[["친절한 설명",42],["세심한 배려",31]],
+    monthly:[29,30,30,31,33,34] },
+  { name:"시스템/절차관련", neg:28, pos:72, prev:18, cnt:96, color:"#c0392b", barColor:"#c0392b",
+    negKw:[["예약 변경 어려움",41],["수납 절차 복잡",32]],
+    posKw:[["간편한 접수",12],["빠른 수납",9]],
+    monthly:[17,18,19,22,25,28] },
+  { name:"진료/치료·검사관련", neg:18, pos:82, prev:19, cnt:142, color:"#1f6f5b", barColor:"#1f6f5b",
+    negKw:[["대기시간 김",26],["검사일정 조율 어려움",15]],
+    posKw:[["꼼꼼한 진료",38],["정확한 설명",29]],
+    monthly:[19,19,18,18,18,18] },
+  { name:"서비스제공(호텔리티)관련", neg:15, pos:85, prev:16, cnt:118, color:"#1f6f5b", barColor:"#1f6f5b",
+    negKw:[["식사 만족도 낮음",19],["편의시설 부족",11]],
+    posKw:[["깨끗한 병실",35],["편안한 침구",22]],
+    monthly:[16,16,15,15,15,15] },
+  { name:"환경관련", neg:12, pos:88, prev:20, cnt:74, color:"#94a3b8", barColor:"#1f6f5b",
+    negKw:[["냉난방 불편",9],["주차 불편",6]],
+    posKw:[["쾌적한 환경",28],["깨끗한 화장실",18]],
+    monthly:[21,20,19,16,14,12] },
+  { name:"기타문의", neg:9, pos:91, prev:11, cnt:22, color:"#94a3b8", barColor:"#1f6f5b",
+    negKw:[["면회 절차 문의",8],["주차 문의",5]],
+    posKw:[["친절한 안내",6],["신속한 처리",4]],
+    monthly:[11,11,10,10,9,9] }
+];
+
+var IPA_QUADRANTS = [
+  { x0:0, x1:IPA_X_MID, y0:IPA_Y_MID, y1:45, fill:"rgba(201,162,39,0.22)", title:"I. 최우선 개선", sub:"빈도 낮음 · 불편비율 높음", titleColor:"#fbbf24", align:"left" },
+  { x0:IPA_X_MID, x1:220, y0:IPA_Y_MID, y1:45, fill:"rgba(192,57,43,0.22)", title:"II. 최우선 개선", sub:"빈도 높음 · 불편비율 높음", titleColor:"#f87171", align:"right" },
+  { x0:0, x1:IPA_X_MID, y0:0, y1:IPA_Y_MID, fill:"rgba(148,163,184,0.24)", title:"III. 후순위", sub:"빈도·비율 모두 낮음", titleColor:"#94a3b8", align:"left" },
+  { x0:IPA_X_MID, x1:220, y0:0, y1:IPA_Y_MID, fill:"rgba(31,111,91,0.22)", title:"IV. 지속 관리", sub:"빈도 높음 · 불편비율 낮음", titleColor:"#34d399", align:"right" }
+];
+
+function renderKpis(){
+  document.getElementById("kpiRow").innerHTML = [
+    { k:"접수 건수", v:"686건", d:"Q2 기준", cls:"" },
+    { k:"불편 VOC 비율", v:"23.8%", d:"▲ +1.3%p (Q1 대비)", cls:"down" },
+    { k:"목표까지", v:"−8.8%p", d:"목표 15% 이하", cls:"warn" },
+    { k:"최우선 개선", v:"3개", d:"인적·시스템·비용", cls:"warn" },
+    { k:"급개선", v:"1개", d:"환경관련 −8%p", cls:"up" }
+  ].map(function(it){
+    return '<div class="kpi"><div class="k">'+it.k+'</div><div class="v">'+it.v+'</div>'+(it.d?'<div class="d '+it.cls+'">'+it.d+'</div>':"")+'</div>';
+  }).join("");
+}
+
+function renderCatDiag(){
+  document.getElementById("catDiag").innerHTML =
+    '<b>인적응대관련:</b> 189건으로 접수 건수가 가장 많고, 불편비율 34%로 목표선(15%)의 두 배를 넘습니다. 빈도와 심각도가 모두 높아 개선 효과가 가장 큽니다.<br>' +
+    '<b>비용관련:</b> 건수(45건)는 적지만 불편비율 40%로 전 카테고리 중 가장 높습니다.';
+}
+
+function renderKeywordChart(){
+  var max = KW_MAX;
+  var rows = VOC_CATS.map(function(c){
+    var negBars = c.negKw.map(function(kw){
+      var w = Math.round(kw[1] / max * 100);
+      return '<div class="kw-bar neg"><span class="lbl">'+kw[0]+' ('+kw[1]+')</span><div class="track"><div class="fill" style="width:'+w+'%"></div></div></div>';
+    }).join("");
+    var posBars = c.posKw.map(function(kw){
+      var w = Math.round(kw[1] / max * 100);
+      return '<div class="kw-bar pos"><div class="track"><div class="fill" style="width:'+w+'%"></div></div><span class="lbl">'+kw[0]+' ('+kw[1]+')</span></div>';
+    }).join("");
+    return '<div class="kw-row"><div class="kw-side">'+negBars+'</div><div class="kw-cat">'+c.name+'</div><div class="kw-side">'+posBars+'</div></div>';
+  }).join("");
+  document.getElementById("kwChart").innerHTML =
+    '<div class="kw-head"><div>불편 키워드</div><div>카테고리</div><div>칭찬 키워드</div></div>' + rows;
+  document.getElementById("kwNote").textContent =
+    "불친절한 말투(58건)가 전 카테고리·전 키워드 중 가장 많이 언급됐습니다. 시스템/절차관련은 예약 변경 어려움(41건), 비용관련은 예상치 못한 추가비용(21건)이 대표 불편 키워드입니다.";
+}
+
+function monthlyDelta(data){
+  return data[data.length - 1] - data[0];
+}
+
+function buildMonthlyDatasets(){
+  return VOC_CATS.map(function(c){
+    var delta = monthlyDelta(c.monthly);
+    var highlight = Math.abs(delta) >= MONTHLY_CHANGE_THRESHOLD;
+    var up = delta > 0;
+    var color = highlight ? (up ? "#f87171" : "#38bdf8") : "#64748b";
+    var short = c.name.replace("관련","").replace("·검사","");
+    if (short.length > 12) short = short.slice(0, 10) + "…";
+    return {
+      label: short + (highlight ? (up ? " ▲" : " ▼") : ""),
+      data: c.monthly,
+      borderColor: color,
+      tension: 0.35,
+      borderWidth: highlight ? 2.5 : 1.5,
+      pointRadius: highlight ? 4 : 2,
+      pointBackgroundColor: color,
+      borderDash: highlight ? [] : [5, 4]
+    };
+  });
+}
+
+function renderDeepGrid(){
+  var cards = [
+    { name:"인적응대관련", cls:"priority", why:"접수 189건·불편 34% 모두 1위. IPA II사분면.", what:"응대매뉴얼 표준화 및 전 직원 교육 · 8/31" },
+    { name:"시스템/절차관련", cls:"priority", why:"Q1→Q2 +10%p 유일 급등. IPA II사분면.", what:"수납·예약 프로세스 재정비 · 원무·전산 8/31" },
+    { name:"비용관련", cls:"priority", why:"불편 40% 전환율 최고. IPA I사분면.", what:"수납 전 비용 사전 안내 강화 · 원무 8/20" },
+    { name:"환경관련", cls:"good", why:"Q1→Q2 −8%p 가장 크게 개선.", what:"개선 조치 문서화 후 타 카테고리 확산 검토" }
+  ];
+  document.getElementById("deepGrid").innerHTML = cards.map(function(c){
+    return '<div class="insight-card '+c.cls+'"><div class="ic-head"><div class="ic-name">'+c.name+'</div></div>' +
+      '<div class="ic-body"><div><div class="ic-col-label">분석 근거</div>'+c.why+'</div>' +
+      '<div><div class="ic-col-label">개선 과제</div>'+c.what+'</div></div></div>';
+  }).join("");
+}
+
+function drawLabelBox(ctx, x, y, text, opts){
+  opts = opts || {};
+  var padX = 6, padY = 4, maxW = opts.maxWidth || 168;
+  ctx.save();
+  ctx.font = "600 10px 'Noto Sans KR', sans-serif";
+  var boxW = Math.min(maxW, ctx.measureText(text).width + padX * 2);
+  var boxH = 22;
+  var bx = opts.align === "right" ? x - boxW - 8 : x + 8;
+  var by = y - boxH / 2;
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  ctx.strokeStyle = "rgba(15,23,42,0.12)";
+  if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(bx, by, boxW, boxH, 4); ctx.fill(); ctx.stroke(); }
+  else ctx.fillRect(bx, by, boxW, boxH);
+  ctx.fillStyle = "#1e293b";
+  ctx.fillText(text, bx + padX, by + 14);
+  ctx.restore();
+}
+
+function ipaQuadrantPlugin(){
+  return {
+    id: "ipaQuadrant",
+    beforeDraw: function(chart){
+      var ctx = chart.ctx, xs = chart.scales.x, ys = chart.scales.y;
+      IPA_QUADRANTS.forEach(function(q){
+        var left = xs.getPixelForValue(q.x0);
+        var right = xs.getPixelForValue(q.x1);
+        var top = ys.getPixelForValue(q.y1);
+        var bottom = ys.getPixelForValue(q.y0);
+        ctx.save();
+        ctx.fillStyle = q.fill;
+        ctx.fillRect(left, top, right - left, bottom - top);
+        ctx.fillStyle = q.titleColor;
+        ctx.font = "800 10px 'Noto Sans KR', sans-serif";
+        var tx = q.align === "right" ? right - 8 : left + 8;
+        ctx.textAlign = q.align === "right" ? "right" : "left";
+        ctx.fillText(q.title, tx, top + 14);
+        if (q.sub) {
+          ctx.font = "600 9px 'Noto Sans KR', sans-serif";
+          ctx.fillStyle = "rgba(203,213,225,0.72)";
+          ctx.fillText(q.sub, tx, top + 28);
+        }
+        ctx.restore();
+      });
+      ctx.save();
+      ctx.strokeStyle = "rgba(148,163,184,0.4)";
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.moveTo(xs.getPixelForValue(IPA_X_MID), ys.top);
+      ctx.lineTo(xs.getPixelForValue(IPA_X_MID), ys.bottom);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(xs.left, ys.getPixelForValue(IPA_Y_MID));
+      ctx.lineTo(xs.right, ys.getPixelForValue(IPA_Y_MID));
+      ctx.stroke();
+      ctx.restore();
+    },
+    afterDatasetsDraw: function(chart){
+      var ctx = chart.ctx, meta = chart.getDatasetMeta(0);
+      if (!meta || !meta.data) return;
+      VOC_CATS.forEach(function(c, i){
+        var el = meta.data[i];
+        if (!el) return;
+        var label = c.name + " " + c.cnt + "건 · " + c.neg + "%";
+        var align = c.cnt >= IPA_X_MID ? "right" : "left";
+        drawLabelBox(ctx, el.x, el.y, label, { align: align, maxWidth: 200 });
+      });
+    }
+  };
+}
+
+function targetLinePlugin(value){
+  return {
+    id: "targetLine",
+    afterDraw: function(chart){
+      var ctx = chart.ctx, ys = chart.scales.y;
+      var y = ys.getPixelForValue(value);
+      ctx.save();
+      ctx.strokeStyle = "rgba(251,191,36,0.85)";
+      ctx.setLineDash([6, 4]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(chart.chartArea.left, y);
+      ctx.lineTo(chart.chartArea.right, y);
+      ctx.stroke();
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "700 10px 'Noto Sans KR', sans-serif";
+      ctx.fillText("목표선 " + value + "%", chart.chartArea.right - 62, y - 4);
+      ctx.restore();
+    }
+  };
+}
+
+function initCharts(){
+  if (typeof Chart === "undefined") return;
+  Object.keys(charts).forEach(function(k){ if(charts[k]) charts[k].destroy(); });
+  charts = {};
+
+  var sorted = VOC_CATS.slice().sort(function(a,b){ return b.neg - a.neg; });
+
+  charts.catBar = new Chart(document.getElementById("catBarChart"), {
+    type: "bar",
+    data: {
+      labels: sorted.map(function(c){ return c.name; }),
+      datasets: [
+        {
+          label: "긍정",
+          data: sorted.map(function(c){ return c.pos; }),
+          backgroundColor: "rgba(56,189,248,0.85)",
+          borderRadius: 4,
+          barThickness: 14
+        },
+        {
+          label: "부정",
+          data: sorted.map(function(c){ return c.neg; }),
+          backgroundColor: sorted.map(function(c){ return c.neg > TARGET_NEG ? "#c0392b" : "rgba(248,113,113,0.55)"; }),
+          borderRadius: 4,
+          barThickness: 14
+        }
+      ]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: "top", labels: { color: "#8b97a8", font: { size: 11, weight: "600" }, boxWidth: 14 } },
+        tooltip: {
+          callbacks: {
+            label: function(ctx){
+              var cat = sorted[ctx.dataIndex];
+              var pct = ctx.raw;
+              return (ctx.datasetIndex === 0 ? "긍정 " : "부정 ") + pct + "% · 접수 " + cat.cnt + "건";
+            }
+          }
+        }
+      },
+      scales: {
+        x: { min: 0, max: 100, ticks: { color: "#8b97a8", callback: function(v){ return v + "%"; } }, grid: { color: "#1e2936" },
+          title: { display: true, text: "VOC 비율 (%)", color: "#8b97a8", font: { size: 11, weight: "600" } } },
+        y: { ticks: { color: "#cbd5e1", font: { size: 10, weight: "600" } }, grid: { display: false } }
+      }
+    },
+    plugins: [targetLinePlugin(TARGET_NEG)]
+  });
+
+  charts.ipa = new Chart(document.getElementById("ipaChart"), {
+    type: "scatter",
+    data: {
+      datasets: [{
+        label: "카테고리",
+        data: VOC_CATS.map(function(c){ return { x: c.cnt, y: c.neg }; }),
+        backgroundColor: VOC_CATS.map(function(c){ return c.color; }),
+        pointRadius: 9,
+        pointBorderColor: "#fff",
+        pointBorderWidth: 1.5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { min: 0, max: 220, title: { display: true, text: "분기 접수 건수 (빈도)", color: "#8b97a8", font: { size: 11, weight: "600" } },
+          ticks: { color: "#8b97a8" }, grid: { color: "rgba(30,41,59,0.2)" } },
+        y: { min: 0, max: 45, title: { display: true, text: "불편 VOC 비율 (%)", color: "#8b97a8", font: { size: 11, weight: "600" } },
+          ticks: { color: "#8b97a8", callback: function(v){ return v + "%"; } }, grid: { color: "rgba(30,41,59,0.2)" } }
+      }
+    },
+    plugins: [ipaQuadrantPlugin()]
+  });
+
+  charts.monthly = new Chart(document.getElementById("monthlyChart"), {
+    type: "line",
+    data: {
+      labels: MONTHS,
+      datasets: buildMonthlyDatasets()
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { labels: { color: "#8b97a8", font: { size: 9 }, boxWidth: 10 } }
+      },
+      scales: {
+        x: { ticks: { color: "#8b97a8" }, grid: { color: "#1e2936" } },
+        y: { min: 0, max: 45, ticks: { color: "#8b97a8", callback: function(v){ return v + "%"; } }, grid: { color: "#1e2936" },
+          title: { display: true, text: "불편 VOC 비율 (%)", color: "#8b97a8", font: { size: 11, weight: "600" } } }
+      }
+    },
+    plugins: [targetLinePlugin(TARGET_NEG)]
+  });
+
+  document.getElementById("monthlyNote").textContent =
+    "AI 요약: 1~6월 전체 카테고리 추이를 표시합니다. ±5%p 이상 변동만 컬러 강조됩니다. 시스템/절차관련(+11%p)은 유일한 급등, 환경관련(−9%p)은 가장 크게 개선됐습니다.";
+}
+
+function runAnalysis(){
+  document.getElementById("loading").classList.add("on");
+  document.getElementById("content").classList.add("hidden");
+  setTimeout(function(){
+    document.getElementById("loading").classList.remove("on");
+    document.getElementById("content").classList.remove("hidden");
+    renderKpis();
+    renderCatDiag();
+    renderKeywordChart();
+    renderDeepGrid();
+    initCharts();
+  }, 700);
+}
+
+(function boot(){
+  var isEmbed = new URLSearchParams(location.search||"").get("embed")==="1";
+  if (isEmbed) document.body.classList.add("embed");
+  function post(type){ if(window.parent&&window.parent!==window) window.parent.postMessage({ source:"pix-survey-ai-board", type:type }, "*"); }
+  ["reportBtn","embedReportBtn"].forEach(function(id){ var b=document.getElementById(id); if(b) b.addEventListener("click",function(){ post("open-report"); }); });
+  var c=document.getElementById("embedCloseBtn"); if(c) c.addEventListener("click",function(){ post("close"); });
+  document.getElementById("runBtn").addEventListener("click", runAnalysis);
+  if (isEmbed) runAnalysis();
+})();
+</script>
+</body>
+</html>

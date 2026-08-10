@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>환자경험평가 5차 결과 진단 및 1등급 달성 개선계획</title>
+<style>
+  :root {
+    --ink: #1f1e1c; --ink-sub: #5f5e5a; --ink-muted: #898781;
+    --line: #cfcdc5; --line-soft: #e1e0d9; --paper: #ffffff; --shell: #eae8e2;
+    --blue: #0C447C; --blue-bg: #E6F1FB;
+    --red: #791F1F; --red-bg: #FCEBEB;
+    --amber: #A67A1E; --amber-bg: #FAEEDA;
+    --teal: #1F6F5B; --teal-bg: #E6F4EF;
+    --gray-bg: #F1F0EC;
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body { margin: 0; background: var(--shell); color: var(--ink); font-family: "Malgun Gothic","Apple SD Gothic Neo",-apple-system,sans-serif; padding: 36px 0 80px; }
+  .doc { width: 860px; margin: 0 auto; background: var(--paper); box-shadow: 0 2px 14px rgba(0,0,0,.08); padding: 42px 48px 56px; }
+
+  .doc-eyebrow { font-size: 11px; font-weight: 700; color: var(--ink-muted); margin-bottom: 6px; }
+  .doc-title { font-size: 22px; font-weight: 800; margin: 0 0 8px; line-height: 1.35; }
+  .doc-lead { font-size: 13px; font-weight: 700; color: var(--blue); margin: 0 0 16px; }
+
+  .status-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+  .status-card { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 12px; background: var(--gray-bg); }
+  .status-card.goal { background: var(--blue-bg); border-color: #c5d8ec; }
+  .status-card.need { background: var(--amber-bg); border-color: #efd8a8; }
+  .status-card .sl { font-size: 10px; font-weight: 700; color: var(--ink-muted); margin-bottom: 4px; }
+  .status-card .sv { font-size: 15px; font-weight: 800; }
+  .status-card .ss { font-size: 11px; color: var(--ink-sub); margin-top: 3px; }
+
+  .doc-info-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 12px; }
+  .doc-info-table td { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 7px 12px; }
+  .doc-info-table td.lbl { width: 90px; background: var(--gray-bg); font-weight: 700; color: var(--ink-sub); border-right: 1px solid var(--line-soft); }
+  .doc-info-table td.val { border-right: 1px solid var(--line-soft); }
+  .note { font-size: 10.5px; color: var(--ink-muted); line-height: 1.6; margin: 0 0 18px; }
+
+  .sec { margin-top: 28px; }
+  .sec-title { font-size: 15px; font-weight: 800; border-bottom: 2px solid var(--ink); padding-bottom: 6px; margin-bottom: 12px; }
+  .sec-title .num { color: var(--blue); margin-right: 6px; }
+  .sub-title { font-size: 13px; font-weight: 800; margin: 16px 0 8px; padding-left: 8px; border-left: 3px solid var(--blue); }
+  p.body { font-size: 12px; line-height: 1.75; margin: 0 0 9px; }
+
+  table.data { width: 100%; border-collapse: collapse; font-size: 11.5px; margin: 0 0 12px; }
+  table.data th, table.data td { border: 1px solid var(--line-soft); padding: 7px 8px; text-align: center; }
+  table.data th { background: var(--gray-bg); font-weight: 800; color: var(--ink-sub); }
+  table.data td.left { text-align: left; font-weight: 700; }
+  table.data tr.hl td { background: var(--red-bg); }
+  table.data .neg { color: var(--red); font-weight: 800; }
+  table.data .pos { color: var(--blue); font-weight: 800; }
+
+  .plain-list { margin: 0 0 10px; padding-left: 20px; font-size: 11.5px; line-height: 1.8; }
+  .plain-list li { margin-bottom: 4px; }
+
+  .callout { border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px 14px; background: var(--gray-bg); margin-bottom: 12px; }
+  .callout.danger { background: var(--red-bg); border-color: #efc4c4; }
+  .callout.warn { background: var(--amber-bg); border-color: #efd8a8; }
+  .callout.ok { background: var(--teal-bg); border-color: #b9ddd2; }
+  .callout .ct { font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+  .callout p { font-size: 11.5px; line-height: 1.7; margin: 0 0 6px; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .quad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .quad { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 12px; }
+  .quad .qh { font-size: 11px; font-weight: 800; margin-bottom: 4px; }
+  .quad .qa { font-size: 11.5px; font-weight: 700; margin-bottom: 4px; }
+  .quad .qd { font-size: 11px; color: var(--ink-sub); line-height: 1.55; }
+  .quad.q1 { border-left: 4px solid var(--red); }
+  .quad.q2 { border-left: 4px solid var(--teal); }
+  .quad.q3 { border-left: 4px solid var(--amber); }
+  .quad.q4 { border-left: 4px solid var(--ink-muted); }
+
+  .cap { font-size: 10px; color: var(--ink-muted); margin: 4px 0 12px; }
+  .chart-fig { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 12px 8px; margin: 0 0 14px; background: #fff; }
+  .chart-fig .fig-title { font-size: 11.5px; font-weight: 800; margin: 0 0 8px; color: var(--ink); }
+  .chart-fig img { display: block; width: 100%; height: auto; border-radius: 4px; }
+  .chart-fig .fig-cap { font-size: 10px; color: var(--ink-muted); margin: 8px 0 0; line-height: 1.5; }
+  .footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 9.5px; color: var(--ink-muted); display: flex; justify-content: space-between; gap: 12px; }
+</style>
+</head>
+<body>
+
+<div class="doc">
+
+  <p class="doc-eyebrow">수원윌스기념병원 · 경영진 보고</p>
+  <h1 class="doc-title">환자경험평가 5차 결과 진단 및 1등급 달성 개선계획</h1>
+  <p class="doc-lead">현재 3등급 82.64점 · 360개소 중 198위 → 목표 1등급 90점 이상</p>
+
+  <div class="status-grid">
+    <div class="status-card">
+      <div class="sl">현재</div>
+      <div class="sv">3등급 · 82.64점</div>
+      <div class="ss">198 / 360위</div>
+    </div>
+    <div class="status-card goal">
+      <div class="sl">목표</div>
+      <div class="sv">1등급 · 90.00점 이상</div>
+      <div class="ss">57위 이내</div>
+    </div>
+    <div class="status-card need">
+      <div class="sl">필요</div>
+      <div class="sv">2단계 · +7.36점</div>
+      <div class="ss">141계단 상승</div>
+    </div>
+  </div>
+
+  <table class="doc-info-table">
+    <tr>
+      <td class="lbl">보고일</td><td class="val">2026.8.4</td>
+      <td class="lbl">보고 대상</td><td class="val">병원장 및 경영진</td>
+    </tr>
+    <tr>
+      <td class="lbl">작성 부서</td><td class="val">QI팀</td>
+      <td class="lbl">작성자</td><td class="val">OOO</td>
+    </tr>
+  </table>
+  <p class="note">※ 수치는 2026.7.31 심평원 공개 5차 환자경험평가 기관별 결과 직접 분석값입니다. 종합점수=7개 영역 산술평균이며, 등급경계와 360개 기관 전수 대조로 검증했습니다.</p>
+
+  <!-- 1. 개요 -->
+  <div class="sec">
+    <p class="sec-title"><span class="num">1.</span>개요 및 결과 요약</p>
+
+    <p class="sub-title">1-1. 목표 설정 — 1등급은 2단계로 도달</p>
+    <p class="body">6차(2026.9~11) 단일 차수 1등급 목표는 실패 위험이 큽니다. 최근 2년 개선 실적 +2.35점 &lt; 필요 상승 +7.36점이며, 5차→6차는 평가주기가 1년으로 단축되었습니다. 1등급을 최종 목표로 확정하되 2단계로 구분합니다.</p>
+    <table class="data">
+      <thead>
+        <tr><th>단계</th><th>시점</th><th>목표 종합점수</th><th>목표 등급</th><th>필요 상승</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1단계</td><td>6차(2026.9~11)</td><td>86.00점</td><td>2등급</td><td class="pos">+3.36점</td></tr>
+        <tr><td>2단계</td><td>7차(차기)</td><td>90.57점</td><td>1등급</td><td class="pos">+4.57점</td></tr>
+      </tbody>
+    </table>
+
+    <p class="sub-title">1-2. 핵심 결론</p>
+    <div class="callout">
+      <p><b>현재:</b> 종합점수는 82.64점으로 3등급 평균(82.33점)을 소폭 웃도는 중위권 수준입니다. 다만 최근 2년간 개선 속도(+2.35점)는 전체 기관 평균 상승폭(+3.61점)에 못 미치고 있습니다.</p>
+      <p><b>목표:</b> 6차에서 2등급(86.00점)에 먼저 진입한 뒤, 7차에서 1등급(90.57점)을 달성하는 2단계 로드맵으로 추진합니다.</p>
+      <p><b>최우선 과제:</b> 정서적 지지입니다. 1등급 병원과 5등급 병원 간 점수 격차가 7개 영역 중 가장 크며, 우리 병원 점수도 최저이고 1등급까지 격차 역시 가장 큽니다.</p>
+      <p><b>결정 요청:</b> 경영진 결정이 필요한 사항은 총 5건이며, 8월 10일까지 승인이 이뤄져야 8월 중 착수가 가능합니다.</p>
+    </div>
+  </div>
+
+  <!-- 2. 영역별 성과 -->
+  <div class="sec">
+    <p class="sec-title"><span class="num">2.</span>영역별 성과 분석</p>
+    <p class="sub-title">2-1. 영역별 점수 비교 — 우리 병원 vs 등급별 평균 (5차, 2025)</p>
+    <figure class="chart-fig">
+      <p class="fig-title">[차트1] 영역별 점수 비교 — 수원윌스기념병원 vs 등급별 평균 (5차, 2025년)</p>
+      <img src="assets/willis-report/chart1-area-compare.png" alt="영역별 점수 비교 차트">
+      <p class="fig-cap">연두 계열(1등급 평균)·회색(3등급 평균)·빨강(우리 병원). 점선은 1등급 기준선 90점.</p>
+    </figure>
+    <table class="data">
+      <thead>
+        <tr>
+          <th rowspan="2">평가 영역</th>
+          <th rowspan="2">우리 병원</th>
+          <th colspan="2">3등급 평균 대비</th>
+          <th colspan="2">1등급 평균 대비</th>
+        </tr>
+        <tr><th>평균</th><th>갭</th><th>평균</th><th>갭</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="left">간호사 영역</td><td>83.57</td><td>84.52</td><td class="neg">▼ −0.95</td><td>93.97</td><td class="neg">▼ −10.40</td></tr>
+        <tr><td class="left">의사 영역</td><td>83.82</td><td>82.70</td><td class="pos">▲ +1.12</td><td>92.24</td><td class="neg">▼ −8.42</td></tr>
+        <tr><td class="left">투약 및 치료과정</td><td>81.57</td><td>81.12</td><td class="pos">▲ +0.45</td><td>91.92</td><td class="neg">▼ −10.35</td></tr>
+        <tr class="hl"><td class="left">정서적 지지</td><td>76.38</td><td>76.98</td><td class="neg">▼ −0.60</td><td>89.22</td><td class="neg">▼ −12.84</td></tr>
+        <tr><td class="left">환자 안전·병원환경</td><td>85.01</td><td>83.75</td><td class="pos">▲ +1.26</td><td>94.08</td><td class="neg">▼ −9.07</td></tr>
+        <tr><td class="left">환자권리 보장</td><td>82.32</td><td>82.15</td><td class="pos">▲ +0.17</td><td>92.43</td><td class="neg">▼ −10.11</td></tr>
+        <tr><td class="left">전반적 평가</td><td>85.84</td><td>85.07</td><td class="pos">▲ +0.77</td><td>94.32</td><td class="neg">▼ −8.48</td></tr>
+        <tr><td class="left">종합점수</td><td>82.64</td><td>82.33</td><td class="pos">▲ +0.32</td><td>92.60</td><td class="neg">▼ −9.95</td></tr>
+      </tbody>
+    </table>
+    <p class="cap">빨간 정서적 지지는 3등급 평균보다도 낮은 유일한 항목입니다.</p>
+
+    <div class="callout danger">
+      <div class="ct">진단 요약</div>
+      <p><b>정서적 지지:</b> 76.38점으로 7개 영역 중 최저점이며, 1등급 평균(89.22점)까지 격차가 −12.84점으로 가장 큽니다. 1등급 기관조차 이 영역만큼은 90점을 넘지 못해, 아직 어느 병원도 완전히 장악하지 못한 구간입니다. 최우선 개선 대상으로 선정합니다.</p>
+      <p><b>간호사 영역:</b> 83.57점으로, 7개 영역 중 유일하게 3등급 평균(84.52점)에도 미치지 못하고 있습니다. 간호·간병 통합서비스를 운영 중인 병원이라는 점을 감안하면, 통합병동과 일반병동을 분리하여 원인을 규명할 필요가 있습니다.</p>
+    </div>
+
+    <p class="sub-title">2-2. 종합점수 분포</p>
+    <figure class="chart-fig">
+      <p class="fig-title">[차트] 종합점수 분포 — 전국 360개 기관 개별 점수 (5차, 2025)</p>
+      <img src="assets/willis-report/chart2-score-distribution.png" alt="종합점수 분포 도트플롯">
+      <p class="fig-cap">점 1개 = 병원 1개소 · 0.5점 단위로 쌓음 · 점선은 등급 경계 · ★ 우리 병원 82.64점 (198/360위)</p>
+    </figure>
+    <p class="body">80~83점 구간이 가장 두텁게 몰려 있어 전체 분포의 정점을 이루며, 우리 병원(82.64점)도 바로 이 정점 부근에 위치합니다. 가장 붐비는 구간에 있다는 것은 경쟁이 가장 치열하다는 뜻으로, 소폭 개선만으로는 순위가 잘 오르지 않습니다.</p>
+
+    <p class="sub-title">2-3. 전국 분포 대비 우리 병원 위치</p>
+    <figure class="chart-fig">
+      <p class="fig-title">전국 분포 대비 우리 병원 위치 — 영역별 점수구간 기관 비율 (5차, 363개 기관)</p>
+      <img src="assets/willis-report/chart3-domain-histograms.png" alt="영역별 전국 분포 대비 우리 병원 위치">
+      <p class="fig-cap">청록: 전국 363개 기관 분포 · 빨강★: 우리 병원 해당 구간</p>
+    </figure>
+    <p class="body">정서적 지지는 전국 최다 구간(70~80점, 54.5%)에 속해 이례적이지 않으나, 이미 80점 이상 상위 구간에 39.4%가 진입해 있어 구간 이동이 시급합니다. 나머지 6개 영역은 대부분 전국 최다 구간(80~90점)에 위치합니다.</p>
+  </div>
+
+  <!-- 3. 개선 우선순위 -->
+  <div class="sec">
+    <p class="sec-title"><span class="num">3.</span>개선 우선순위</p>
+    <p class="body">7개 영역을 가로축(1등급까지 남은 갭)과 세로축(1등급 병원과 5등급 병원 간 점수 격차) 두 기준으로 나누어 어디부터 손대야 할지 시각화했습니다. 전반적 평가는 결과지표로 제외합니다.</p>
+    <figure class="chart-fig">
+      <p class="fig-title">[차트2] IPA 매트릭스 — 수원윌스기념병원 5차 결과 · 1등급 목표 기준</p>
+      <img src="assets/willis-report/chart4-ipa-matrix.png" alt="IPA 매트릭스 차트">
+      <p class="fig-cap">I 최우선 개선 · II 상대적 강점 · III 중장기 과제 · IV 후순위 (전반적 평가는 결과지표로 제외)</p>
+    </figure>
+
+    <div class="quad-grid">
+      <div class="quad q1">
+        <div class="qh">Ⅰ. 최우선 개선</div>
+        <div class="qa">정서적 지지 · 투약 및 치료과정</div>
+        <div class="qd">위로·공감 응대 표준화 및 전 직원 교육(8/31), 설명 스크립트 표준화(8/31) — 6차 조사 전 8월 중 완료</div>
+      </div>
+      <div class="quad q2">
+        <div class="qh">Ⅱ. 강점·우위 확대</div>
+        <div class="qa">환자 안전·병원환경</div>
+        <div class="qd">소음·청결 관리, 환자 본인확인 절차 강화로 90점대 진입 — 9월 내 병행 추진</div>
+      </div>
+      <div class="quad q3">
+        <div class="qh">Ⅲ. 중장기 과제</div>
+        <div class="qa">간호사 영역</div>
+        <div class="qd">통합병동·일반병동 분리 진단(8/25) 후 원인별 개선안 수립 — 7차 집중 투입</div>
+      </div>
+      <div class="quad q4">
+        <div class="qh">Ⅳ. 후순위</div>
+        <div class="qa">의사 영역 · 환자권리 보장</div>
+        <div class="qd">회진시간 사전고지 등 저비용 과제만 6차 병행(8/20), 본격 개선은 7차 이후</div>
+      </div>
+    </div>
+
+    <p class="sub-title">3-3. 차수별 영역 점수 변동 분석</p>
+    <figure class="chart-fig">
+      <p class="fig-title">차수별 영역 점수 변동 분석 — 4차→5차 실측 변화</p>
+      <img src="assets/willis-report/chart5-trend.png" alt="차수별 영역 점수 변동 라인차트">
+      <p class="fig-cap">심평원 1~5차 원자료 기준 · 1~3차는 평가 미참여로 비교 불가 · 정서적 지지는 5차 신설</p>
+    </figure>
+    <p class="body">우리 병원은 4차(2023)부터 신규 편입되어 1~3차 데이터가 없습니다. 4차→5차 두 시점 비교에서 하락 영역과 급개선 영역이 뚜렷이 갈렸습니다.</p>
+    <ul class="plain-list">
+      <li><b style="color:var(--red)">간호사 영역</b>은 4차 83.94점에서 5차 83.57점으로 6개 비교 가능 영역 중 유일하게 하락했습니다(−0.37점).</li>
+      <li><b style="color:var(--blue)">환자권리보장(+5.65점)</b>과 <b style="color:var(--blue)">의사 영역(+4.80점)</b>은 가장 크게 개선됐습니다.</li>
+      <li><b style="color:var(--amber)">정서적 지지</b>는 5차 신설 영역이라 비교 기준이 없으며, 등장하자마자 전 영역 최저점(76.38)입니다.</li>
+    </ul>
+  </div>
+
+  <!-- 4. 실행 계획 -->
+  <div class="sec">
+    <p class="sec-title"><span class="num">4.</span>실행 계획</p>
+    <p class="body">Phase 1(8월, 조사 전 정비) → Phase 2(9~11월, 조사 운영) → Phase 3(12월~, 1등급 기반 구축)의 3단계 중 경영진 결정이 필요한 Phase 1 핵심 과제입니다.</p>
+    <table class="data">
+      <thead>
+        <tr><th>순위</th><th>개선 과제</th><th>담당</th><th>6차 목표</th><th>기한</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl"><td>1</td><td class="left">정서적 지지 — 위로·공감 응대 표준화 및 전 직원 교육</td><td>진료부·간호부</td><td class="pos">+6.62</td><td>8/31</td></tr>
+        <tr><td>2</td><td class="left">투약·검사·처치 설명 스크립트 표준화</td><td>간호부·진료지원</td><td class="pos">+3.43</td><td>8/31</td></tr>
+        <tr><td>3</td><td class="left">회진시간 사전 고지 체계 도입</td><td>진료부</td><td class="pos">+2.68</td><td>8/20</td></tr>
+        <tr><td>4</td><td class="left">간호 응대 병동 편차 진단 (통합/일반 분리)</td><td>QI팀·간호부</td><td class="pos">+3.43</td><td>8/25</td></tr>
+        <tr><td>5</td><td class="left">환자 안전·환경 우위 확대 (소음·청결·본인확인)</td><td>시설·간호부</td><td class="pos">+2.49</td><td>9월 內</td></tr>
+        <tr><td>6</td><td class="left">진료비·권리 안내 개선</td><td>원무</td><td class="pos">+3.18</td><td>10월</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <div class="ct">왜 정서적 지지가 1순위인가</div>
+      <p>정서적 지지는 1등급 병원과 5등급 병원 간 점수 격차가 7개 영역 중 가장 커서, 병원 수준을 가장 뚜렷하게 반영하는 영역입니다. 우리 병원의 최저점(76.38점)이자 1등급까지 격차도 가장 큽니다(−12.84점). 시설투자나 인력증원 없이 응대 개선만으로 4주 내 실행이 가능합니다.</p>
+    </div>
+
+    <p class="sub-title">Phase 2·3 요약</p>
+    <ul class="plain-list">
+      <li><b>Phase 2 (9~11월):</b> 병동 라운딩 주 1회, 자체 미니설문 주 1회, VOC 접수 후 24시간 이내 대응, 경영진 보고 월 1회</li>
+      <li><b>Phase 3 (12월~):</b> 교육 정례화, 상시 측정체계 구축, 간호사·의사 영역 구조적 개선 본격 추진</li>
+    </ul>
+  </div>
+
+  <!-- 5. 의사결정 -->
+  <div class="sec">
+    <p class="sec-title"><span class="num">5.</span>기대효과 및 의사결정 요청</p>
+
+    <p class="sub-title">기대효과</p>
+    <ul class="plain-list">
+      <li><b>대외 효과:</b> 6차 결과는 2027년 7월 심평원 누리집과 병원평가통합포털에 공개됩니다. 3등급에서 2등급으로 상향될 경우 상위 40% 구간에 진입하게 됩니다.</li>
+      <li><b>브랜드 정합성:</b> 척추전문병원 지정, 의료기관 인증, 간호간병통합서비스 운영이라는 대외 메시지에 부합하는 환자경험 지표를 확보할 수 있습니다.</li>
+      <li><b>비교군 확대 대응:</b> 6차부터는 비교 대상 기관이 376개소에서 887개소로 크게 확대됩니다.</li>
+    </ul>
+
+    <p class="sub-title">미실행 시 리스크</p>
+    <ul class="plain-list">
+      <li>개선 속도(2년 +2.35점)가 전체 평균(+3.61점)에 못 미칩니다.</li>
+      <li>아무 조치 없이 6차를 맞으면 점수가 소폭 올라도 상대 순위는 하락할 가능성이 높습니다.</li>
+      <li>6차 결과 공개 후에는 7차까지 회복 기회 없이 등급이 대외에 고정 노출됩니다.</li>
+    </ul>
+
+    <p class="sub-title">경영진 의사결정 요청 (5건)</p>
+    <p class="body">QI팀 권한으로는 실행할 수 없으며, 경영진 결정이 있어야 8월 중 착수가 가능합니다.</p>
+    <table class="data">
+      <thead>
+        <tr><th>No</th><th>요청 사항</th><th>필요 사유</th><th>기한</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="left">1등급 2단계 로드맵 승인 (6차 2등급→7차 1등급)</td><td class="left">6차 단일 1등급은 달성확률 낮음</td><td>8/10</td></tr>
+        <tr><td>2</td><td class="left">정서적 지지 교육 예산 승인 및 전 직원 필수 이수 지정</td><td class="left">등급별 점수 격차 최대·최저점 영역</td><td>8/10</td></tr>
+        <tr><td>3</td><td class="left">회진시간 사전 고지, 병원장 지시사항으로 전 진료과 시행</td><td class="left">진료부 협조 없이 불가</td><td>8/10</td></tr>
+        <tr><td>4</td><td class="left">환자경험 TF 구성 승인 (QI·진료부·간호부·원무·시설)</td><td class="left">전 병원 과제, 상설 협의체 필요</td><td>8/10</td></tr>
+        <tr><td>5</td><td class="left">6차 조사기간(9~11월) VOC 대응 전담 인력 지정</td><td class="left">미해결 불만이 설문응답에 직결</td><td>8/25</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    <span>메디통 픽스 AI · 수원윌스기념병원 경영진 보고 문서 (환자경험평가 5차 · 1등급 달성계획)</span>
+    <span>내부용</span>
+  </div>
+
+</div>
+
+<script src="pix-report-stats-query.js?v=20260809-1"></script>
+<script src="pix-report-layout-edit.js?v=20260809-1"></script>
+<script>
+(function enableReportTextEdit() {
+  function applyReportTextEdit() {
+    var root = document.querySelector(".doc");
+    if (!root) return;
+    var selector = [
+      ".doc-eyebrow", ".doc-title", ".doc-lead",
+      ".doc-info-table td", ".note",
+      ".sec-title", ".sub-title", "p", "li",
+      ".sl", ".sv", ".ss",
+      ".cap", ".ct", ".qh", ".qa", ".qd",
+      "table.data th", "table.data td",
+      ".footer-note span"
+    ].join(",");
+    Array.prototype.forEach.call(root.querySelectorAll(selector), function (el) {
+      if (el.closest(".rpt-block-toolbar") || el.closest(".rpt-sec-add-row")) return;
+      if (el.getAttribute("contenteditable") === "true") return;
+      el.setAttribute("contenteditable", "true");
+      el.setAttribute("spellcheck", "false");
+    });
+  }
+  window.__pixReportEnableTextEdit = applyReportTextEdit;
+  if (!window.__pixReportDeferTextEdit) applyReportTextEdit();
+})();
+</script>
+
+</body>
+</html>

@@ -9,15 +9,15 @@
       label: "VOC",
       variant: "voc",
       keyPrefix: "pix_voc_report_",
-      reportUrl: "voc-analysis-report.html?v=20260804-v2",
-      reportTitle: "2026년 6월 VOC 분석보고서",
-      reportSubtitle: "내부 보고 · 임원 보고용 · PIX AI 환자경험관리",
-      iframeTitle: "VOC 분석보고서",
+      reportUrl: "px-voc-executive-report.html?v=20260809-1",
+      reportTitle: "VOC 분석 결과 진단 및 개선계획",
+      reportSubtitle: "수원윌스기념병원 · 경영진 보고 · PIX AI",
+      iframeTitle: "VOC 개선계획 경영진 보고서",
       seeds: [
         {
-          storageKey: "pix_voc_report_2026_06",
-          period: "2026년 6월",
-          title: "2026년 6월 VOC 분석보고서"
+          storageKey: "pix_voc_report_improvement_plan",
+          period: "2026 Q2 · 개선계획",
+          title: "VOC 분석 결과 진단 및 개선계획"
         }
       ],
       emptyHint: "VOC 통계 화면에서 AI 분석 · 보고서 작성 후 저장하면 이 목록에 표시됩니다."
@@ -27,15 +27,15 @@
       label: "환자경험평가",
       variant: "survey",
       keyPrefix: "pix_survey_report_",
-      reportUrl: "px-survey-analysis-report.html?v=20260804-v2",
-      reportTitle: "2026년 6월 환자경험평가 분석보고서",
-      reportSubtitle: "내부 보고 · 임원 보고용 · PIX AI 환자경험관리",
-      iframeTitle: "환자경험평가 분석보고서",
+      reportUrl: "px-survey-executive-report.html?v=20260809-2",
+      reportTitle: "환자경험평가 5차 결과 진단 및 1등급 달성 개선계획",
+      reportSubtitle: "수원윌스기념병원 · 경영진 보고 · PIX AI",
+      iframeTitle: "1등급 달성 경영진 보고서",
       seeds: [
         {
-          storageKey: "pix_survey_report_2026_06",
-          period: "2026년 6월",
-          title: "2026년 6월 환자경험평가 분석보고서"
+          storageKey: "pix_survey_report_grade1_plan",
+          period: "5차 · 1등급 달성계획",
+          title: "환자경험평가 5차 결과 진단 및 1등급 달성 개선계획"
         }
       ],
       emptyHint: "환자경험평가 화면에서 AI 분석 · 보고서 작성 후 저장하면 이 목록에 표시됩니다."

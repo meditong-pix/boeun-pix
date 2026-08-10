@@ -5081,13 +5081,13 @@
   function registerPxSurveyAnalyticsSection(deps) {
     return registerPixAiStatisticsShell(deps, {
       variant: "survey",
-      storageKey: "pix_survey_report_2026_06",
-      reportUrl: "px-survey-analysis-report.html?v=20260804-v2",
-      reportTitle: "2026\uB144 6\uC6D4 \uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
-      reportSubtitle: "\uB0B4\uBD80 \uBCF4\uACE0 \u00B7 \uC784\uC6D0 \uBCF4\uACE0\uC6A9 \u00B7 PIX AI \uD658\uC790\uACBD\uD5D8\uAD00\uB9AC",
-      iframeTitle: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBD84\uC11D\uBCF4\uACE0\uC11C",
-      reportLabel: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 \uBCF4\uACE0\uC11C",
-      wordFilename: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00_\uBD84\uC11D\uBCF4\uACE0\uC11C_2026-06.doc"
+      storageKey: "pix_survey_report_grade1_plan",
+      reportUrl: "px-survey-executive-report.html?v=20260809-2",
+      reportTitle: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00 5\uCC28 \uACB0\uACFC \uC9C4\uB2E8 \uBC0F 1\uB4F1\uAE09 \uB2EC\uC131 \uAC1C\uC120\uACC4\uD68D",
+      reportSubtitle: "\uC218\uC6D0\uC6D8\uC2A4\uAE30\uB150\uBCD1\uC6D0 \u00B7 \uACBD\uC601\uC9C4 \uBCF4\uACE0 \u00B7 PIX AI",
+      iframeTitle: "1\uB4F1\uAE09 \uB2EC\uC131 \uACBD\uC601\uC9C4 \uBCF4\uACE0\uC11C",
+      reportLabel: "1\uB4F1\uAE09 \uB2EC\uC131 \uACBD\uC601\uC9C4 \uBCF4\uACE0\uC11C",
+      wordFilename: "\uD658\uC790\uACBD\uD5D8\uD3C9\uAC00_1\uB4F1\uAE09\uB2EC\uC131\uACC4\uD68D_\uACBD\uC601\uC9C4\uBCF4\uACE0\uC11C.doc"
     });
   }
 
@@ -5547,6 +5547,9 @@
     var style = document.createElement("style");
     style.id = "pix-ai-split-css";
     style.textContent =
+      ".voc-filter-actions{margin-left:auto;display:inline-flex;align-items:center;gap:8px;flex-shrink:0;}" +
+      ".voc-filter-action{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#6d5dfc,#5b46ff);color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 18px rgba(91,70,255,.22);white-space:nowrap;}" +
+      ".voc-filter-action:hover{filter:brightness(1.05);}" +
       ".pix-ai-stats-shell{display:flex;width:100%;min-width:0;box-sizing:border-box;}" +
       ".pix-ai-stats-shell.is-open{height:calc(100vh - 140px);min-height:640px;overflow:hidden;}" +
       ".pix-ai-stats-shell-pane{min-height:0;min-width:0;box-sizing:border-box;}" +
@@ -5554,7 +5557,11 @@
       ".pix-ai-split-pane{flex:0 0 " + PIX_AI_SPLIT_PANEL_WIDTH + "px;width:" + PIX_AI_SPLIT_PANEL_WIDTH + "px;max-width:min(50vw,920px);min-width:560px;}" +
       ".pix-ai-split-pane.is-survey-light{flex:0 0 " + PIX_AI_SURVEY_SPLIT_PANEL_WIDTH + "px;width:" + PIX_AI_SURVEY_SPLIT_PANEL_WIDTH + "px;max-width:min(52vw,720px);min-width:520px;background:#fff !important;color:#0f172a !important;border-left:1px solid #e2e8f0 !important;}" +
       ".pix-ai-split-pane.is-survey-light .pix-ai-survey-frame-wrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 !important;}" +
-      ".pix-ai-survey-frame{width:100%;height:100%;border:0;background:#fff;display:block;flex:1 1 auto;min-height:0;}";
+      ".pix-ai-survey-frame{width:100%;height:100%;border:0;background:#0D1117;display:block;flex:1 1 auto;min-height:0;}" +
+      ".pix-ai-board-overlay{position:fixed;inset:0;z-index:120;display:flex;align-items:stretch;justify-content:center;padding:12px;box-sizing:border-box;}" +
+      ".pix-ai-board-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);}" +
+      ".pix-ai-board-panel{position:relative;z-index:1;width:min(1180px,100%);margin:0 auto;border-radius:16px;overflow:hidden;border:1px solid #262F3A;background:#0D1117;box-shadow:0 24px 64px rgba(0,0,0,.45);display:flex;flex-direction:column;min-height:0;}" +
+      ".pix-ai-board-panel .pix-ai-survey-frame-wrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}";
     document.head.appendChild(style);
   }
 
@@ -5945,7 +5952,32 @@
 
   function createPixAiAnalysisDrawer(React, opts) {
     if (!opts || !opts.open) return null;
-    var isSurveyLight = opts.theme === "light" || opts.variant === "survey";
+    var isSurveyLight = opts.theme === "light";
+    var isBoard = opts.layout === "board";
+    if (isBoard) {
+      ensurePixAiSplitCss();
+      return React.createElement(
+        "div",
+        { className: "pix-ai-board-overlay" },
+        React.createElement("div", {
+          className: "pix-ai-board-backdrop",
+          onClick: opts.onClose
+        }),
+        React.createElement(
+          "div",
+          {
+            className: "pix-ai-board-panel",
+            style: { height: "calc(100vh - 24px)", maxHeight: "calc(100vh - 24px)" },
+            onClick: function (e) { e.stopPropagation(); }
+          },
+          React.createElement(
+            "div",
+            { className: "pix-ai-survey-frame-wrap", style: { flex: "1 1 auto", minHeight: 0, overflow: "hidden" } },
+            opts.children
+          )
+        )
+      );
+    }
     if (opts.layout === "split") {
       ensurePixAiSplitCss();
       return React.createElement(
@@ -5966,8 +5998,8 @@
             style: {
               flex: "1 1 auto",
               minHeight: 0,
-              overflow: isSurveyLight ? "hidden" : "auto",
-              padding: isSurveyLight ? 0 : "22px 22px 18px",
+              overflow: isSurveyLight || opts.variant === "survey" ? "hidden" : "auto",
+              padding: isSurveyLight || opts.variant === "survey" ? 0 : "22px 22px 18px",
               display: "flex",
               flexDirection: "column"
             }
@@ -6202,7 +6234,7 @@
         };
       }, []);
       useEffect(function () {
-        if (!open || cfg.variant === "survey") return undefined;
+        if (!open || cfg.variant === "survey" || cfg.variant === "voc") return undefined;
         if (!panelRef.current || typeof global.mountPxAiAnalysisPanel !== "function") return undefined;
         return global.mountPxAiAnalysisPanel(panelRef.current, {
           variant: cfg.variant,
@@ -6225,10 +6257,10 @@
         });
       }, [open, props.showToast]);
       useEffect(function () {
-        if (!open || cfg.variant !== "survey") return undefined;
+        if (!open || (cfg.variant !== "survey" && cfg.variant !== "voc")) return undefined;
         function onMsg(ev) {
           var data = ev && ev.data;
-          if (!data || data.source !== "pix-survey-ai-panel") return;
+          if (!data || (data.source !== "pix-survey-ai-board" && data.source !== "pix-survey-ai-panel" && data.source !== "pix-voc-ai-board")) return;
           if (data.type === "close") {
             setOpen(false);
             setReportOpen(false);
@@ -6252,11 +6284,16 @@
           onPrint: function () { actions.print && actions.print(reportFrameRef.current, props.showToast); }
         })
         : null;
-      var surveyPanelChild = cfg.variant === "survey"
+      var useBoardOverlay = cfg.variant === "survey" || cfg.variant === "voc";
+      var boardDomain = cfg.variant === "voc" ? "voc" : "px";
+      var boardSrc = cfg.variant === "survey"
+        ? "px-survey-ai-dashboard.html?embed=1&v=20260810-11"
+        : "px-voc-ai-dashboard.html?embed=1&v=20260810-4";
+      var surveyPanelChild = useBoardOverlay
         ? React.createElement("iframe", {
           className: "pix-ai-survey-frame",
-          title: "환자경험평가 AI 분석",
-          src: "px-survey-ai-panel.html?embed=1&v=20260805-4"
+          title: cfg.variant === "voc" ? "VOC AI 분석" : "환자경험평가 AI 분석",
+          src: boardSrc
         })
         : React.createElement("div", {
           ref: panelRef,
@@ -6264,9 +6301,9 @@
         });
       var aiDrawer = typeof global.createPixAiAnalysisDrawer === "function"
         ? global.createPixAiAnalysisDrawer(React, {
-          layout: "split",
+          layout: useBoardOverlay ? "board" : "split",
           variant: cfg.variant,
-          theme: cfg.variant === "survey" ? "light" : "dark",
+          theme: "dark",
           open: open,
           onClose: function () {
             setOpen(false);
@@ -6357,8 +6394,8 @@
         React.createElement(
           "div",
           {
-            className: "pix-ai-stats-shell" + (open ? " is-open" : ""),
-            style: open ? undefined : { width: "100%" }
+            className: "pix-ai-stats-shell" + (open && !useBoardOverlay ? " is-open" : ""),
+            style: open && !useBoardOverlay ? undefined : { width: "100%" }
           },
           React.createElement(
             "div",
@@ -6369,8 +6406,9 @@
             },
             props.children
           ),
-          open ? aiDrawer : null
+          open && !useBoardOverlay ? aiDrawer : null
         ),
+        open && useBoardOverlay ? portalize(aiDrawer) : null,
         portalize(reportModal),
         portalize(historyReportModal)
       );
@@ -6521,4 +6559,5 @@
   global.mountPxAiStrengthPicker = mountPxAiStrengthPicker;
   global.registerPxAiAnalysisPanel = registerPxAiAnalysisPanel;
   global.registerPxSurveyAnalyticsSection = registerPxSurveyAnalyticsSection;
+  ensurePixAiSplitCss();
 })(typeof window !== "undefined" ? window : global);

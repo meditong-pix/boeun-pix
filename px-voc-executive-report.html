@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOC 분석 결과 진단 및 개선계획</title>
+<style>
+  :root {
+    --ink: #1f1e1c; --ink-sub: #5f5e5a; --ink-muted: #898781;
+    --line: #cfcdc5; --line-soft: #e1e0d9; --paper: #ffffff; --shell: #eae8e2;
+    --blue: #0C447C; --blue-bg: #E6F1FB;
+    --red: #791F1F; --red-bg: #FCEBEB;
+    --amber: #A67A1E; --amber-bg: #FAEEDA;
+    --teal: #1F6F5B; --teal-bg: #E6F4EF;
+    --gray-bg: #F1F0EC;
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body { margin: 0; background: var(--shell); color: var(--ink); font-family: "Malgun Gothic","Apple SD Gothic Neo",-apple-system,sans-serif; padding: 36px 0 80px; }
+  .doc { width: 860px; margin: 0 auto; background: var(--paper); box-shadow: 0 2px 14px rgba(0,0,0,.08); padding: 42px 48px 56px; }
+
+  .doc-eyebrow { font-size: 11px; font-weight: 700; color: var(--ink-muted); margin-bottom: 6px; }
+  .doc-title { font-size: 22px; font-weight: 800; margin: 0 0 8px; line-height: 1.35; }
+  .doc-lead { font-size: 13px; font-weight: 700; color: var(--blue); margin: 0 0 16px; }
+
+  .status-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+  .status-card { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 12px; background: var(--gray-bg); }
+  .status-card.goal { background: var(--blue-bg); border-color: #c5d8ec; }
+  .status-card.need { background: var(--amber-bg); border-color: #efd8a8; }
+  .status-card .sl { font-size: 10px; font-weight: 700; color: var(--ink-muted); margin-bottom: 4px; }
+  .status-card .sv { font-size: 15px; font-weight: 800; }
+  .status-card .ss { font-size: 11px; color: var(--ink-sub); margin-top: 3px; }
+
+  .doc-info-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 12px; }
+  .doc-info-table td { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 7px 12px; }
+  .doc-info-table td.lbl { width: 90px; background: var(--gray-bg); font-weight: 700; color: var(--ink-sub); border-right: 1px solid var(--line-soft); }
+  .doc-info-table td.val { border-right: 1px solid var(--line-soft); }
+  .note { font-size: 10.5px; color: var(--ink-muted); line-height: 1.6; margin: 0 0 18px; }
+
+  .sec { margin-top: 28px; }
+  .sec-title { font-size: 15px; font-weight: 800; border-bottom: 2px solid var(--ink); padding-bottom: 6px; margin-bottom: 12px; }
+  .sec-title .num { color: var(--blue); margin-right: 6px; }
+  .sub-title { font-size: 13px; font-weight: 800; margin: 16px 0 8px; padding-left: 8px; border-left: 3px solid var(--blue); }
+  p.body { font-size: 12px; line-height: 1.75; margin: 0 0 9px; }
+
+  table.data { width: 100%; border-collapse: collapse; font-size: 11.5px; margin: 0 0 12px; }
+  table.data th, table.data td { border: 1px solid var(--line-soft); padding: 7px 8px; text-align: center; }
+  table.data th { background: var(--gray-bg); font-weight: 800; color: var(--ink-sub); }
+  table.data td.left { text-align: left; font-weight: 700; }
+  table.data tr.hl td { background: var(--red-bg); }
+  table.data .neg { color: var(--red); font-weight: 800; }
+  table.data .pos { color: var(--blue); font-weight: 800; }
+
+  .plain-list { margin: 0 0 10px; padding-left: 20px; font-size: 11.5px; line-height: 1.8; }
+  .plain-list li { margin-bottom: 4px; }
+
+  .callout { border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px 14px; background: var(--gray-bg); margin-bottom: 12px; }
+  .callout.danger { background: var(--red-bg); border-color: #efc4c4; }
+  .callout.warn { background: var(--amber-bg); border-color: #efd8a8; }
+  .callout .ct { font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+  .callout p { font-size: 11.5px; line-height: 1.7; margin: 0 0 6px; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .quad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .quad { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 12px; }
+  .quad .qh { font-size: 11px; font-weight: 800; margin-bottom: 4px; }
+  .quad .qa { font-size: 11.5px; font-weight: 700; margin-bottom: 4px; }
+  .quad .qd { font-size: 11px; color: var(--ink-sub); line-height: 1.55; }
+  .quad.q1 { border-left: 4px solid var(--amber); }
+  .quad.q2 { border-left: 4px solid var(--red); }
+  .quad.q3 { border-left: 4px solid var(--ink-muted); }
+  .quad.q4 { border-left: 4px solid var(--teal); }
+
+  .chart-fig { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 12px 8px; margin: 0 0 14px; background: #fff; }
+  .chart-fig .fig-title { font-size: 11.5px; font-weight: 800; margin: 0 0 8px; color: var(--ink); }
+  .chart-fig img { display: block; width: 100%; height: auto; border-radius: 4px; }
+  .chart-fig .fig-cap { font-size: 10px; color: var(--ink-muted); margin: 8px 0 0; line-height: 1.5; }
+  .cap { font-size: 10px; color: var(--ink-muted); margin: 4px 0 12px; }
+  .footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 9.5px; color: var(--ink-muted); display: flex; justify-content: space-between; gap: 12px; }
+</style>
+</head>
+<body>
+
+<div class="doc">
+
+  <p class="doc-eyebrow">수원윌스기념병원 · 경영진 보고</p>
+  <h1 class="doc-title">VOC 분석 결과 진단 및 개선계획</h1>
+  <p class="doc-lead">이번 분기(2026 Q2) 불편 VOC 비율 23.8% · 686건 접수 → 목표 불편비율 15% 이하</p>
+
+  <div class="status-grid">
+    <div class="status-card">
+      <div class="sl">현재</div>
+      <div class="sv">23.8% · 686건</div>
+      <div class="ss">전분기 대비 +1.3%p</div>
+    </div>
+    <div class="status-card goal">
+      <div class="sl">목표</div>
+      <div class="sv">15.0% 이하</div>
+      <div class="ss">필요 −8.8%p</div>
+    </div>
+    <div class="status-card need">
+      <div class="sl">필요</div>
+      <div class="sv">3단계 감소</div>
+      <div class="ss">Q3 → Q4 → 2027 Q1</div>
+    </div>
+  </div>
+
+  <table class="doc-info-table">
+    <tr>
+      <td class="lbl">보고일</td><td class="val">2026년 7월 8일</td>
+      <td class="lbl">보고 대상</td><td class="val">병원장 및 경영진</td>
+    </tr>
+    <tr>
+      <td class="lbl">작성</td><td class="val">QI팀 (VOC 담당)</td>
+      <td class="lbl">문서 등급</td><td class="val">대외비</td>
+    </tr>
+  </table>
+  <p class="note">※ 본 보고서는 PIX 기능설계용 목업이며, 표시된 모든 수치는 예시 데이터입니다. 실제 보고서는 VOC 접수 원자료를 기준으로 동일한 구조로 자동 생성됩니다.</p>
+
+  <div class="sec">
+    <p class="sec-title"><span class="num">1.</span>개요 및 결과 요약</p>
+    <p class="sub-title">1-1. 목표 설정 — 3단계로 15% 이하 도달</p>
+    <p class="body">이번 분기 불편 VOC 비율은 23.8%로 전분기(22.5%) 대비 +1.3%p 상승했습니다. 특히 시스템/절차관련이 한 분기 만에 +10%p 급등해 원인 파악이 시급합니다. 목표(15% 이하)를 3단계로 나누어 단계적으로 접근합니다.</p>
+    <table class="data">
+      <thead>
+        <tr><th>단계</th><th>시점</th><th>목표 불편비율</th><th>핵심 대상</th><th>필요 감소</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1단계</td><td>Q3(7~9월)</td><td>20.0%</td><td>인적응대·시스템절차</td><td class="neg">−3.8%p</td></tr>
+        <tr><td>2단계</td><td>Q4(10~12월)</td><td>17.0%</td><td>비용관련 추가</td><td class="neg">−3.0%p</td></tr>
+        <tr><td>3단계</td><td>2027 Q1</td><td>15.0% 이하</td><td>전 카테고리</td><td class="neg">−2.0%p</td></tr>
+      </tbody>
+    </table>
+
+    <p class="sub-title">1-2. 핵심 결론</p>
+    <div class="callout">
+      <p><b>현재:</b> 불편 VOC 비율 23.8%(686건 중 163건)로 전분기 대비 +1.3%p 상승했습니다. 7개 카테고리 중 3개(인적응대·시스템절차·비용관련)가 목표선(15%)을 크게 웃돕니다.</p>
+      <p><b>목표:</b> Q3 20.0% → Q4 17.0% → 2027 Q1 15.0% 이하로 3단계 감소 로드맵을 추진합니다.</p>
+      <p><b>최우선 과제:</b> 인적응대관련입니다. 발생 빈도(189건)와 불편비율(34%)이 모두 높아 개선 효과가 가장 큽니다.</p>
+      <p><b>결정 요청:</b> 경영진 결정이 필요한 사항은 총 5건이며, 8월 10일까지 승인이 이뤄져야 8월 중 착수가 가능합니다.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><span class="num">2.</span>카테고리별 VOC 분석</p>
+    <p class="sub-title">2-1. 카테고리별 비교</p>
+    <figure class="chart-fig">
+      <p class="fig-title">[차트1] 카테고리별 불편 VOC 비율 — 이번 분기(2026 Q2)</p>
+      <img src="assets/willis-voc-report/chart1.png" alt="카테고리별 불편 VOC 비율 차트">
+      <p class="fig-cap">빨강: 목표선(15%) 초과 · 청록: 목표선 이하 · 점선은 목표선 15%</p>
+    </figure>
+    <table class="data">
+      <thead>
+        <tr>
+          <th rowspan="2">카테고리</th>
+          <th rowspan="2">이번분기</th>
+          <th colspan="2">전분기 대비</th>
+          <th colspan="2">목표(15%) 대비</th>
+        </tr>
+        <tr><th>전분기</th><th>갭</th><th>목표</th><th>갭</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl"><td class="left">인적응대관련</td><td>34%</td><td>30%</td><td class="neg">▲ +4%p</td><td>15%</td><td class="neg">▲ +19%p</td></tr>
+        <tr><td class="left">진료/치료·검사관련</td><td>18%</td><td>19%</td><td class="pos">▼ −1%p</td><td>15%</td><td class="neg">▲ +3%p</td></tr>
+        <tr><td class="left">서비스제공(호텔리티)관련</td><td>15%</td><td>16%</td><td class="pos">▼ −1%p</td><td>15%</td><td>▲ +0%p</td></tr>
+        <tr class="hl"><td class="left">시스템/절차관련</td><td>28%</td><td>18%</td><td class="neg">▲ +10%p</td><td>15%</td><td class="neg">▲ +13%p</td></tr>
+        <tr><td class="left">환경관련</td><td>12%</td><td>20%</td><td class="pos">▼ −8%p</td><td>15%</td><td class="pos">▼ −3%p</td></tr>
+        <tr class="hl"><td class="left">비용관련</td><td>40%</td><td>38%</td><td class="neg">▲ +2%p</td><td>15%</td><td class="neg">▲ +25%p</td></tr>
+        <tr><td class="left">기타문의</td><td>9%</td><td>11%</td><td class="pos">▼ −2%p</td><td>15%</td><td class="pos">▼ −6%p</td></tr>
+      </tbody>
+    </table>
+    <p class="cap">빨간 카테고리 3개는 목표선을 크게 초과한 항목입니다.</p>
+
+    <div class="callout danger">
+      <div class="ct">진단 요약</div>
+      <p><b>인적응대관련:</b> 189건으로 전체 카테고리 중 접수 건수가 가장 많고, 불편비율도 34%로 목표선(15%)의 두 배를 넘습니다. 빈도와 심각도가 모두 높아 개선 시 효과가 가장 큽니다.</p>
+      <p><b>비용관련:</b> 건수(45건)는 적지만 불편비율이 40%로 전 카테고리 중 가장 높습니다. 발생하면 불만으로 이어질 확률이 가장 높은 항목입니다.</p>
+    </div>
+
+    <p class="sub-title">2-2. 카테고리별 대표 키워드</p>
+    <figure class="chart-fig">
+      <p class="fig-title">카테고리별 대표 키워드 — 칭찬 vs 불편 (Top2)</p>
+      <img src="assets/willis-voc-report/chart2.png" alt="카테고리별 대표 키워드 차트">
+      <p class="fig-cap">왼쪽(빨강): 불편 키워드 · 오른쪽(파랑): 칭찬 키워드 · 막대 길이는 언급 건수</p>
+    </figure>
+    <p class="body">불친절한 말투(58건)가 전 카테고리·전 키워드 중 가장 많이 언급됐습니다. 인적응대관련이 1순위 개선과제로 선정된 이유가 건수·비율뿐 아니라 키워드로도 뒷받침됩니다. 시스템/절차관련은 예약 변경 어려움(41건), 비용관련은 예상치 못한 추가비용(21건)이 각각 대표 불편 키워드입니다.</p>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><span class="num">3.</span>개선 우선순위</p>
+    <p class="body">7개 카테고리를 가로축(분기 접수 건수)과 세로축(불편 VOC 비율) 두 기준으로 나누어 어디부터 손대야 할지 시각화했습니다. 오른쪽 위(빈도·비율 모두 높음)일수록 개선 효과가 큽니다.</p>
+    <figure class="chart-fig">
+      <p class="fig-title">[차트2] 빈도-불편비율 매트릭스 — 개선 우선순위 도출</p>
+      <img src="assets/willis-voc-report/chart3.png" alt="빈도-불편비율 매트릭스">
+      <p class="fig-cap">I·II 최우선 개선 · III 후순위 · IV 지속 관리</p>
+    </figure>
+
+    <div class="quad-grid">
+      <div class="quad q2">
+        <div class="qh">Ⅱ. 최우선 개선</div>
+        <div class="qa">인적응대관련</div>
+        <div class="qd">빈도·비율 모두 최고. 응대 표준화 및 전 직원 교육 즉시 착수</div>
+      </div>
+      <div class="quad q1">
+        <div class="qh">Ⅰ. 최우선 개선</div>
+        <div class="qa">비용관련 · 시스템/절차관련</div>
+        <div class="qd">빈도는 낮으나 비율 높음(급등 포함). 수납 사전안내·프로세스 재정비 우선</div>
+      </div>
+      <div class="quad q4">
+        <div class="qh">Ⅳ. 지속 관리</div>
+        <div class="qa">진료/치료·검사관련 · 서비스제공(호텔리티)</div>
+        <div class="qd">빈도 높으나 비율은 양호. 현재 수준 유지·모니터링</div>
+      </div>
+      <div class="quad q3">
+        <div class="qh">Ⅲ. 후순위</div>
+        <div class="qa">환경관련 · 기타문의</div>
+        <div class="qd">빈도·비율 모두 낮음. 정기 점검 수준으로 충분</div>
+      </div>
+    </div>
+
+    <p class="sub-title">3-3. 분기별 변동 분석</p>
+    <figure class="chart-fig">
+      <p class="fig-title">분기별 카테고리 불편비율 변동 — Q1 → Q2</p>
+      <img src="assets/willis-voc-report/chart4.png" alt="분기별 불편비율 변동 차트">
+      <p class="fig-cap">빨강: 시스템/절차관련 급등(+10%p) · 파랑: 환경관련 급개선(−8%p)</p>
+    </figure>
+    <ul class="plain-list">
+      <li><b style="color:var(--red)">시스템/절차관련</b>은 Q1 18%에서 Q2 28%로 유일하게 급등했습니다(+10%p). 예약·수납 시스템 변경이나 절차 개편이 있었는지 QI팀이 원인을 확인할 필요가 있습니다.</li>
+      <li><b style="color:var(--blue)">환경관련</b>은 Q1 20%에서 Q2 12%로 가장 크게 개선됐습니다(−8%p). 이 기간 시행한 조치가 있다면 문서화하여 다른 카테고리에도 적용할 수 있는지 검토할 필요가 있습니다.</li>
+    </ul>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><span class="num">4.</span>실행 계획 (Phase 1, 2026년 8월)</p>
+    <p class="body">Phase 1(8월, 원인 진단 및 응대 개선) → Phase 2(9~11월, Q3 목표 운영) → Phase 3(12월~, 상시 관리체계 구축)의 3단계 중 경영진 결정이 필요한 Phase 1 핵심 과제입니다.</p>
+    <table class="data">
+      <thead>
+        <tr><th>순위</th><th>개선 과제</th><th>담당</th><th>Q3 목표</th><th>기한</th></tr>
+      </thead>
+      <tbody>
+        <tr class="hl"><td>1</td><td class="left">인적응대 응대매뉴얼 표준화 및 전 직원 교육</td><td>간호부·진료부</td><td class="neg">−10%p</td><td>8/31</td></tr>
+        <tr><td>2</td><td class="left">시스템/절차 프로세스 재정비(수납·예약)</td><td>원무·전산팀</td><td class="neg">−8%p</td><td>8/31</td></tr>
+        <tr><td>3</td><td class="left">비용관련 사전 안내 강화(수납 전 설명)</td><td>원무</td><td class="neg">−12%p</td><td>8/20</td></tr>
+        <tr><td>4</td><td class="left">인적응대 병동별 편차 진단</td><td>QI팀·간호부</td><td>원인 규명</td><td>8/25</td></tr>
+        <tr><td>5</td><td class="left">진료/치료 설명 프로세스 점검</td><td>진료부</td><td class="neg">−3%p</td><td>9월 內</td></tr>
+        <tr><td>6</td><td class="left">환경관련 개선사례 확산</td><td>시설·간호부</td><td>유지</td><td>10월</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <div class="ct">왜 인적응대관련이 1순위인가</div>
+      <p>인적응대관련은 접수 건수(189건)와 불편비율(34%) 모두 전 카테고리 중 가장 높습니다. 발생 빈도가 가장 크면서 불편 강도도 가장 세, 같은 노력을 투입했을 때 전체 불편비율을 낮추는 효과가 가장 큽니다. 시설투자 없이 응대 교육만으로 4주 내 실행이 가능하다는 점도 우선순위를 뒷받침합니다.</p>
+    </div>
+
+    <p class="sub-title">Phase 2·3 요약</p>
+    <ul class="plain-list">
+      <li><b>Phase 2 (9~11월):</b> 병동별 VOC 현황 주 1회 점검, 카테고리별 불편비율 월 1회 경영진 보고, 신규 VOC 24시간 이내 1차 대응</li>
+      <li><b>Phase 3 (12월~):</b> VOC 대응 매뉴얼 정례화, 상시 모니터링 체계 구축, 시스템/절차관련 개선 본격 추진</li>
+    </ul>
+  </div>
+
+  <div class="sec">
+    <p class="sec-title"><span class="num">5.</span>기대효과 및 의사결정 요청</p>
+    <p class="sub-title">기대효과</p>
+    <ul class="plain-list">
+      <li><b>환자경험 연계 효과:</b> VOC 불편비율 개선은 환자경험평가 정서적 지지·환자권리보장 영역 점수와 상관관계가 높아, 두 지표를 함께 끌어올릴 수 있습니다.</li>
+      <li><b>응대 리스크 감소:</b> 인적응대·비용관련처럼 불편비율이 높은 카테고리를 선제 관리하면, 민원·평판 리스크로 확산되기 전에 대응할 수 있습니다.</li>
+      <li><b>데이터 기반 운영:</b> 병동·카테고리별 정례 모니터링 체계가 갖춰지면, 다음 분기부터는 이슈가 커지기 전 조기에 발견할 수 있습니다.</li>
+    </ul>
+
+    <p class="sub-title">미실행 시 리스크</p>
+    <ul class="plain-list">
+      <li>시스템/절차관련이 한 분기 만에 +10%p 급등한 원인을 방치하면 다음 분기 더 확산될 가능성이 높습니다.</li>
+      <li>인적응대관련(34%)을 방치하면 환자경험평가 정서적 지지 영역 점수에도 부정적 영향을 줄 수 있습니다.</li>
+      <li>불편비율이 목표(15%) 대비 2배 이상인 상태가 누적되면 환자 만족도 저하가 재원일수·재이용률에도 영향을 줄 수 있습니다.</li>
+    </ul>
+
+    <p class="sub-title">경영진 의사결정 요청 (5건)</p>
+    <p class="body">QI팀 권한으로는 실행할 수 없으며, 경영진 결정이 있어야 8월 중 착수가 가능합니다.</p>
+    <table class="data">
+      <thead>
+        <tr><th>No</th><th>요청 사항</th><th>필요 사유</th><th>기한</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="left">인적응대 표준교육 예산 승인 및 전 직원 필수 이수 지정</td><td class="left">빈도·비율 모두 최고 영역</td><td>8/10</td></tr>
+        <tr><td>2</td><td class="left">원무 프로세스 개편 승인(수납·예약 시스템)</td><td class="left">전산팀 협조 없이 불가</td><td>8/10</td></tr>
+        <tr><td>3</td><td class="left">VOC 대응 전담 TF 구성 승인(QI·간호부·원무·전산)</td><td class="left">전 병원 과제, 상설 협의체 필요</td><td>8/10</td></tr>
+        <tr><td>4</td><td class="left">병동별 VOC 결과 공개 및 성과 연동 승인</td><td class="left">병동 자율개선 유인 필요</td><td>8/10</td></tr>
+        <tr><td>5</td><td class="left">Q3(7~9월) VOC 대응 전담 인력 지정</td><td class="left">미해결 VOC가 재접수로 직결</td><td>8/25</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    <span>메디통 픽스 AI · 수원윌스기념병원 경영진 보고 문서 (VOC 분석 · 개선계획)</span>
+    <span>대외비</span>
+  </div>
+
+</div>
+
+<script src="pix-report-stats-query.js?v=20260809-1"></script>
+<script src="pix-report-layout-edit.js?v=20260809-1"></script>
+<script>
+(function enableReportTextEdit() {
+  function applyReportTextEdit() {
+    var root = document.querySelector(".doc");
+    if (!root) return;
+    var selector = [
+      ".doc-eyebrow", ".doc-title", ".doc-lead",
+      ".doc-info-table td", ".note",
+      ".sec-title", ".sub-title", "p", "li",
+      ".sl", ".sv", ".ss",
+      ".cap", ".ct", ".qh", ".qa", ".qd", ".fig-title", ".fig-cap",
+      "table.data th", "table.data td",
+      ".footer-note span"
+    ].join(",");
+    Array.prototype.forEach.call(root.querySelectorAll(selector), function (el) {
+      if (el.closest(".rpt-block-toolbar") || el.closest(".rpt-sec-add-row") || el.closest("img")) return;
+      if (el.getAttribute("contenteditable") === "true") return;
+      el.setAttribute("contenteditable", "true");
+      el.setAttribute("spellcheck", "false");
+    });
+  }
+  window.__pixReportEnableTextEdit = applyReportTextEdit;
+  if (!window.__pixReportDeferTextEdit) applyReportTextEdit();
+})();
+</script>
+
+</body>
+</html>

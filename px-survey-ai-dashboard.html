@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>환자경험평가 AI 분석하기</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+  :root{
+    --bg:#0b0f14; --surface:#121820; --surface-2:#171f2a; --border:#243041;
+    --text:#eef2f7; --muted:#8b97a8; --accent:#38bdf8; --accent-2:#6366f1;
+    --good:#34d399; --bad:#f87171; --warn:#fbbf24;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.55}
+  body.embed .top-actions{position:sticky;top:0;z-index:30;background:rgba(11,15,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  body:not(.embed) .top-actions{display:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 22px 88px}
+  body.embed .wrap{padding-top:12px}
+  .page-title{font-size:22px;font-weight:800;margin:0 0 4px}
+  .page-sub{font-size:12px;color:var(--muted);margin:0 0 16px}
+
+  .control-bar{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px}
+  .control-bar select,.control-bar input{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 10px;font:inherit;font-size:12px;font-weight:600}
+  .run-btn{margin-left:auto;background:linear-gradient(135deg,#2563eb,#38bdf8);color:#fff;border:none;border-radius:9px;padding:9px 18px;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+  .run-btn:hover{filter:brightness(1.06)}
+  .close-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+
+  .notice{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:#fde68a;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:18px;line-height:1.6}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+  .kpi .k{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .kpi .v{font-size:20px;font-weight:800;color:#fff}
+  .kpi .v-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .kpi .grade-badge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;line-height:1}
+  .kpi .d{font-size:11px;font-weight:700;margin-top:4px}
+  .kpi .d.up{color:var(--good)} .kpi .d.down{color:var(--bad)}
+
+  .sec{margin-bottom:26px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .sec-num{width:28px;height:28px;border-radius:999px;background:linear-gradient(135deg,#2563eb,#38bdf8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+  .sec-title{font-size:15px;font-weight:800;margin:0}
+  .sec-sub{font-size:11px;color:var(--muted);margin:2px 0 0}
+
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .chart-box{position:relative;height:240px}
+  .chart-box.sm{height:200px}
+  .chart-box.priority{height:340px}
+
+  .bar-list{display:flex;flex-direction:column;gap:10px;margin-top:4px;position:relative;z-index:1}
+  .area-bar-panel{position:relative}
+  .grade-legend{display:flex;gap:14px;justify-content:flex-end;font-size:10px;color:var(--muted);font-weight:700;margin-bottom:8px;flex-wrap:wrap}
+  .grade-legend span{display:inline-flex;align-items:center;gap:5px}
+  .grade-legend i{display:inline-block;width:14px;height:0;border-top:2px dashed #94a3b8}
+  .area-bar-body{position:relative}
+  .bar-row{display:grid;grid-template-columns:92px 1fr 44px;gap:10px;align-items:center;font-size:12px}
+  .bar-row .label{color:var(--muted);font-weight:600}
+  .bar-track{position:relative;height:10px;border-radius:999px;background:var(--surface-2);overflow:visible}
+  .bar-track-bands{position:absolute;inset:0;border-radius:999px;opacity:.38;overflow:hidden}
+  .bar-fill{position:relative;z-index:1;height:100%;border-radius:999px;min-width:2px}
+  .bar-nat-vline{position:absolute;top:-5px;bottom:-5px;border-left:2px dashed #94a3b8;z-index:3;pointer-events:none;opacity:.95}
+  .bar-val{font-weight:800;text-align:right}
+
+  .composite-gauge{margin-bottom:14px;padding:16px 18px}
+  .cg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .cg-title{font-size:12px;font-weight:800;color:var(--muted)}
+  .cg-score-row{display:flex;align-items:center;gap:10px}
+  .cg-score{font-size:28px;font-weight:800;color:#fff;line-height:1}
+  .cg-grade{font-size:12px;font-weight:800;padding:4px 12px;border-radius:999px}
+  .cg-track-wrap{position:relative}
+  .cg-track{position:relative;height:16px;border-radius:999px;background:var(--surface-2);overflow:visible;margin-bottom:6px}
+  .cg-bands{position:absolute;inset:0;border-radius:999px;opacity:.45;background:var(--grade-bands, linear-gradient(90deg,#f87171 0% 16.6667%,#fbbf24 16.6667% 33.3333%,#a78bfa 33.3333% 50%,#34d399 50% 66.6667%,#38bdf8 66.6667% 100%))}
+  .cg-fill{position:relative;z-index:1;height:100%;border-radius:999px;min-width:4px;box-shadow:0 0 12px rgba(56,189,248,.25)}
+  .cg-vline{position:absolute;top:-8px;bottom:-8px;border-left:2px dashed #fbbf24;z-index:4;transform:translateX(-50%);pointer-events:none}
+  .cg-vline span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#fbbf24;white-space:nowrap;background:rgba(11,15,20,.85);padding:1px 5px;border-radius:4px}
+  .cg-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;border:2px solid #fff;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+  .cg-scale{display:flex;justify-content:space-between;font-size:9px;font-weight:700;color:var(--muted);padding:0 2px}
+  .cg-foot{margin-top:10px;font-size:11px;color:var(--muted);font-weight:600;display:flex;flex-wrap:wrap;gap:12px}
+  .cg-foot b{color:var(--text)}
+  .cg-legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);font-weight:700}
+  .cg-legend span{display:inline-flex;align-items:center;gap:5px}
+  .cg-legend i{display:inline-block}
+  .cg-legend .sw{width:10px;height:10px;border-radius:2px}
+  .cg-legend .tg{width:14px;border-top:2px dashed #fbbf24}
+
+  .item-progress{margin-bottom:2px}
+
+  .item-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .item-card{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+  .item-card .name{font-size:12px;font-weight:800;margin-bottom:8px}
+  .item-card .score{font-size:18px;font-weight:800;margin-bottom:8px}
+  .item-card .hint{font-size:11px;color:var(--muted);line-height:1.55;margin-top:8px}
+
+  .trend-note{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.65;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px dashed var(--border)}
+
+  .deep-grid{display:grid;grid-template-columns:1fr;gap:12px}
+  .insight-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--border);border-radius:12px;padding:15px 18px}
+  .insight-card.priority{border-left-color:var(--bad)}
+  .insight-card.watch{border-left-color:var(--warn)}
+  .insight-card.good{border-left-color:#4e93f7}
+  .insight-card.strength{border-left-color:var(--good)}
+  .ic-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .ic-title{display:flex;align-items:center;gap:9px}
+  .ic-num{width:22px;height:22px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0}
+  .ic-name{font-size:14.5px;font-weight:800;color:#fff}
+  .ic-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .score-tag{display:inline-flex;align-items:baseline;gap:4px}
+  .score-tag .num{font-size:20px;font-weight:800}
+  .score-tag .unit{font-size:10px;color:var(--muted)}
+  .confidence{font-size:10.3px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:6px}
+  .confidence .cbar{width:44px;height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;position:relative}
+  .confidence .cbar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+  .status-badge{font-size:10.5px;font-weight:800;padding:4px 11px;border-radius:100px;white-space:nowrap}
+  .status-badge.priority{background:rgba(248,113,113,.15);color:var(--bad)}
+  .status-badge.watch{background:rgba(251,191,36,.15);color:var(--warn)}
+  .status-badge.good{background:rgba(78,147,247,.15);color:#4e93f7}
+  .status-badge.strength{background:rgba(52,211,153,.15);color:var(--good)}
+  .ic-body{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px}
+  .ic-col-label{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.4px;margin-bottom:5px}
+  .ic-col-text{font-size:12.3px;color:var(--text);line-height:1.65}
+  .ic-col-text b{color:#fff}
+  .ic-foot{display:flex;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px dashed var(--border)}
+  .ic-chip{background:var(--surface-2);border-radius:100px;padding:5px 12px;font-size:11px;color:var(--muted)}
+  .ic-chip b{color:var(--text);font-weight:700}
+  .ic-chip.hl b{color:var(--bad)}
+
+  .footer-bar{position:sticky;bottom:0;margin-top:24px;padding:14px 0;background:linear-gradient(180deg,transparent,rgba(11,15,20,.95) 30%)}
+  .footer-inner{display:flex;justify-content:flex-end}
+  .report-btn{background:linear-gradient(135deg,#2563eb,#6366f1);color:#fff;border:none;border-radius:10px;padding:12px 22px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.35)}
+
+  .loading{display:none;text-align:center;padding:80px 20px;color:var(--muted)}
+  .loading.on{display:block}
+  .loading .spin{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .content.hidden{display:none}
+
+  @media(max-width:900px){
+    .kpi-row{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.item-grid,.ic-body{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="top-actions">
+  <div>
+    <div class="page-title" style="font-size:15px;margin:0">환자경험평가 AI 분석</div>
+    <div class="page-sub" style="margin:0">2026년 2차 · 전체 부서</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button type="button" class="report-btn" id="embedReportBtn" style="padding:8px 14px;font-size:12px">보고서 작성하기</button>
+    <button type="button" class="close-btn" id="embedCloseBtn">닫기</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <h1 class="page-title">환자경험평가 AI 분석하기</h1>
+  <p class="page-sub">조회된 통계를 바탕으로 영역·문항 성과, 추이, 개선 우선순위를 한 화면에서 확인합니다.</p>
+
+  <div class="control-bar">
+    <select id="fYear"><option>2026년</option><option>2025년</option></select>
+    <select id="fRound"><option>2차</option><option>1차</option></select>
+    <select id="fDept"><option>전체 부서</option><option>내과 병동</option><option>외과 병동</option></select>
+    <button type="button" class="run-btn" id="runBtn">AI 분석 시작</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spin"></div>
+    <div>통계 결과를 분석하고 있습니다…</div>
+  </div>
+
+  <div class="content hidden" id="content">
+    <div class="notice" id="noticeBar">※ 분석 표본은 2026년 2차 응답 428명 기준입니다. 전국 평균·등급 벤치마크와 대조하여 해석했습니다.</div>
+
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <section class="sec">
+      <div class="sec-head">
+        <div class="sec-num">01</div>
+        <div><h2 class="sec-title">영역별 성과</h2><p class="sec-sub">종합점수 등급·목표선 · 영역별 전국 평균 대비</p></div>
+      </div>
+      <div class="panel composite-gauge" id="compositeGaugePanel"></div>
+      <div class="grid-2">
+        <div class="panel"><div class="chart-box"><canvas id="radarChart"></canvas></div></div>
+        <div class="panel"><div class="area-bar-panel" id="areaBarPanel"></div></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head">
+        <div class="sec-num">02</div>
+        <div><h2 class="sec-title">문항별 성과</h2><p class="sec-sub">영역별 세부 지표 · 전국 평균 대비 비교</p></div>
+      </div>
+      <div class="item-grid" id="itemGrid"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head">
+        <div class="sec-num">03</div>
+        <div><h2 class="sec-title">성과 변화 추이</h2><p class="sec-sub">전체 영역 표시 · 유의미한 상승·하락 영역만 컬러 강조</p></div>
+      </div>
+      <div class="panel">
+        <div class="chart-box"><canvas id="trendChart"></canvas></div>
+        <div class="trend-note" id="trendNote"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head">
+        <div class="sec-num">04</div>
+        <div><h2 class="sec-title">개선 우선순위 분석</h2><p class="sec-sub">갭·등급 판별력 매트릭스 · 사분면별 우선순위</p></div>
+      </div>
+      <div class="panel">
+        <div class="chart-box priority"><canvas id="scatterChart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head">
+        <div class="sec-num">05</div>
+        <div><h2 class="sec-title">AI 영역별 심층 분석</h2><p class="sec-sub">IPA 매트릭스 기준 · 우선순위 점수 높은 순 자동 정렬</p></div>
+      </div>
+      <div class="deep-grid" id="deepGrid"></div>
+    </section>
+
+    <div class="footer-bar">
+      <div class="footer-inner">
+        <button type="button" class="report-btn" id="reportBtn">보고서 생성하기 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var AREAS = [
+  { name:"간호사", ours:86.92, nat:85.97, color:"#38bdf8" },
+  { name:"의사", ours:88.44, nat:84.04, color:"#6366f1" },
+  { name:"투약·치료", ours:83.55, nat:82.82, color:"#a78bfa" },
+  { name:"정서적 지지", ours:78.90, nat:78.77, color:"#f472b6" },
+  { name:"환자권리", ours:85.64, nat:83.86, color:"#34d399" },
+  { name:"병원환경", ours:76.40, nat:85.50, color:"#fb923c" }
+];
+var COMPOSITE = 83.98;
+var charts = {};
+var BAR_MIN = 70;
+var BAR_MAX = 100;
+var GRADE1_SCORE = 90;
+var GRADE2_SCORE = 85;
+var GRADE_BANDS = [
+  { g:1, lo:90, hi:100, color:"#38bdf8", label:"1등급" },
+  { g:2, lo:85, hi:90, color:"#34d399", label:"2등급" },
+  { g:3, lo:80, hi:85, color:"#a78bfa", label:"3등급" },
+  { g:4, lo:75, hi:80, color:"#fbbf24", label:"4등급" },
+  { g:5, lo:70, hi:75, color:"#f87171", label:"5등급" }
+];
+var GRADE_BANDS_CSS = "linear-gradient(90deg,#f87171 0% 16.6667%,#fbbf24 16.6667% 33.3333%,#a78bfa 33.3333% 50%,#34d399 50% 66.6667%,#38bdf8 66.6667% 100%)";
+var TREND_CHANGE_THRESHOLD = 1.0;
+var TREND_SERIES = [
+  { name:"종합점수", color:"#38bdf8", data:[81.2,82.1,82.8,83.98] },
+  { name:"간호사", color:"#22d3ee", data:[85.2,85.5,85.9,86.92] },
+  { name:"의사", color:"#6366f1", data:[82.1,84.0,86.2,88.44] },
+  { name:"투약·치료", color:"#a78bfa", data:[84.0,83.9,83.7,83.55] },
+  { name:"정서적 지지", color:"#f472b6", data:[78.6,78.7,78.8,78.90] },
+  { name:"환자권리", color:"#34d399", data:[80.0,81.0,82.5,85.64] },
+  { name:"병원환경", color:"#fb923c", data:[78.5,77.2,76.8,76.40] }
+];
+var PRIORITY_X_MID = -10.2;
+var PRIORITY_Y_MID = 18.4;
+var PRIORITY_POINTS = [
+  { name:"정서적 지지", score:76.38, gap:12.8, x:-12.8, y:21.0, color:"#e24b4a" },
+  { name:"투약 및 치료과정", score:81.57, gap:10.3, x:-10.3, y:20.4, color:"#e24b4a" },
+  { name:"환자 안전과 병원환경", score:85.01, gap:9.1, x:-9.1, y:20.1, color:"#2ca089" },
+  { name:"간호사 영역", score:83.57, gap:10.4, x:-10.4, y:17.5, color:"#c9a227" },
+  { name:"환자권리 보장", score:82.32, gap:10.1, x:-10.1, y:17.1, color:"#94a3b8" },
+  { name:"의사 영역", score:83.82, gap:8.4, x:-8.4, y:16.8, color:"#64748b" }
+];
+var PRIORITY_QUADRANTS = [
+  { x0:-14, x1:PRIORITY_X_MID, y0:PRIORITY_Y_MID, y1:22, fill:"rgba(226,75,74,0.22)", title:"I. 최우선 개선", sub:"갭 크고 · 등급 판별력 높음", titleColor:"#f87171", align:"left" },
+  { x0:PRIORITY_X_MID, x1:-7, y0:PRIORITY_Y_MID, y1:22, fill:"rgba(44,160,137,0.22)", title:"II. 상대적 강점 · 우위 확대", sub:"갭 작고 · 등급 판별력 높음", titleColor:"#34d399", align:"right" },
+  { x0:-14, x1:PRIORITY_X_MID, y0:16, y1:PRIORITY_Y_MID, fill:"rgba(201,162,39,0.22)", title:"III. 중장기 과제", sub:"", titleColor:"#fbbf24", align:"left" },
+  { x0:PRIORITY_X_MID, x1:-7, y0:16, y1:PRIORITY_Y_MID, fill:"rgba(148,163,184,0.24)", title:"IV. 후순위", sub:"(판별력 낮음)", titleColor:"#94a3b8", align:"right" }
+];
+var STATUS_META = {
+  priority:{ label:"최우선 개선", cls:"priority", scoreLabel:"우선순위", color:"#f87171" },
+  watch:{ label:"주의 관찰", cls:"watch", scoreLabel:"이상 신뢰도", color:"#fbbf24" },
+  good:{ label:"양호", cls:"good", scoreLabel:"기여도", color:"#4e93f7" },
+  strength:{ label:"강점 유지", cls:"strength", scoreLabel:"우위도", color:"#34d399" }
+};
+var DEEP_INSIGHT_BY_NAME = {
+  "정서적 지지":{
+    status:"priority", score:94, conf:92, n:"n=348",
+    why:"등급별 점수 격차 <b>1위(21.59)</b>, 우리 병원 <b>최저점(76.38)</b>, 1등급까지 갭도 <b>최대(−12.84)</b> — IPA I사분면(최우선 개선) 3근거 일치",
+    what:"<b>위로·공감 응대 표준화</b> 및 전 직원 교육 실시. 나쁜 소식 전달·수술 전후 불안 대응 매뉴얼 마련",
+    chips:[["담당","진료부·간호부"],["기한","8/31"],["기대효과","+6.62점","hl"]]
+  },
+  "투약 및 치료과정":{
+    status:"priority", score:78, conf:88, n:"n=348",
+    why:"1등급까지 갭 <b>10.35점</b>, 등급 영향력 <b>3위</b> — IPA I사분면, 정서적 지지 다음으로 개선 효과가 큼",
+    what:"투약·검사·처치 <b>이유 설명 스크립트 표준화</b>. 처치 전 확인 절차 정비",
+    chips:[["담당","간호부·진료지원"],["기한","8/31"],["기대효과","+3.43점","hl"]]
+  },
+  "환자 안전과 병원환경":{
+    status:"strength", score:58, conf:82, n:"n=348",
+    why:"IPA II사분면 — 1등급까지 갭 <b>9.1점</b>으로 7개 영역 중 <b>가장 작음</b>, 등급 판별력도 높아 우위 확대 여지",
+    what:"소음·청결 관리, 환자 본인확인 절차 강화로 <b>90점대 진입</b> — 9월 내 병행 추진",
+    chips:[["담당","시설·간호부"],["기한","9월 내"],["기대효과","+2.49점","hl"]]
+  },
+  "간호사 영역":{
+    status:"watch", score:62, conf:71, n:"n=348, 2개 차수 비교",
+    why:"IPA III사분면(중장기)이나 4차→5차 <b>유일하게 하락(−0.37)</b>, 3등급 평균 미달 — 원인 불명",
+    what:"<b>통합병동·일반병동 분리 진단</b>으로 편차 원인 규명 선행. 간호·간병 통합서비스 운영 방식 점검",
+    chips:[["담당","QI팀·간호부"],["기한","8/25"],["목표","원인 규명"]]
+  },
+  "환자권리 보장":{
+    status:"good", score:84, conf:85, n:"n=348, 2개 차수 비교",
+    why:"IPA IV사분면이나 4차→5차 <b>+5.65점</b> — 전 영역 중 가장 크게 개선됨",
+    what:"설명 프로세스 개선 등 실행 내역을 <b>문서화</b>하여, 정서적 지지·간호사 영역에도 적용 가능한지 검토",
+    chips:[["담당","QI팀"],["유형","성공요인 확산"]]
+  },
+  "의사 영역":{
+    status:"good", score:71, conf:85, n:"n=348, 2개 차수 비교",
+    why:"IPA IV사분면(후순위)이나 4차→5차 <b>+4.80점</b> 개선 — 전체 평균 상승폭을 단일 차수 만에 상회",
+    what:"이 기간 시행한 조치(회진 방식 변경 등)를 <b>문서화</b>하여, 정체된 영역에 적용 가능한지 검토",
+    chips:[["담당","QI팀"],["유형","성공요인 확산"]]
+  }
+};
+
+function getIpaQuadrant(pt){
+  if (pt.x < PRIORITY_X_MID && pt.y >= PRIORITY_Y_MID) return 1;
+  if (pt.x >= PRIORITY_X_MID && pt.y >= PRIORITY_Y_MID) return 2;
+  if (pt.x < PRIORITY_X_MID && pt.y < PRIORITY_Y_MID) return 3;
+  return 4;
+}
+
+function buildDeepInsights(){
+  return PRIORITY_POINTS.map(function(pt){
+    var base = DEEP_INSIGHT_BY_NAME[pt.name];
+    if (!base) return null;
+    var q = getIpaQuadrant(pt);
+    return {
+      name: pt.name,
+      quadrant: q,
+      score: pt.score,
+      gap: pt.gap,
+      ipaX: pt.x,
+      ipaY: pt.y,
+      status: base.status,
+      priorityScore: base.score,
+      conf: base.conf,
+      n: base.n,
+      why: base.why,
+      what: base.what,
+      chips: base.chips
+    };
+  }).filter(Boolean).sort(function(a, b){ return b.priorityScore - a.priorityScore; });
+}
+
+function trendDelta(data){
+  return data[data.length - 1] - data[0];
+}
+
+function buildTrendDatasets(){
+  return TREND_SERIES.map(function(s){
+    var delta = trendDelta(s.data);
+    var highlight = Math.abs(delta) >= TREND_CHANGE_THRESHOLD;
+    var up = delta > 0;
+    var color = highlight ? s.color : "#64748b";
+    return {
+      label: s.name + (highlight ? (up ? " ▲" : " ▼") : ""),
+      data: s.data,
+      borderColor: color,
+      backgroundColor: highlight && s.name === "종합점수" ? "rgba(56,189,248,.1)" : "transparent",
+      fill: highlight && s.name === "종합점수",
+      tension: 0.35,
+      borderWidth: highlight ? 2.5 : 1.5,
+      pointRadius: highlight ? 4 : 2,
+      pointBackgroundColor: color,
+      pointBorderColor: highlight ? "#fff" : color,
+      pointBorderWidth: highlight ? 1.5 : 0,
+      borderDash: highlight ? [] : [5, 4]
+    };
+  });
+}
+
+function drawLabelBox(ctx, x, y, text, opts){
+  opts = opts || {};
+  var padX = 6, padY = 4, maxW = opts.maxWidth || 168;
+  ctx.save();
+  ctx.font = "600 10px 'Noto Sans KR', sans-serif";
+  var lines = [];
+  if (ctx.measureText(text).width <= maxW) {
+    lines = [text];
+  } else {
+    var parts = text.split(" ");
+    var line = "";
+    parts.forEach(function(w){
+      var test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+      else line = test;
+    });
+    if (line) lines.push(line);
+  }
+  var lineH = 13;
+  var boxW = Math.min(maxW, Math.max.apply(null, lines.map(function(l){ return ctx.measureText(l).width; })) + padX * 2);
+  var boxH = lines.length * lineH + padY * 2;
+  var bx = opts.align === "right" ? x - boxW - 8 : x + 8;
+  var by = y - boxH / 2;
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  ctx.strokeStyle = "rgba(15,23,42,0.12)";
+  ctx.lineWidth = 1;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(bx, by, boxW, boxH, 4);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.fillRect(bx, by, boxW, boxH);
+  }
+  ctx.fillStyle = "#1e293b";
+  lines.forEach(function(l, i){
+    ctx.fillText(l, bx + padX, by + padY + 10 + i * lineH);
+  });
+  ctx.restore();
+}
+
+function priorityQuadrantPlugin(){
+  return {
+    id: "priorityQuadrant",
+    beforeDraw: function(chart){
+      var ctx = chart.ctx, xs = chart.scales.x, ys = chart.scales.y;
+      PRIORITY_QUADRANTS.forEach(function(q){
+        var left = xs.getPixelForValue(q.x0);
+        var right = xs.getPixelForValue(q.x1);
+        var top = ys.getPixelForValue(q.y1);
+        var bottom = ys.getPixelForValue(q.y0);
+        ctx.save();
+        ctx.fillStyle = q.fill;
+        ctx.fillRect(left, top, right - left, bottom - top);
+        ctx.fillStyle = q.titleColor;
+        ctx.font = "800 10px 'Noto Sans KR', sans-serif";
+        var tx = q.align === "right" ? right - 8 : left + 8;
+        ctx.textAlign = q.align === "right" ? "right" : "left";
+        ctx.fillText(q.title, tx, top + 14);
+        if (q.sub) {
+          ctx.font = "600 9px 'Noto Sans KR', sans-serif";
+          ctx.fillStyle = "rgba(203,213,225,0.72)";
+          ctx.fillText(q.sub, tx, top + 28);
+        }
+        ctx.restore();
+      });
+      ctx.save();
+      ctx.strokeStyle = "rgba(30,41,59,0.35)";
+      ctx.setLineDash([5, 4]);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xs.getPixelForValue(PRIORITY_X_MID), ys.top);
+      ctx.lineTo(xs.getPixelForValue(PRIORITY_X_MID), ys.bottom);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(xs.left, ys.getPixelForValue(PRIORITY_Y_MID));
+      ctx.lineTo(xs.right, ys.getPixelForValue(PRIORITY_Y_MID));
+      ctx.stroke();
+      ctx.restore();
+    },
+    afterDatasetsDraw: function(chart){
+      var ctx = chart.ctx, meta = chart.getDatasetMeta(0);
+      if (!meta || !meta.data) return;
+      PRIORITY_POINTS.forEach(function(pt, i){
+        var el = meta.data[i];
+        if (!el) return;
+        var label = pt.name + " / " + pt.score.toFixed(2) + "점 (1등급까지 " + pt.gap + "점)";
+        var align = pt.x < PRIORITY_X_MID ? "left" : "right";
+        drawLabelBox(ctx, el.x, el.y, label, { align: align, maxWidth: 180 });
+      });
+    }
+  };
+}
+
+function scoreToPct(score){
+  return Math.max(0, Math.min(100, (score - BAR_MIN) / (BAR_MAX - BAR_MIN) * 100));
+}
+
+function gradeOfScore(score){
+  var i;
+  for (i = 0; i < GRADE_BANDS.length; i++) {
+    if (score >= GRADE_BANDS[i].lo) return GRADE_BANDS[i];
+  }
+  return GRADE_BANDS[GRADE_BANDS.length - 1];
+}
+
+function renderGradeLegendHtml(){
+  return GRADE_BANDS.map(function(b){
+    var range = b.g === 1 ? b.lo + "점+" : b.lo + "~" + b.hi + "점";
+    return '<span><i class="sw" style="background:'+b.color+'"></i>'+b.label+" "+range+"</span>";
+  }).join("") + '<span><i class="tg"></i>1·2등급 목표선</span>';
+}
+
+function svgItemProgress(score, nat, color){
+  color = color || "#38bdf8";
+  var w = 260, h = 30, barY = 10, barH = 10;
+  var pct = scoreToPct(score);
+  var natX = scoreToPct(nat) / 100 * w;
+  var fillW = pct / 100 * w;
+  return '<svg class="item-progress" viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'">' +
+    '<rect x="0" y="'+barY+'" width="'+w+'" height="'+barH+'" rx="5" fill="#0b0f14"/>' +
+    '<rect x="0" y="'+barY+'" width="'+fillW+'" height="'+barH+'" rx="5" fill="'+color+'"/>' +
+    '<line x1="'+natX+'" y1="4" x2="'+natX+'" y2="'+(barY+barH+4)+'" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3"/>' +
+    '<text x="4" y="'+(h-1)+'" font-size="9" fill="#8b97a8">전국 평균 '+nat.toFixed(1)+'</text>' +
+    '<text x="'+(w-4)+'" y="'+(h-1)+'" font-size="10" fill="#eef2f7" text-anchor="end" font-weight="700">'+score+'</text></svg>';
+}
+
+function renderKpis(){
+  var compositeGrade = gradeOfScore(COMPOSITE);
+  var items = [
+    { k:"종합점수", v:COMPOSITE.toFixed(2), grade:compositeGrade, d:"▲ +2.3", cls:"up" },
+    { k:"간호사", v:"86.92", d:"▲ +1.8", cls:"up" },
+    { k:"의사", v:"88.44", d:"▲ +4.2", cls:"up" },
+    { k:"투약·치료", v:"83.55", d:"▼ −0.5", cls:"down" },
+    { k:"병원환경", v:"76.40", d:"▼ −2.1", cls:"down" }
+  ];
+  document.getElementById("kpiRow").innerHTML = items.map(function(it){
+    var gradeHtml = it.grade
+      ? '<span class="grade-badge" style="color:'+it.grade.color+';background:'+it.grade.color+'22">'+it.grade.label+'</span>'
+      : "";
+    return '<div class="kpi"><div class="k">'+it.k+'</div>' +
+      '<div class="v-row"><span class="v">'+it.v+'</span>'+gradeHtml+'</div>' +
+      '<div class="d '+it.cls+'">'+it.d+'</div></div>';
+  }).join("");
+}
+
+function renderCompositeGauge(){
+  var grade = gradeOfScore(COMPOSITE);
+  var pct = scoreToPct(COMPOSITE);
+  var g2Pct = scoreToPct(GRADE2_SCORE);
+  var g1Pct = scoreToPct(GRADE1_SCORE);
+  var gap2 = Math.max(0, GRADE2_SCORE - COMPOSITE);
+  var gap1 = Math.max(0, GRADE1_SCORE - COMPOSITE);
+  document.getElementById("compositeGaugePanel").innerHTML =
+    '<div class="cg-head">' +
+      '<div class="cg-title">우리 병원 종합점수</div>' +
+      '<div class="cg-score-row">' +
+        '<span class="cg-score">'+COMPOSITE.toFixed(2)+'</span>' +
+        '<span class="cg-grade" style="color:'+grade.color+';background:'+grade.color+'22">'+grade.label+'</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="cg-track-wrap">' +
+      '<div class="cg-track">' +
+        '<div class="cg-bands" style="background:'+GRADE_BANDS_CSS+'"></div>' +
+        '<div class="cg-fill" style="width:'+pct+'%;background:'+grade.color+'"></div>' +
+        '<div class="cg-vline" style="left:'+g2Pct+'%"><span>2등급 '+GRADE2_SCORE+'</span></div>' +
+        '<div class="cg-vline" style="left:'+g1Pct+'%"><span>1등급 '+GRADE1_SCORE+'</span></div>' +
+        '<div class="cg-marker" style="left:'+pct+'%;background:'+grade.color+'"></div>' +
+      '</div>' +
+      '<div class="cg-scale"><span>'+BAR_MIN+'</span><span>'+GRADE2_SCORE+'</span><span>'+GRADE1_SCORE+'</span><span>'+BAR_MAX+'</span></div>' +
+    '</div>' +
+    '<div class="cg-foot">' +
+      '<span>2등급 목표선 <b>'+GRADE2_SCORE+'점</b>까지 <b>'+gap2.toFixed(2)+'점</b></span>' +
+      '<span>1등급 목표선 <b>'+GRADE1_SCORE+'점</b>까지 <b>'+gap1.toFixed(2)+'점</b></span>' +
+    '</div>' +
+    '<div class="cg-legend">'+renderGradeLegendHtml()+'</div>';
+}
+
+function renderAreaBars(){
+  var rows = AREAS.map(function(a){
+    var pct = scoreToPct(a.ours);
+    var natPct = scoreToPct(a.nat);
+    return '<div class="bar-row"><div class="label">'+a.name+'</div>' +
+      '<div class="bar-track"><div class="bar-track-bands" style="background:'+GRADE_BANDS_CSS+'"></div>' +
+      '<div class="bar-fill" style="width:'+pct+'%;background:'+a.color+'"></div>' +
+      '<div class="bar-nat-vline" style="left:'+natPct+'%" title="전국 평균 '+a.nat.toFixed(1)+'점"></div></div>' +
+      '<div class="bar-val">'+a.ours.toFixed(1)+'</div></div>';
+  }).join("");
+  document.getElementById("areaBarPanel").innerHTML =
+    '<div class="grade-legend">' +
+      '<span><i></i>점선 = 해당 영역 전국 평균</span>' +
+    '</div>' +
+    '<div class="area-bar-body">' +
+      '<div class="bar-list">'+rows+'</div>' +
+    '</div>';
+}
+
+function renderItemGrid(){
+  var items = [
+    { name:"간호사 서비스", score:86.92, nat:85.97, color:"#38bdf8", text:"전국 평균(85.97점) 대비 +0.95점 상회합니다." },
+    { name:"의사 서비스", score:88.44, nat:84.04, color:"#6366f1", text:"전국 평균(84.04점) 대비 +4.40점으로 가장 크게 앞섭니다." },
+    { name:"투약·치료과정", score:83.55, nat:82.82, color:"#a78bfa", text:"전국 평균(82.82점)과 근접합니다(+0.73점)." },
+    { name:"병원환경", score:76.40, nat:85.50, color:"#fb923c", text:"전국 평균(85.50점) 대비 −9.10점으로 가장 큰 격차입니다. 집중 개선이 필요합니다." },
+    { name:"환자권리", score:85.64, nat:83.86, color:"#34d399", text:"전국 평균(83.86점) 대비 +1.78점 상회합니다." },
+    { name:"전반적 평가", score:90.52, nat:88.20, color:"#22d3ee", text:"전국 평균(88.20점) 대비 +2.32점 상회합니다." }
+  ];
+  document.getElementById("itemGrid").innerHTML = items.map(function(it){
+    return '<div class="item-card"><div class="name">'+it.name+'</div>' +
+      '<div class="score">'+it.score+'점</div>'+svgItemProgress(it.score, it.nat, it.color)+
+      '<div class="hint">'+it.text+'</div></div>';
+  }).join("");
+}
+
+function renderDeepGrid(){
+  var insights = buildDeepInsights();
+  document.getElementById("deepGrid").innerHTML = insights.map(function(ins, idx){
+    var meta = STATUS_META[ins.status] || STATUS_META.priority;
+    return '<div class="insight-card '+meta.cls+'">' +
+      '<div class="ic-head">' +
+        '<div class="ic-title"><span class="ic-num">'+(idx+1)+'</span><span class="ic-name">'+ins.name+'</span></div>' +
+        '<div class="ic-right">' +
+          '<div>' +
+            '<div class="score-tag"><span class="num" style="color:'+meta.color+'">'+ins.priorityScore+'</span><span class="unit">/ 100 '+meta.scoreLabel+'</span></div>' +
+            '<div class="confidence"><span class="cbar"><i style="width:'+ins.conf+'%;background:'+meta.color+'"></i></span>신뢰도 '+ins.conf+'% · '+ins.n+'</div>' +
+          '</div>' +
+          '<span class="status-badge '+meta.cls+'">'+meta.label+'</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ic-body">' +
+        '<div><div class="ic-col-label">분석 근거</div><div class="ic-col-text">'+ins.why+'</div></div>' +
+        '<div><div class="ic-col-label">개선 과제</div><div class="ic-col-text">'+ins.what+'</div></div>' +
+      '</div>' +
+      '<div class="ic-foot">'+ins.chips.map(function(c){
+        return '<div class="ic-chip '+(c[2]||'')+'">'+c[0]+' <b>'+c[1]+'</b></div>';
+      }).join('')+'</div>' +
+    '</div>';
+  }).join("");
+}
+
+function initCharts(){
+  if (typeof Chart === "undefined") return;
+  Object.keys(charts).forEach(function(k){ if(charts[k]) charts[k].destroy(); });
+  charts = {};
+
+  charts.radar = new Chart(document.getElementById("radarChart"), {
+    type:"radar",
+    data:{
+      labels: AREAS.map(function(a){ return a.name; }),
+      datasets:[
+        { label:"우리 병원", data:AREAS.map(function(a){ return a.ours; }), borderColor:"#38bdf8", backgroundColor:"rgba(56,189,248,.15)", borderWidth:2, pointRadius:3 },
+        { label:"전국 평균", data:AREAS.map(function(a){ return a.nat; }), borderColor:"#64748b", backgroundColor:"rgba(100,116,139,.08)", borderWidth:1.5, borderDash:[4,4], pointRadius:2 }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:"#8b97a8", font:{ size:11, weight:"600" } } } },
+      scales:{ r:{ min:70, max:95, ticks:{ display:false }, grid:{ color:"#243041" }, angleLines:{ color:"#243041" }, pointLabels:{ color:"#cbd5e1", font:{ size:11, weight:"600" } } } }
+    }
+  });
+
+  charts.trend = new Chart(document.getElementById("trendChart"), {
+    type:"line",
+    data:{
+      labels:["2023","2024","2025","2026"],
+      datasets: buildTrendDatasets()
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:"index", intersect:false },
+      plugins:{ legend:{ labels:{ color:"#8b97a8", font:{ size:10 }, boxWidth:14, usePointStyle:true } } },
+      scales:{
+        x:{ ticks:{ color:"#8b97a8" }, grid:{ color:"#1e2936" } },
+        y:{ min:74, max:92, ticks:{ color:"#8b97a8" }, grid:{ color:"#1e2936" } }
+      }
+    }
+  });
+
+  document.getElementById("trendNote").textContent =
+    "AI 요약: 전 영역 추이를 표시합니다. 2023년 대비 ±1.0점 이상 변동 영역만 컬러로 강조됩니다. 종합(+2.78), 의사(+6.34), 환자권리(+5.64), 간호사(+1.72)는 상승, 병원환경(−2.1)은 하락입니다.";
+
+  charts.scatter = new Chart(document.getElementById("scatterChart"), {
+    type:"scatter",
+    data:{
+      datasets:[{
+        label:"평가영역",
+        data: PRIORITY_POINTS.map(function(pt){ return { x: pt.x, y: pt.y }; }),
+        backgroundColor: PRIORITY_POINTS.map(function(pt){ return pt.color; }),
+        pointRadius:9,
+        pointHoverRadius:11,
+        pointBorderColor:"#fff",
+        pointBorderWidth:1.5
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          enabled:true,
+          callbacks:{
+            label:function(ctx){
+              var pt = PRIORITY_POINTS[ctx.dataIndex];
+              return pt.name + " · " + pt.score.toFixed(2) + "점 (1등급까지 " + pt.gap + "점)";
+            }
+          }
+        }
+      },
+      scales:{
+        x:{
+          title:{ display:true, text:"1등급 갭 (점)", color:"#8b97a8", font:{ size:11, weight:"600" } },
+          min:-14, max:-7,
+          ticks:{ color:"#8b97a8" },
+          grid:{ color:"rgba(30,41,59,0.2)" }
+        },
+        y:{
+          title:{ display:true, text:"등급 판별력", color:"#8b97a8", font:{ size:11, weight:"600" } },
+          min:16, max:22,
+          ticks:{ color:"#8b97a8", stepSize:1 },
+          grid:{ color:"rgba(30,41,59,0.2)" }
+        }
+      }
+    },
+    plugins:[ priorityQuadrantPlugin() ]
+  });
+}
+
+function runAnalysis(){
+  document.getElementById("loading").classList.add("on");
+  document.getElementById("content").classList.add("hidden");
+  setTimeout(function(){
+    document.getElementById("loading").classList.remove("on");
+    document.getElementById("content").classList.remove("hidden");
+    renderKpis();
+    renderCompositeGauge();
+    renderAreaBars();
+    renderItemGrid();
+    renderDeepGrid();
+    initCharts();
+  }, 700);
+}
+
+(function boot(){
+  var params = new URLSearchParams(location.search || "");
+  var isEmbed = params.get("embed") === "1";
+  if (isEmbed) document.body.classList.add("embed");
+
+  function post(type, payload){
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage(Object.assign({ source:"pix-survey-ai-board", type:type }, payload||{}), "*");
+  }
+
+  function openReport(){ post("open-report"); }
+  ["reportBtn","embedReportBtn"].forEach(function(id){
+    var btn = document.getElementById(id);
+    if (btn) btn.addEventListener("click", openReport);
+  });
+  var closeBtn = document.getElementById("embedCloseBtn");
+  if (closeBtn) closeBtn.addEventListener("click", function(){ post("close"); });
+
+  document.getElementById("runBtn").addEventListener("click", runAnalysis);
+  if (isEmbed) runAnalysis();
+})();
+</script>
+</body>
+</html>
