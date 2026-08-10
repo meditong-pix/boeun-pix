@@ -1,0 +1,122 @@
+﻿================================================================================
+PATTERN: openPxSurveyAiModal
+--- Match #1 at offset 578120 ---
+BEFORE:
+gray-50 transition-all whitespace-nowrap"},/*#__PURE__*/React.createElement(Icon,{name:"RotateCcw",size:13}),"초기화"),/*#__PURE__*/React.createElement("button",{type:"button",onClick:()=>{typeof window.
+MATCH:
+openPxSurveyAiModal
+AFTER:
+==="function"?window.openPxSurveyAiModal(pxSurveyRoundLabel):window.openPixAiSummaryPage&&window.openPixAiSummaryPage("survey",{period:pxSurveyRoundLabel,ward:"전체",department:"전체"})},className:"inline
+
+--- Match #2 at offset 578160 ---
+BEFORE:
+"},/*#__PURE__*/React.createElement(Icon,{name:"RotateCcw",size:13}),"초기화"),/*#__PURE__*/React.createElement("button",{type:"button",onClick:()=>{typeof window.openPxSurveyAiModal==="function"?window.
+MATCH:
+openPxSurveyAiModal
+AFTER:
+(pxSurveyRoundLabel):window.openPixAiSummaryPage&&window.openPixAiSummaryPage("survey",{period:pxSurveyRoundLabel,ward:"전체",department:"전체"})},className:"inline-flex items-center gap-1.5 px-3 py-2 rou
+
+================================================================================
+PATTERN: AI 상세분석
+  (no matches)
+================================================================================
+PATTERN: AI 분석하기
+--- Match #1 at offset 12824 ---
+BEFORE:
+t">
+          <option>6월</option>
+        </select>
+      </div>
+      <button type="button" class="voc-filter-action" onclick="typeof window.openVocAiModal==='function'&&window.openVocAiModal()">
+MATCH:
+AI 분석하기
+AFTER:
+</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-title">전체 VOC 현황</p>
+    <p class="panel-sub">접수 규모, 칭찬/불편 흐름, 응답자 구성을 한 화면에서 확인합니다.</p>
+    <p class="panel-sub2" id="v
+
+--- Match #2 at offset 578577 ---
+BEFORE:
+ounded-lg text-sm font-black border transition-all whitespace-nowrap border-violet-600 bg-violet-600 text-white hover:bg-violet-700"},/*#__PURE__*/React.createElement(Icon,{name:"Sparkles",size:13}),"
+MATCH:
+AI 분석하기
+AFTER:
+"))),/*#__PURE__*/React.createElement("p",{className:"text-[12px] text-gray-400 font-bold mt-3"},pxSurveyRoundLabel,pxPeriodType==="round"?" · 차수 누적 조회":""," · 비교 기준: ",pxCompareLabel," (",pxPrevPerio
+
+================================================================================
+PATTERN: AI 요약하기
+  (no matches)
+================================================================================
+PATTERN: voc-filter-action
+--- Match #1 at offset 9123 ---
+BEFORE:
+font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .voc-filter-chip.active {
+    border-color: #7c6cff;
+    background: #f3f0ff;
+    color: #5b46ff;
+  }
+  .
+MATCH:
+voc-filter-action
+AFTER:
+ {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background: lin
+
+--- Match #2 at offset 12728 ---
+BEFORE:
+l" id="vocBucketLabel">월 선택</span>
+        <select class="voc-filter-select" id="vocBucketSelect">
+          <option>6월</option>
+        </select>
+      </div>
+      <button type="button" class="
+MATCH:
+voc-filter-action
+AFTER:
+" onclick="typeof window.openVocAiModal==='function'&&window.openVocAiModal()">AI 분석하기</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-title">전체 VOC 현황</p>
+    <p class="
+
+--- Match #3 at offset 177288 ---
+BEFORE:
+nVocAiModal = function () {
+          setOpen(true);
+        };
+        function onClick(e) {
+          var t = e.target;
+          if (!t || !t.closest) return;
+          var btn = t.closest(".
+MATCH:
+voc-filter-action
+AFTER:
+");
+          if (!btn) return;
+          e.preventDefault();
+          setOpen(true);
+        }
+        document.addEventListener("click", onClick, true);
+        return function () {
+        
+

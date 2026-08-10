@@ -1,0 +1,99 @@
+================================================================================
+PATTERN: openPxSurveyAiModal
+--- Match #1 at offset 578120 ---
+BEFORE (200 chars):
+gray-50 transition-all whitespace-nowrap"},/*#__PURE__*/React.createElement(Icon,{name:"RotateCcw",size:13}),"초기화"),/*#__PURE__*/React.createElement("button",{type:"button",onClick:()=>{typeof window.
+MATCH:
+openPxSurveyAiModal
+AFTER (200 chars):
+==="function"?window.openPxSurveyAiModal(pxSurveyRoundLabel):window.openPixAiSummaryPage&&window.openPixAiSummaryPage("survey",{period:pxSurveyRoundLabel,ward:"전체",department:"전체"})},className:"inline
+
+--- Match #2 at offset 578160 ---
+BEFORE (200 chars):
+"},/*#__PURE__*/React.createElement(Icon,{name:"RotateCcw",size:13}),"초기화"),/*#__PURE__*/React.createElement("button",{type:"button",onClick:()=>{typeof window.openPxSurveyAiModal==="function"?window.
+MATCH:
+openPxSurveyAiModal
+AFTER (200 chars):
+(pxSurveyRoundLabel):window.openPixAiSummaryPage&&window.openPixAiSummaryPage("survey",{period:pxSurveyRoundLabel,ward:"전체",department:"전체"})},className:"inline-flex items-center gap-1.5 px-3 py-2 rou
+
+================================================================================
+PATTERN: AI 상 세 분 석
+(no matches)
+
+================================================================================
+PATTERN: AI 분 석 하 기
+(no matches)
+
+================================================================================
+PATTERN: AI 요 약 하 기
+(no matches)
+
+================================================================================
+PATTERN: voc-filter-action
+--- Match #1 at offset 9123 ---
+BEFORE (200 chars):
+font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .voc-filter-chip.active {
+    border-color: #7c6cff;
+    background: #f3f0ff;
+    color: #5b46ff;
+  }
+  .
+MATCH:
+voc-filter-action
+AFTER (200 chars):
+ {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background: lin
+
+--- Match #2 at offset 12728 ---
+BEFORE (200 chars):
+l" id="vocBucketLabel">월 선택</span>
+        <select class="voc-filter-select" id="vocBucketSelect">
+          <option>6월</option>
+        </select>
+      </div>
+      <button type="button" class="
+MATCH:
+voc-filter-action
+AFTER (200 chars):
+" onclick="typeof window.openVocAiModal==='function'&&window.openVocAiModal()">AI 분석하기</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-title">전체 VOC 현황</p>
+    <p class="
+
+--- Match #3 at offset 177288 ---
+BEFORE (200 chars):
+nVocAiModal = function () {
+          setOpen(true);
+        };
+        function onClick(e) {
+          var t = e.target;
+          if (!t || !t.closest) return;
+          var btn = t.closest(".
+MATCH:
+voc-filter-action
+AFTER (200 chars):
+");
+          if (!btn) return;
+          e.preventDefault();
+          setOpen(true);
+        }
+        document.addEventListener("click", onClick, true);
+        return function () {
+        
+

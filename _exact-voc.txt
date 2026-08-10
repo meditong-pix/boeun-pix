@@ -1,0 +1,19 @@
+  .voc-filter-action {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6d5dfc, #5b46ff);
+    color: #fff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(91, 70, 255, 0.22);
+  }
+---
+<button type="button" class="voc-filter-action" onclick="typeof window.openVocAiModal==='function'&&window.openVocAiModal()">AI 분석하기</button>

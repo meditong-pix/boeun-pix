@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 분석하기 — 전 영역 현황판</title>
+<style>
+  @font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://cdn.jsdelivr.net/gh/webfontworld/NanumSquareRound/NanumSquareRoundEB.woff2') format('woff2');
+    font-weight: 800; font-display: swap;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #0D1117;
+    --bg-grad: radial-gradient(1200px 600px at 10% -10%, rgba(42,162,211,0.09), transparent 60%),
+                radial-gradient(900px 500px at 100% 0%, rgba(242,169,59,0.05), transparent 55%);
+    --surface: #151B23; --surface-2: #1B222C;
+    --border: #262F3A; --border-strong: #37424F;
+    --text-1: #E9EDF2; --text-2: #9AA6B4; --text-3: #66707D;
+    --accent: #2AA2D3; --accent-soft: rgba(42,162,211,0.14);
+    --positive: #4E93F7; --negative: #E5586A; --warning: #F2A93B; --teal: #2CA089;
+    --warning-soft: rgba(242,169,59,0.12);
+    --radius: 14px; --radius-sm: 9px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background: var(--bg-grad), var(--bg); color: var(--text-1);
+    font-family: 'Noto Sans KR', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; height:100%; }
+  body.embed{ overflow:auto; }
+  .wrap{ max-width: 1140px; margin: 0 auto; padding: 32px 26px 80px; }
+  body.embed .wrap{ padding-top: 18px; padding-bottom: 48px; }
+  .embed-bar{ display:none; position:sticky; top:0; z-index:40; background:rgba(13,17,23,.92); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border); padding:10px 18px; align-items:center; justify-content:space-between; gap:12px; }
+  body.embed .embed-bar{ display:flex; }
+  .embed-bar .eb-title{ font-size:13px; font-weight:800; color:#fff; }
+  .embed-bar .eb-sub{ font-size:11px; color:var(--text-3); margin-top:2px; }
+  .embed-close{ border:1px solid var(--border-strong); background:var(--surface); color:var(--text-1);
+    border-radius:8px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .embed-close:hover{ background:var(--surface-2); }
+
+  .sample-banner{ display:flex; align-items:center; gap:10px; background: var(--warning-soft);
+    border: 1px solid rgba(242,169,59,0.35); color: var(--warning); font-size: 12px; font-weight:600;
+    padding: 8px 15px; border-radius: var(--radius-sm); margin-bottom: 20px; }
+  .sample-banner .dot{ width:6px; height:6px; border-radius:50%; background: var(--warning); box-shadow: 0 0 0 4px rgba(242,169,59,0.18); }
+
+  header{ margin-bottom: 18px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  header .head-copy{ min-width:0; flex:1; }
+  body.embed header #ctaReportBtnTop{ display:none; }
+  .eyebrow{ font-size: 11.5px; font-weight:700; letter-spacing: 1.6px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  h1{ font-family: 'NanumSquareRound','Noto Sans KR', sans-serif; font-weight: 800; font-size: 24px; margin: 0 0 6px; color: #fff; }
+  .sub{ color: var(--text-2); font-size: 13px; line-height: 1.6; max-width: 780px; }
+
+  .control-bar{ display:flex; flex-wrap: wrap; gap: 20px; align-items:center; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin: 16px 0 22px; }
+  .control-group{ display:flex; align-items:center; gap:10px; }
+  .control-label{ font-size: 11.5px; color: var(--text-3); font-weight:700; }
+  .seg{ display:flex; gap:3px; background: var(--surface-2); border-radius: 100px; padding: 3px; }
+  .seg-btn{ padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight:700; color: var(--text-2); cursor:pointer; }
+  .seg-btn.active{ background: var(--accent); color:#fff; }
+  .run-btn{ margin-left: auto; background: linear-gradient(135deg, var(--accent), #1D7FA8); color:#fff; border:none;
+    padding: 10px 20px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight:700; cursor:pointer; }
+
+  .summary-panel{ background: linear-gradient(180deg, rgba(42,162,211,0.08), rgba(42,162,211,0.01));
+    border: 1px solid rgba(42,162,211,0.3); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 24px; }
+  .summary-title{ font-size: 14px; font-weight:800; color:#fff; margin-bottom: 12px; }
+  .stat-row{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card{ background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .stat-card .k{ font-size: 10px; color: var(--text-3); margin-bottom: 3px; }
+  .stat-card .v{ font-size: 16px; font-weight:800; color: #fff; }
+  .stat-card .v.neg{ color: var(--negative); }
+  .stat-card .v.warn{ color: var(--warning); }
+  .stat-card .v.teal{ color: var(--teal); }
+  .summary-text{ font-size: 12.5px; color: var(--text-1); line-height: 1.75; }
+
+  /* ---- 메타데이터 바 (실행 정보) ---- */
+  .meta-bar{ display:flex; flex-wrap:wrap; gap: 16px; align-items:center; font-size: 11px; color: var(--text-3);
+    padding: 8px 2px 0; }
+  .meta-bar .m-item{ display:flex; align-items:center; gap:5px; }
+  .meta-bar .m-item b{ color: var(--text-2); font-weight:600; }
+  .meta-bar .live-dot{ width:6px; height:6px; border-radius:50%; background:#3DDC84; box-shadow:0 0 0 3px rgba(61,220,132,0.18); }
+
+  /* ---- 긴급 알림 배너 ---- */
+  .alert-banner{ background: rgba(229,88,106,0.08); border: 1px solid rgba(229,88,106,0.4);
+    border-radius: var(--radius); padding: 14px 18px; margin: 18px 0 22px; display:flex; gap:12px; align-items:flex-start; }
+  .alert-banner .a-ico{ font-size: 18px; flex-shrink:0; line-height:1.3; }
+  .alert-banner .a-title{ font-size: 12.5px; font-weight:800; color: var(--negative); margin-bottom: 5px; }
+  .alert-banner .a-list{ display:flex; flex-direction:column; gap: 4px; }
+  .alert-banner .a-row{ font-size: 12px; color: var(--text-1); }
+  .alert-banner .a-row b{ color:#fff; }
+  .alert-banner .a-row .a-score{ color: var(--negative); font-weight:800; }
+
+  /* ---- 우선순위 점수 / 신뢰도 ---- */
+  .score-tag{ display:inline-flex; align-items:baseline; gap:4px; }
+  .score-tag .num{ font-size: 20px; font-weight:800; }
+  .score-tag .unit{ font-size: 10px; color: var(--text-3); }
+  .confidence{ font-size: 10.3px; color: var(--text-3); display:flex; align-items:center; gap:5px; margin-top:6px; }
+  .confidence .cbar{ width:44px; height:5px; border-radius:3px; background: var(--surface-2); overflow:hidden; position:relative; }
+  .confidence .cbar i{ position:absolute; left:0; top:0; bottom:0; border-radius:3px; }
+
+  .section-label{ font-size: 12.5px; font-weight:800; color: var(--text-2); text-transform:uppercase;
+    letter-spacing: 0.8px; margin: 26px 0 6px; display:flex; align-items:center; gap:10px; }
+  .section-label::after{ content:""; flex:1; height:1px; background: var(--border); }
+  .section-hint{ font-size: 12px; color: var(--text-3); margin-bottom: 16px; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap: 10px 18px; margin-bottom: 18px; }
+  .legend-item{ display:flex; align-items:center; gap:6px; font-size: 11.5px; color: var(--text-2); }
+  .legend-dot{ width:9px; height:9px; border-radius:50%; }
+
+  .domain-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .domain-card{ background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px 18px; position: relative; overflow:hidden; }
+  .domain-card::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; }
+  .domain-card.status-priority::before{ background: var(--negative); }
+  .domain-card.status-watch::before{ background: var(--warning); }
+  .domain-card.status-good::before{ background: var(--positive); }
+  .domain-card.status-strength::before{ background: var(--teal); }
+  .domain-card.status-outcome::before{ background: var(--border-strong); }
+
+  .dc-head{ display:flex; justify-content:space-between; align-items:flex-start; gap: 10px; margin-bottom: 10px; }
+  .dc-name{ font-size: 15px; font-weight:800; color:#fff; }
+  .dc-score{ font-size: 12px; color: var(--text-2); margin-top:2px; }
+  .dc-score b{ color: #fff; font-size: 15px; }
+  .status-badge{ font-size: 10.5px; font-weight:800; padding: 4px 11px; border-radius: 100px; white-space:nowrap; }
+  .status-badge.priority{ background: rgba(229,88,106,0.15); color: var(--negative); }
+  .status-badge.watch{ background: rgba(242,169,59,0.15); color: var(--warning); }
+  .status-badge.good{ background: rgba(78,147,247,0.15); color: var(--positive); }
+  .status-badge.strength{ background: rgba(44,160,137,0.15); color: var(--teal); }
+  .status-badge.outcome{ background: rgba(102,112,125,0.2); color: var(--text-2); }
+
+  .dc-chart{ background: var(--surface-2); border-radius: 8px; padding: 8px 10px 4px; margin-bottom: 10px; }
+  .dc-narration{ font-size: 12.3px; color: var(--text-1); line-height: 1.65; }
+  .dc-narration b{ color: #fff; }
+
+  /* ---- 인사이트 카드 ---- */
+  .insight-grid{ display:grid; grid-template-columns: 1fr; gap: 12px; }
+  .insight-card{ background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 15px 18px; }
+  .insight-card.priority{ border-left-color: var(--negative); }
+  .insight-card.watch{ border-left-color: var(--warning); }
+  .insight-card.good{ border-left-color: var(--positive); }
+  .ic-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom: 10px; }
+  .ic-title{ display:flex; align-items:center; gap:9px; }
+  .ic-name{ font-size: 14.5px; font-weight:800; color:#fff; }
+  .ic-num{ width:22px; height:22px; border-radius:50%; background: var(--surface-2); border:1px solid var(--border-strong);
+    display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight:800; color: var(--text-2); flex-shrink:0; }
+  .ic-right{ display:flex; align-items:center; gap:12px; }
+  .ic-body{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 10px; }
+  .ic-col-label{ font-size: 10.5px; font-weight:800; color: var(--text-3); text-transform:uppercase; letter-spacing:.5px; margin-bottom: 5px; }
+  .ic-col-text{ font-size: 12.3px; color: var(--text-1); line-height: 1.6; }
+  .ic-col-text b{ color:#fff; }
+  .ic-foot{ display:flex; flex-wrap:wrap; gap: 8px; padding-top: 10px; border-top: 1px dashed var(--border); }
+  .ic-chip{ background: var(--surface-2); border-radius: 100px; padding: 5px 12px; font-size: 11px; color: var(--text-2); }
+  .ic-chip b{ color: var(--text-1); }
+  .ic-chip.hl b{ color: var(--negative); }
+
+  .cta-btn{ background: var(--accent); color:#fff; border:none; padding: 10px 18px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight:800; cursor:pointer; white-space:nowrap; font-family:inherit; flex-shrink:0; }
+  .cta-btn:hover{ filter:brightness(1.08); }
+  .embed-bar .eb-actions{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+  footer{ margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-3); line-height: 1.7; }
+
+  @media (max-width: 780px){
+    .domain-grid{ grid-template-columns: 1fr; }
+    .stat-row{ grid-template-columns: repeat(2,1fr); }
+    .ic-body{ grid-template-columns: 1fr; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="embed-bar">
+  <div>
+    <div class="eb-title">AI 분석하기</div>
+    <div class="eb-sub" id="embedDomainSub">전 영역 현황판</div>
+  </div>
+  <div class="eb-actions">
+    <button type="button" class="cta-btn" id="ctaReportBtn">보고서 작성하기 →</button>
+    <button type="button" class="embed-close" id="embedCloseBtn">닫기</button>
+  </div>
+</div>
+<div class="wrap">
+
+  <div class="sample-banner"><span class="dot"></span> 예시 데이터입니다 · 실제 병원 정보 아님 (PIX 화면설계용 목업)</div>
+
+  <header>
+    <div class="head-copy">
+      <div class="eyebrow">PX / VOC 공통 · AI 분석 엔진</div>
+      <h1>AI 분석하기</h1>
+      <p class="sub">보고서는 경영진 결정에 필요한 상위 항목만 추려 정리한 요약본입니다. 이 화면은 <b style="color:#fff">전체 영역을 빠짐없이</b> 보여줘서, 통계 원자료를 따로 열어보지 않아도 현황을 전부 파악할 수 있게 만들었습니다.</p>
+    </div>
+    <button type="button" class="cta-btn" id="ctaReportBtnTop">보고서 작성하기 →</button>
+  </header>
+
+  <div class="meta-bar" id="metaBar"></div>
+
+  <div class="alert-banner" id="alertBanner"></div>
+
+  <div class="summary-panel">
+    <div class="summary-title">📊 전체 요약</div>
+    <div class="stat-row" id="statRow"></div>
+    <div class="summary-text" id="summaryText"></div>
+  </div>
+
+  <div class="section-label">영역별 전체 현황</div>
+  <div class="section-hint" id="sectionHint"></div>
+  <div class="legend" id="legend"></div>
+
+  <div class="domain-grid" id="domainGrid"></div>
+
+  <div class="section-label">핵심 인사이트 및 개선 제안</div>
+  <div class="section-hint">우선순위 점수(0~100) 높은 순으로 자동 정렬했습니다. 점수가 높을수록 지금 착수했을 때 효과가 큽니다. 이 카드가 보고서 실행계획·종합결론의 기반이 됩니다.</div>
+  <div class="insight-grid" id="insightGrid"></div>
+
+  <footer>
+    ※ 이 화면은 PIX 'AI 분석하기' 기능의 설계 예시이며, 표시된 병원명·수치는 모두 가상입니다.<br>
+    이 화면은 참고용이며 별도의 수정 기능은 제공하지 않습니다. 각 카드의 해설 문구는 통계 결과를 AI가 자동으로 문장화한 것이며, 보고서에는 이 중 상태가 "최우선 개선"·"주의 관찰"·"우수 개선"인 영역만 선별되어 반영됩니다.
+  </footer>
+
+</div>
+
+<script>
+function svgProgress(value, target, max, targetLabel="목표", w=280, h=42){
+  const pct = Math.min(100, value/max*100), tgtPct = Math.min(100, target/max*100);
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">
+    <rect x="0" y="16" width="${w}" height="12" rx="6" fill="#0D1117"/>
+    <rect x="0" y="16" width="${w*pct/100}" height="12" rx="6" fill="#2AA2D3"/>
+    <line x1="${w*tgtPct/100}" y1="7" x2="${w*tgtPct/100}" y2="33" stroke="#F2A93B" stroke-width="2"/>
+    <text x="${Math.min(w-22,Math.max(22,w*tgtPct/100))}" y="6" font-size="8.5" fill="#F2A93B" text-anchor="middle" font-weight="700">${targetLabel} ${target}</text>
+    <text x="4" y="38" font-size="9" fill="#E9EDF2" font-weight="700">${value}</text>
+    <text x="${w-4}" y="38" font-size="8.5" fill="#66707D" text-anchor="end">${max}</text>
+  </svg>`;
+}
+function svgTrend(v1, v2, w=280, h=42){
+  const min=Math.min(v1,v2)-1, max=Math.max(v1,v2)+1;
+  const y1=h-14-((v1-min)/((max-min)||1))*(h-24);
+  const y2=h-14-((v2-min)/((max-min)||1))*(h-24);
+  const delta = (v2-v1).toFixed(2);
+  const dcolor = v2>=v1 ? "#4E93F7" : "#E5586A";
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">
+    <line x1="30" y1="${y1}" x2="${w-70}" y2="${y2}" stroke="${dcolor}" stroke-width="3"/>
+    <circle cx="30" cy="${y1}" r="3.5" fill="${dcolor}"/>
+    <circle cx="${w-70}" cy="${y2}" r="5" fill="${dcolor}"/>
+    <text x="30" y="${h-2}" font-size="8.5" fill="#66707D" text-anchor="middle">이전</text>
+    <text x="${w-70}" y="${h-2}" font-size="8.5" fill="#66707D" text-anchor="middle">현재</text>
+    <text x="${w-4}" y="${(y1+y2)/2+4}" font-size="11" fill="${dcolor}" font-weight="800" text-anchor="end">${delta>0?'+':''}${delta}</text>
+  </svg>`;
+}
+
+const STATUS_META = {
+  priority: {label:"최우선 개선", cls:"priority"},
+  watch: {label:"주의 관찰", cls:"watch"},
+  good: {label:"양호", cls:"good"},
+  strength: {label:"강점 유지", cls:"strength"},
+  outcome: {label:"결과지표(참고)", cls:"outcome"},
+};
+
+const DATA = {
+  px: {
+    meta: { asof:"2026-07-31 (5차)", sample:"응답 348명 / 전국 130,306명", elapsed:"3.8초", updated:"오늘 09:14" },
+    alert: [
+      { area:"정서적 지지", msg:"1등급까지 갭 최대(−12.84) + 등급 영향력 1위 — 개선 착수 지연 시 6차 목표 달성 확률 급락", score:94 },
+      { area:"간호사 영역", msg:"유일하게 하락(−0.37) — 3등급 평균 미달, 원인 미확인 상태 지속 중", score:62 },
+    ],
+    hint: "7개 평가영역 전부를 보여줍니다. 보고서에는 이 중 일부만 실리지만, 여기서는 왜 나머지도 지금 상태로 괜찮은지까지 확인할 수 있습니다.",
+    targetLabel: "1등급",
+    stats: [
+      {k:"종합점수", v:"82.64점"}, {k:"목표까지", v:"+7.36점", cls:"warn"},
+      {k:"최우선 개선", v:"2개 영역", cls:"neg"}, {k:"주의 관찰", v:"1개 영역", cls:"warn"}, {k:"우수 개선", v:"2개 영역", cls:"teal"},
+    ],
+    summaryHTML: `7개 영역 중 <b>정서적 지지·투약및치료과정</b> 2곳이 시급하고, <b>간호사 영역</b>은 유일하게 하락해 원인 확인이 필요합니다. 반대로 <b>환자권리보장·의사 영역</b>은 크게 개선됐고, <b>환자안전과병원환경</b>은 이미 1등급에 가장 가깝습니다. <b>전반적 평가</b>는 다른 영역이 좋아지면 따라 오르는 결과지표라 별도 조치가 필요 없습니다.`,
+    priorityCount: 2,
+    domains: [
+      { name:"정서적 지지", status:"priority", score:"76.38점", chartType:"progress", chart:[76.38,89.22,100],
+        text:`7개 영역 중 <b>가장 낮은 점수</b>이고, 1등급 병원과 점수차도 <b>가장 큽니다(−12.84점)</b>. 등급을 가장 크게 좌우하는 영역이라 지금 손대면 효과가 가장 큽니다.` },
+      { name:"투약 및 치료과정", status:"priority", score:"81.57점", chartType:"progress", chart:[81.57,91.92,100],
+        text:`1등급까지 <b>10점 이상</b> 남았고, 등급을 가르는 힘도 상위권입니다. 정서적 지지 다음으로 신경 써야 할 영역입니다.` },
+      { name:"간호사 영역", status:"watch", score:"83.57점", chartType:"trend", chart:[83.94,83.57],
+        text:`점수 자체는 나쁘지 않지만, <b>지난 차수 대비 유일하게 떨어진</b> 영역입니다(−0.37점). 다른 6개는 다 좋아졌는데 왜 여기만 내려갔는지 확인이 필요합니다.` },
+      { name:"의사 영역", status:"good", score:"83.82점", chartType:"trend", chart:[79.02,83.82],
+        text:`지난 차수 대비 <b>+4.80점</b> 올랐습니다. 7개 영역 중 두 번째로 크게 개선돼, 이 기간 무엇을 잘했는지 살펴볼 가치가 있습니다.` },
+      { name:"환자권리보장", status:"good", score:"82.32점", chartType:"trend", chart:[76.67,82.32],
+        text:`지난 차수 대비 <b>+5.65점</b>으로 전 영역 중 가장 크게 올랐습니다. 이 성공 요인을 다른 영역에도 적용할 수 있는지 검토해볼 만합니다.` },
+      { name:"환자 안전과 병원환경", status:"strength", score:"85.01점", chartType:"progress", chart:[85.01,94.08,100],
+        text:`1등급까지 갭이 7개 영역 중 <b>가장 작습니다</b>. 지금 수준만 유지해도 문제없고, 조금만 더 신경 쓰면 1등급 진입도 가능합니다.` },
+      { name:"전반적 평가", status:"outcome", score:"85.84점", chartType:"progress", chart:[85.84,94.32,100],
+        text:`가장 높은 점수지만, 이 영역은 <b>다른 6개 영역이 좋아지면 따라 오르는 결과지표</b>입니다. 직접 손대기보다 다른 영역 개선을 통해 자연스럽게 오르길 지켜보면 됩니다.` },
+    ],
+    insights: [
+      { name:"정서적 지지", status:"priority", num:1, score:94, conf:92, n:"n=348",
+        why:`등급별 점수 격차 <b>1위(21.59)</b>, 우리 병원 <b>최저점(76.38)</b>, 1등급까지 갭도 <b>최대(−12.84)</b> — 세 근거가 모두 이 영역을 가리킴`,
+        what:`<b>위로·공감 응대 표준화</b> 및 전 직원 교육 실시. 나쁜 소식 전달·수술 전후 불안 대응 매뉴얼 마련`,
+        chips:[["담당","진료부·간호부"],["기한","8/31"],["기대효과","+6.62점","hl"]] },
+      { name:"투약 및 치료과정", status:"priority", num:2, score:78, conf:88, n:"n=348",
+        why:`1등급까지 갭 <b>10.35점</b>, 등급 영향력 <b>3위</b> — 정서적 지지 다음으로 개선 효과가 큼`,
+        what:`투약·검사·처치 <b>이유 설명 스크립트 표준화</b>. 처치 전 확인 절차 정비`,
+        chips:[["담당","간호부·진료지원"],["기한","8/31"],["기대효과","+3.43점","hl"]] },
+      { name:"간호사 영역", status:"watch", num:3, score:62, conf:71, n:"n=348, 2개 차수 비교",
+        why:`4차→5차 <b>유일하게 하락(−0.37)</b>, 3등급 평균에도 못 미치는 유일한 영역 — 원인 불명`,
+        what:`<b>통합병동·일반병동 분리 진단</b>으로 편차 원인 규명 선행. 간호·간병 통합서비스 운영 방식 점검`,
+        chips:[["담당","QI팀·간호부"],["기한","8/25"],["목표","원인 규명"]] },
+      { name:"의사 영역", status:"good", num:4, score:71, conf:85, n:"n=348, 2개 차수 비교",
+        why:`4차→5차 <b>+4.80점</b> 개선 — 전체 평균 상승폭(2년 +3.61점)을 단일 차수 만에 상회`,
+        what:`이 기간 시행한 조치(회진 방식 변경 등)를 <b>문서화</b>하여, 정체된 영역에 적용 가능한지 검토`,
+        chips:[["담당","QI팀"],["유형","성공요인 확산"]] },
+      { name:"환자권리보장", status:"good", num:5, score:84, conf:85, n:"n=348, 2개 차수 비교",
+        why:`4차→5차 <b>+5.65점</b> — 전 영역 중 가장 크게 개선됨`,
+        what:`설명 프로세스 개선 등 실행 내역을 <b>문서화</b>하여, 정서적 지지·간호사 영역에도 적용 가능한지 검토`,
+        chips:[["담당","QI팀"],["유형","성공요인 확산"]] },
+    ],
+  },
+  voc: {
+    meta: { asof:"2026-06-30 (Q2)", sample:"접수 686건 / 응답률 91.2%", elapsed:"2.1초", updated:"오늘 09:14" },
+    alert: [
+      { area:"인적응대관련", msg:"빈도(189건)·불편비율(34%) 모두 전 카테고리 최고 — 대표 키워드 '불친절한 말투' 58건 집중", score:92 },
+      { area:"시스템/절차관련", msg:"전분기 대비 +10%p 급등 — 이상탐지 모듈 신뢰도 88, 원인 미상 상태", score:79 },
+    ],
+    hint: "7개 VOC 카테고리 전부를 보여줍니다. 보고서에는 일부만 실리지만, 여기서는 왜 나머지도 지금 상태로 괜찮은지까지 확인할 수 있습니다.",
+    targetLabel: "목표",
+    stats: [
+      {k:"불편비율", v:"23.8%"}, {k:"목표까지", v:"−8.8%p", cls:"warn"},
+      {k:"최우선 개선", v:"2개 카테고리", cls:"neg"}, {k:"주의 관찰", v:"1개 카테고리", cls:"warn"}, {k:"우수 개선", v:"1개 카테고리", cls:"teal"},
+    ],
+    summaryHTML: `7개 카테고리 중 <b>인적응대관련·비용관련</b> 2곳이 시급하고, <b>시스템/절차관련</b>은 이번 분기 급등해 원인 확인이 필요합니다. 반대로 <b>환경관련</b>은 크게 개선됐고, <b>서비스제공(호텔리티)관련</b>은 이미 목표선에 도달했습니다. <b>진료/치료·검사관련·기타문의</b>는 현재 수준을 유지하면 됩니다.`,
+    priorityCount: 2,
+    domains: [
+      { name:"인적응대관련", status:"priority", score:"불편비율 34%", chartType:"progress", chart:[34,15,45],
+        text:`불편비율이 전 카테고리 중 <b>가장 높고</b>, 접수 건수(189건)도 <b>가장 많습니다</b>. 가장 많은 환자가 가장 자주 겪는 불편이라 우선순위가 명확합니다.` },
+      { name:"비용관련", status:"priority", score:"불편비율 40%", chartType:"progress", chart:[40,15,45],
+        text:`건수는 45건으로 적지만 불편비율이 <b>전 카테고리 중 가장 높습니다(40%)</b>. 발생하면 열에 넷은 불만으로 이어진다는 뜻이라 사전 예방이 중요합니다.` },
+      { name:"시스템/절차관련", status:"watch", score:"불편비율 28%", chartType:"trend", chart:[18,28],
+        text:`목표(15%)를 크게 웃돌며, 특히 <b>지난 분기 대비 한 번에 +10%p</b> 뛰었습니다. 최근에 프로세스가 바뀐 게 있는지 확인이 필요합니다.` },
+      { name:"환경관련", status:"good", score:"불편비율 12%", chartType:"trend", chart:[20,12],
+        text:`지난 분기 대비 <b>−8%p</b>로 전 카테고리 중 가장 크게 좋아졌습니다. 여기서 무엇을 했는지 다른 카테고리에도 적용해볼 만합니다.` },
+      { name:"서비스제공(호텔리티)관련", status:"strength", score:"불편비율 15%", chartType:"progress", chart:[15,15,45],
+        text:`불편비율이 <b>목표선에 정확히 도달</b>했습니다. 지금 수준만 유지하면 되는 영역입니다.` },
+      { name:"진료/치료·검사관련", status:"good", score:"불편비율 18%", chartType:"progress", chart:[18,15,45],
+        text:`목표에 근접해 있습니다. 건수는 많은 편(142건)이지만 큰 문제는 아닙니다.` },
+      { name:"기타문의", status:"good", score:"불편비율 9%", chartType:"progress", chart:[9,15,45],
+        text:`불편비율이 <b>가장 낮고</b> 건수도 적습니다. 특별히 신경 쓸 필요는 없는 카테고리입니다.` },
+    ],
+    insights: [
+      { name:"인적응대관련", status:"priority", num:1, score:92, conf:95, n:"n=189건",
+        why:`접수 건수 <b>189건(최다)</b>, 불편비율 <b>34%(최고)</b> — 빈도·강도 모두 1위`,
+        what:`<b>응대매뉴얼 표준화</b> 및 전 직원 교육 실시. 대표 불편 키워드 '불친절한 말투'(58건) 집중 개선`,
+        chips:[["담당","간호부·진료부"],["기한","8/31"],["기대효과","−10%p","hl"]] },
+      { name:"비용관련", status:"priority", num:2, score:76, conf:73, n:"n=45건",
+        why:`건수는 45건으로 적지만 불편비율 <b>40%(최고)</b> — 발생 시 불만 전환율이 가장 높음`,
+        what:`수납 전 <b>비용 사전 안내 강화</b>. 예상치 못한 추가비용 발생 최소화`,
+        chips:[["담당","원무"],["기한","8/20"],["기대효과","−12%p","hl"]] },
+      { name:"시스템/절차관련", status:"watch", num:3, score:79, conf:88, n:"n=96건, 2개 분기 비교",
+        why:`전분기 대비 <b>+10%p 급등</b> — 시계열 이상탐지 유일 플래그`,
+        what:`<b>수납·예약 프로세스 재정비</b>. 최근 변경 사항이 있었는지 원인 규명 선행`,
+        chips:[["담당","원무·전산팀"],["기한","8/31"],["기대효과","−8%p","hl"]] },
+      { name:"환경관련", status:"good", num:4, score:69, conf:81, n:"n=74건, 2개 분기 비교",
+        why:`전분기 대비 <b>−8%p 개선</b> — 전 카테고리 중 가장 크게 좋아짐`,
+        what:`개선 조치 내역을 <b>문서화</b>하여 시스템/절차관련 등 다른 카테고리에도 적용 가능한지 검토`,
+        chips:[["담당","QI팀"],["유형","성공요인 확산"]] },
+    ],
+  },
+};
+
+function renderLegend(){
+  const legend = document.getElementById('legend');
+  legend.innerHTML = Object.entries(STATUS_META).map(([k,m])=>{
+    const colorVar = {priority:"var(--negative)",watch:"var(--warning)",good:"var(--positive)",strength:"var(--teal)",outcome:"var(--border-strong)"}[k];
+    return `<div class="legend-item"><span class="legend-dot" style="background:${colorVar}"></span>${m.label}</div>`;
+  }).join('');
+}
+
+function render(domain){
+  const d = DATA[domain];
+  document.getElementById('sectionHint').textContent = d.hint;
+
+  // 메타데이터 바
+  const metaBar = document.getElementById('metaBar');
+  metaBar.innerHTML = `
+    <div class="m-item"><span class="live-dot"></span><b>분석 완료</b></div>
+    <div class="m-item">기준일 <b>${d.meta.asof}</b></div>
+    <div class="m-item">표본 <b>${d.meta.sample}</b></div>
+    <div class="m-item">처리시간 <b>${d.meta.elapsed}</b></div>
+    <div class="m-item">갱신 <b>${d.meta.updated}</b></div>
+  `;
+
+  // 긴급 알림 배너
+  const alertBanner = document.getElementById('alertBanner');
+  alertBanner.innerHTML = `
+    <div class="a-ico">🔔</div>
+    <div style="flex:1">
+      <div class="a-title">지금 확인이 필요합니다</div>
+      <div class="a-list">
+        ${d.alert.map(a=>`<div class="a-row"><span class="a-score">[${a.score}점]</span> <b>${a.area}</b> — ${a.msg}</div>`).join('')}
+      </div>
+    </div>
+  `;
+
+  const statRow = document.getElementById('statRow');
+  statRow.innerHTML = d.stats.map(s=>`
+    <div class="stat-card"><div class="k">${s.k}</div><div class="v ${s.cls||''}">${s.v}</div></div>
+  `).join('');
+  document.getElementById('summaryText').innerHTML = d.summaryHTML;
+
+  const grid = document.getElementById('domainGrid');
+  grid.innerHTML = "";
+  d.domains.forEach(dm=>{
+    const meta = STATUS_META[dm.status];
+    const card = document.createElement('div');
+    card.className = `domain-card status-${meta.cls}`;
+    const chartSVG = dm.chartType==="progress" ? svgProgress(dm.chart[0], dm.chart[1], dm.chart[2], d.targetLabel) : svgTrend(...dm.chart);
+    card.innerHTML = `
+      <div class="dc-head">
+        <div>
+          <div class="dc-name">${dm.name}</div>
+          <div class="dc-score">현재 <b>${dm.score}</b></div>
+        </div>
+        <span class="status-badge ${meta.cls}">${meta.label}</span>
+      </div>
+      <div class="dc-chart">${chartSVG}</div>
+      <div class="dc-narration">${dm.text}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  const igrid = document.getElementById('insightGrid');
+  igrid.innerHTML = "";
+  const sortedInsights = [...(d.insights||[])].sort((a,b)=>b.score-a.score);
+  sortedInsights.forEach((ins,idx)=>{
+    const meta = STATUS_META[ins.status];
+    const scoreColorMap = { priority:"var(--negative)", watch:"var(--warning)", good:"var(--positive)" };
+    const scoreColor = scoreColorMap[ins.status] || "var(--text-1)";
+    const scoreLabelMap = { priority:"우선순위", watch:"이상 신뢰도", good:"기여도" };
+    const scoreLabel = scoreLabelMap[ins.status] || "점수";
+    const card = document.createElement('div');
+    card.className = `insight-card ${meta.cls}`;
+    card.innerHTML = `
+      <div class="ic-head">
+        <div class="ic-title"><span class="ic-num">${idx+1}</span><span class="ic-name">${ins.name}</span></div>
+        <div class="ic-right">
+          <div>
+            <div class="score-tag"><span class="num" style="color:${scoreColor}">${ins.score}</span><span class="unit">/100 ${scoreLabel}</span></div>
+            <div class="confidence"><span class="cbar"><i style="width:${ins.conf}%; background:${scoreColor}"></i></span>신뢰도 ${ins.conf}% · ${ins.n}</div>
+          </div>
+          <span class="status-badge ${meta.cls}">${meta.label}</span>
+        </div>
+      </div>
+      <div class="ic-body">
+        <div>
+          <div class="ic-col-label">분석 근거</div>
+          <div class="ic-col-text">${ins.why}</div>
+        </div>
+        <div>
+          <div class="ic-col-label">개선 과제</div>
+          <div class="ic-col-text">${ins.what}</div>
+        </div>
+      </div>
+      <div class="ic-foot">${ins.chips.map(c=>`<div class="ic-chip ${c[2]||''}">${c[0]} <b>${c[1]}</b></div>`).join('')}</div>
+    `;
+    igrid.appendChild(card);
+  });
+}
+
+(function boot(){
+  var params = new URLSearchParams(location.search || "");
+  var isEmbed = params.get("embed") === "1";
+  if (isEmbed) document.body.classList.add("embed");
+
+  function post(type, payload){
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage(Object.assign({ source:"pix-survey-ai-board", type:type }, payload||{}), "*");
+  }
+
+  var closeBtn = document.getElementById("embedCloseBtn");
+  if (closeBtn) closeBtn.addEventListener("click", function(){ post("close"); });
+  function openReport(){ post("open-report"); }
+  ["ctaReportBtn","ctaReportBtnTop"].forEach(function(id){
+    var btn = document.getElementById(id);
+    if (btn) btn.addEventListener("click", openReport);
+  });
+
+  var domain = params.get("domain") === "voc" ? "voc" : "px";
+  var sub = document.getElementById("embedDomainSub");
+  if (sub) sub.textContent = (domain === "voc" ? "VOC" : "환자경험평가") + " · 전 영역 현황판";
+  renderLegend();
+  render(domain);
+})();
+</script>
+</body>
+</html>

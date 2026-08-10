@@ -1,0 +1,26 @@
+﻿=== key==="analytics" idx=1449276 ===
+in")return/*#__PURE__*/React.createElement(SurveyPatientExperienceSection,{showToast:showToast});if(key==="analytics"){return/*#__PURE__*/React.createElement(AnalyticsSection,{showToast:showToast});}if(key==="boardNotice")return/*#__PURE__*/React.createElement(NoticeListPage,{showToast:showToast});if(key==="boardFaq")return/*#__PURE__*/React.createElement(FaqManagementMockPage,null);if(key==="vocInbox")return/*#__PURE__*/React.createElement(VocInboxPage,{showToast:showToast});if(key==="vocKeywor
+=== key==="vocPixStats" idx=1449761 ===
+ey==="vocKeywords")return/*#__PURE__*/React.createElement(VocKeywordsPage,{showToast:showToast});if(key==="vocPixStats")return/*#__PURE__*/React.createElement(VocPixStatisticsPage,{showToast:showToast});if(key==="vocAnalysis")return/*#__PURE__*/React.createElement(VocPixStatisticsPage,{showToast:showToast});if(key==="bannerManage")return/*#__PURE__*/React.createElement(BannerManagementMasterMockPage,null);if(key==="adminPatients"){return/*#__PURE__*/React.createElement(PatientInvitationsSection,
+=== AnalyticsSection idx=642784 ===
+ect}):function PxAiAnalysisPanelFallback(){return null;};
+const SurveyWithAi=typeof registerPxSurveyAnalyticsSection==="function"?registerPxSurveyAnalyticsSection({React,useState,useRef,useEffect,ReactDOM}):function PxSurveyPassThrough(p){return p.children;};
+const AnalyticsSection=({showToast})=>{
+  const[filters,setFilters]=useState({period:"7",viewBy:"all",ward:"",dept:"",category:""});
+  return/*#__PURE__*/React.createElement(SurveyWithAi,{showToast:showToast},
+    /*#__PURE__*/React.createE
+=== VocPixStatisticsPage idx=173369 ===
+bed-root animate-fadeIn",
+        style: { width: "100%" }
+      });
+    };
+  }
+
+  function registerVocPixStatisticsPage(deps) {
+    var React = deps.React;
+    var Base = createVocLightDomPage(deps, { title: "VOC \uD1B5\uACC4", templateKey: "statistics" });
+    var ShellComponent = null;
+    function getShell() {
+      if (!ShellComponent && typeof global.registerPixAiStatisticsShell === "function") {
+        ShellComponent = global.registerPixAiStatisticsShell(deps, {
+          variant: "voc",

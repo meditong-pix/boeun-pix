@@ -1,0 +1,10 @@
+const AnalyticsSection=({showToast})=>{
+  const[filters,setFilters]=useState({period:"7",viewBy:"all",ward:"",dept:"",category:""});
+  return/*#__PURE__*/React.createElement(SurveyWithAi,{showToast:showToast},
+    /*#__PURE__*/React.createElement("div",{"data-pix-survey-stats-root":"1",className:"flex flex-col h-full animate-fadeIn font-sans"},
+      /*#__PURE__*/React.createElement("div",{className:"flex-1 px-4 overflow-y-auto scrollbar-hide pb-10"},
+        /*#__PURE__*/React.createElement(PatientSurveyAnalysisTab,{filters:filters,showToast:showToast})
+      )
+    )
+  );
+};const NOTICE_WARDS=["51병동","52병동","53병동","61병동","ICU"];const pad2=n=>String(n).padStart(2,"0");const formatDate=iso=>{if(!iso)return"-";const d=new Date(iso);if(Number.isNaN(d.getTime()))return"-";return`${d.getFullYea
